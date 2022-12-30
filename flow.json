@@ -1,1 +1,81 @@
-[]
+[
+    {
+        "id": "68f1d2b77bbdcda6",
+        "type": "tab",
+        "label": "Blueprint",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "784d89e62dfb5070",
+        "type": "cloudantplus",
+        "host": "${DIGA_COUCHDB}",
+        "name": "diga-couchdb"
+    },
+    {
+        "id": "8af7dea70ebbeb09",
+        "type": "inject",
+        "z": "68f1d2b77bbdcda6",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 100,
+        "y": 80,
+        "wires": [
+            [
+                "767235234119b38c"
+            ]
+        ]
+    },
+    {
+        "id": "767235234119b38c",
+        "type": "cloudantplus in",
+        "z": "68f1d2b77bbdcda6",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "insect-configs",
+        "service": "_ext_",
+        "search": "_all_",
+        "design": "",
+        "index": "",
+        "x": 340,
+        "y": 80,
+        "wires": [
+            [
+                "1f84a5ae33f8c95b"
+            ]
+        ]
+    },
+    {
+        "id": "1f84a5ae33f8c95b",
+        "type": "debug",
+        "z": "68f1d2b77bbdcda6",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 580,
+        "y": 80,
+        "wires": []
+    }
+]
