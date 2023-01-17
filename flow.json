@@ -43,6 +43,33 @@
         ]
     },
     {
+        "id": "9f545334a4daa8d2",
+        "type": "inject",
+        "z": "68f1d2b77bbdcda6",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 100,
+        "y": 240,
+        "wires": [
+            []
+        ]
+    },
+    {
         "id": "767235234119b38c",
         "type": "cloudantplus in",
         "z": "68f1d2b77bbdcda6",
@@ -76,80 +103,6 @@
         "statusType": "auto",
         "x": 580,
         "y": 80,
-        "wires": []
-    },
-    {
-        "id": "789bf72416923f6e",
-        "type": "function",
-        "z": "68f1d2b77bbdcda6",
-        "name": "function 1",
-        "func": "msg.payload = new moment().format('YYYY-MM-DD');\n\nmsg.loda = _.chunk(['a', 'b', 'c', 'd'], 2);\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [
-            {
-                "var": "moment",
-                "module": "moment"
-            },
-            {
-                "var": "_",
-                "module": "lodash"
-            }
-        ],
-        "x": 300,
-        "y": 240,
-        "wires": [
-            [
-                "f5f7951b486e47d0"
-            ]
-        ]
-    },
-    {
-        "id": "9f545334a4daa8d2",
-        "type": "inject",
-        "z": "68f1d2b77bbdcda6",
-        "name": "",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 100,
-        "y": 240,
-        "wires": [
-            [
-                "789bf72416923f6e"
-            ]
-        ]
-    },
-    {
-        "id": "f5f7951b486e47d0",
-        "type": "debug",
-        "z": "68f1d2b77bbdcda6",
-        "name": "debug 2",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 480,
-        "y": 240,
         "wires": []
     }
 ]
