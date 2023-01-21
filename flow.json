@@ -275,7 +275,7 @@
         "type": "function",
         "z": "68f1d2b77bbdcda6",
         "name": "function 2",
-        "func": "let id = msg.req.params.id;\nmsg.result['navigation'] = msg.payload.find(x => x.value.applicationID === id).value;\nmsg.payload = msg.result;\nreturn msg;",
+        "func": "let id = msg.req.params.id;\nmsg.result['navigation'] = msg.payload.find(x => x.value.applicationID === id)?.value;\nmsg.payload = msg.result;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
