@@ -64,7 +64,7 @@
         "type": "function",
         "z": "68f1d2b77bbdcda6",
         "name": "check apps",
-        "func": "let id = msg.req.params.id;\nmsg.found = msg.payload.data.some(x => x.code === id);\nif(msg.found){\n    msg.payload = msg.payload.data.find(x => x.code === id);\n}else{\n    msg.payload = \"not found\";\n}\nreturn msg;",
+        "func": "let id = msg.req.params.id;\nmsg.found = msg.payload.data.some(x => x.code === id);\nif(msg.found){\n    msg.result = msg.payload.data.find(x => x.code === id);\n    msg.payload = {\n        key: id\n    }\n}else{\n    msg.payload = \"not found\";\n}\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -100,23 +100,12 @@
         "y": 180,
         "wires": [
             [
-                "c85ef54a9a96d6a5"
+                "23aca37ca7c75333"
             ],
             [
                 "5c0bb31de63a7815"
             ]
         ]
-    },
-    {
-        "id": "c85ef54a9a96d6a5",
-        "type": "http response",
-        "z": "68f1d2b77bbdcda6",
-        "name": "",
-        "statusCode": "200",
-        "headers": {},
-        "x": 740,
-        "y": 160,
-        "wires": []
     },
     {
         "id": "5c0bb31de63a7815",
@@ -125,8 +114,8 @@
         "name": "",
         "statusCode": "404",
         "headers": {},
-        "x": 740,
-        "y": 200,
+        "x": 800,
+        "y": 240,
         "wires": []
     },
     {
@@ -180,10 +169,10 @@
         "type": "http response",
         "z": "68f1d2b77bbdcda6",
         "name": "",
-        "statusCode": "404",
+        "statusCode": "400",
         "headers": {},
-        "x": 740,
-        "y": 240,
+        "x": 800,
+        "y": 280,
         "wires": []
     },
     {
@@ -206,10 +195,97 @@
         "to": "",
         "reg": false,
         "x": 560,
-        "y": 240,
+        "y": 280,
         "wires": [
             [
                 "a11a2132155a3611"
+            ]
+        ]
+    },
+    {
+        "id": "23aca37ca7c75333",
+        "type": "cloudantplus in",
+        "z": "68f1d2b77bbdcda6",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-configs",
+        "service": "_ext_",
+        "search": "_view_",
+        "design": "pages",
+        "index": "all-pages",
+        "x": 820,
+        "y": 60,
+        "wires": [
+            [
+                "30e7957e06e98573"
+            ]
+        ]
+    },
+    {
+        "id": "30e7957e06e98573",
+        "type": "function",
+        "z": "68f1d2b77bbdcda6",
+        "name": "function 1",
+        "func": "msg.result['pages'] = msg.payload.map(x => x.value);\nmsg.payload = {\n    key : msg.req.params.id\n};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 800,
+        "y": 100,
+        "wires": [
+            [
+                "8601b3ec70802672"
+            ]
+        ]
+    },
+    {
+        "id": "cd0e89b2981e6227",
+        "type": "http response",
+        "z": "68f1d2b77bbdcda6",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 980,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "8601b3ec70802672",
+        "type": "cloudantplus in",
+        "z": "68f1d2b77bbdcda6",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-configs",
+        "service": "_ext_",
+        "search": "_view_",
+        "design": "navigations",
+        "index": "all-navs",
+        "x": 820,
+        "y": 140,
+        "wires": [
+            [
+                "bec2818cfb56c788"
+            ]
+        ]
+    },
+    {
+        "id": "bec2818cfb56c788",
+        "type": "function",
+        "z": "68f1d2b77bbdcda6",
+        "name": "function 2",
+        "func": "let id = msg.req.params.id;\nmsg.result['navigation'] = msg.payload.find(x => x.value.applicationID === id).value;\nmsg.payload = msg.result;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 800,
+        "y": 180,
+        "wires": [
+            [
+                "cd0e89b2981e6227"
             ]
         ]
     }
