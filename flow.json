@@ -8,10 +8,36 @@
         "env": []
     },
     {
+        "id": "10a453599cf0bfe0",
+        "type": "tab",
+        "label": "Forms",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "35d2cc8d792ddb2a",
+        "type": "tab",
+        "label": "Migrations",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
         "id": "784d89e62dfb5070",
         "type": "cloudantplus",
         "host": "http://diga:password@localhost:5930",
         "name": "diga-couchdb"
+    },
+    {
+        "id": "9dc2644ec5b51cb2",
+        "type": "mysql2-server",
+        "host": "${DIGA_MYSQL_HOST}",
+        "port": "${DIGA_MYSQL_PORT}",
+        "username": "${DIGA_MYSQL_USER}",
+        "password": "password",
+        "db": "${DIGA_MYSQL_DBNAME}",
+        "servername": ""
     },
     {
         "id": "07090842a5b11d57",
@@ -286,6 +312,357 @@
         "wires": [
             [
                 "cd0e89b2981e6227"
+            ]
+        ]
+    },
+    {
+        "id": "cc2ca5ee337e0870",
+        "type": "http in",
+        "z": "10a453599cf0bfe0",
+        "name": "",
+        "url": "/api/forms/road-condition",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 170,
+        "y": 80,
+        "wires": [
+            [
+                "640e8c66f45f9c26",
+                "740317eedd570707"
+            ]
+        ]
+    },
+    {
+        "id": "740317eedd570707",
+        "type": "http response",
+        "z": "10a453599cf0bfe0",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 700,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "640e8c66f45f9c26",
+        "type": "debug",
+        "z": "10a453599cf0bfe0",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 460,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "cd4a900c35c26c87",
+        "type": "inject",
+        "z": "35d2cc8d792ddb2a",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 100,
+        "y": 80,
+        "wires": [
+            [
+                "24214884693edfa2"
+            ]
+        ]
+    },
+    {
+        "id": "24214884693edfa2",
+        "type": "function",
+        "z": "35d2cc8d792ddb2a",
+        "name": "set query",
+        "func": "msg.topic = `select * from digaportal.v_getsysroleuser2`;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 280,
+        "y": 80,
+        "wires": [
+            [
+                "40248a209f3fdb0c"
+            ]
+        ]
+    },
+    {
+        "id": "40248a209f3fdb0c",
+        "type": "mysql2",
+        "z": "35d2cc8d792ddb2a",
+        "name": "",
+        "server": "9dc2644ec5b51cb2",
+        "bind": "",
+        "topic": "",
+        "x": 280,
+        "y": 120,
+        "wires": [
+            [
+                "dd4fb4fce5680691"
+            ]
+        ]
+    },
+    {
+        "id": "f183a287ee95d591",
+        "type": "debug",
+        "z": "35d2cc8d792ddb2a",
+        "name": "debug 2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 980,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "dd4fb4fce5680691",
+        "type": "change",
+        "z": "35d2cc8d792ddb2a",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "users",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "smart-system-roles",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 300,
+        "y": 160,
+        "wires": [
+            [
+                "99dafc8417f56638"
+            ]
+        ]
+    },
+    {
+        "id": "99dafc8417f56638",
+        "type": "cloudantplus in",
+        "z": "35d2cc8d792ddb2a",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-configs",
+        "service": "_ext_",
+        "search": "_id_",
+        "design": "",
+        "index": "",
+        "x": 300,
+        "y": 200,
+        "wires": [
+            [
+                "4627187758966a77"
+            ]
+        ]
+    },
+    {
+        "id": "f5aa11d58f518d50",
+        "type": "function",
+        "z": "35d2cc8d792ddb2a",
+        "name": "mapping result",
+        "func": "msg.corpRoles = msg.payload.data;\nlet users = msg.users.map(x => {\n    return {\n        nik: x.NIK,\n        fullName: x.szFullName,\n        email: x.szEmailAddress,\n        occupation: msg.corpRoles.find(r => r.origin === x.szCorpRoleName)?.code || null,\n        roles: msg.sysRoles.filter(r => r.origin === x.szSysRoleName).map(r => r.code)\n    }\n});\nmsg.documents = {\n    docs: users\n};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 560,
+        "y": 160,
+        "wires": [
+            [
+                "8f9ff0f95018dd01"
+            ]
+        ]
+    },
+    {
+        "id": "4627187758966a77",
+        "type": "change",
+        "z": "35d2cc8d792ddb2a",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "sysRoles",
+                "pt": "msg",
+                "to": "payload.configs",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "smart-corp-roles",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 560,
+        "y": 80,
+        "wires": [
+            [
+                "4105d7495b07d60f"
+            ]
+        ]
+    },
+    {
+        "id": "4105d7495b07d60f",
+        "type": "cloudantplus in",
+        "z": "35d2cc8d792ddb2a",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-configs",
+        "service": "_ext_",
+        "search": "_id_",
+        "design": "",
+        "index": "",
+        "x": 560,
+        "y": 120,
+        "wires": [
+            [
+                "f5aa11d58f518d50"
+            ]
+        ]
+    },
+    {
+        "id": "36b892547277fd3e",
+        "type": "http request",
+        "z": "35d2cc8d792ddb2a",
+        "name": "",
+        "method": "POST",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "http://localhost:5930/smart-users/_bulk_docs",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "basic",
+        "senderr": false,
+        "headers": [],
+        "x": 790,
+        "y": 200,
+        "wires": [
+            [
+                "f183a287ee95d591"
+            ]
+        ]
+    },
+    {
+        "id": "8f9ff0f95018dd01",
+        "type": "http request",
+        "z": "35d2cc8d792ddb2a",
+        "name": "delete database",
+        "method": "DELETE",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "http://localhost:5930/smart-users",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "basic",
+        "senderr": false,
+        "headers": [],
+        "x": 800,
+        "y": 80,
+        "wires": [
+            [
+                "292e9cb262adf6cc"
+            ]
+        ]
+    },
+    {
+        "id": "292e9cb262adf6cc",
+        "type": "http request",
+        "z": "35d2cc8d792ddb2a",
+        "name": "create database",
+        "method": "PUT",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "http://localhost:5930/smart-users",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "basic",
+        "senderr": false,
+        "headers": [],
+        "x": 800,
+        "y": 120,
+        "wires": [
+            [
+                "b6ef183ef6f342f9"
+            ]
+        ]
+    },
+    {
+        "id": "b6ef183ef6f342f9",
+        "type": "change",
+        "z": "35d2cc8d792ddb2a",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "documents",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 800,
+        "y": 160,
+        "wires": [
+            [
+                "36b892547277fd3e"
             ]
         ]
     }
