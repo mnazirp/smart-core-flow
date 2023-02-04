@@ -372,7 +372,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 280,
+        "x": 300,
         "y": 80,
         "wires": [
             [
@@ -388,7 +388,7 @@
         "server": "9dc2644ec5b51cb2",
         "bind": "",
         "topic": "",
-        "x": 280,
+        "x": 300,
         "y": 120,
         "wires": [
             [
@@ -439,7 +439,7 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 300,
+        "x": 320,
         "y": 160,
         "wires": [
             [
@@ -458,7 +458,7 @@
         "search": "_id_",
         "design": "",
         "index": "",
-        "x": 300,
+        "x": 320,
         "y": 200,
         "wires": [
             [
@@ -646,7 +646,7 @@
         "prompt": "this process will overwriten smart-users data, are you sure ? yes / no",
         "property": "payload",
         "propertyType": "msg",
-        "x": 90,
+        "x": 110,
         "y": 80,
         "wires": [
             [
@@ -671,7 +671,7 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 90,
+        "x": 110,
         "y": 120,
         "wires": [
             [
