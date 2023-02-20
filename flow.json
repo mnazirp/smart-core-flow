@@ -24,6 +24,72 @@
         "env": []
     },
     {
+        "id": "77002254b872fa8e",
+        "type": "subflow",
+        "name": "jwt-sign",
+        "info": "## input:\r\non msg.sub assign an object like this:\r\n\r\n\r\n    {        \r\n        nik: '', \r\n        fullName: '',\r\n        email: '',\r\n        occupation: '',\r\n        roles: ['']\r\n    }\r\n\r\n\r\n\r\n## output:\r\ninside msg.sub:\r\n\r\n\r\n\r\n    {\r\n        token: 'eyJhbGciOiJIUzI1NiI...',\r\n        decoded: {}  \r\n    }\r\n\r\n// nrlint function-eslint:off\r\n",
+        "category": "",
+        "in": [
+            {
+                "x": 60,
+                "y": 80,
+                "wires": [
+                    {
+                        "id": "156f4bd7081013b2"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 340,
+                "y": 80,
+                "wires": [
+                    {
+                        "id": "156f4bd7081013b2",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [],
+        "meta": {},
+        "color": "#DDAA99"
+    },
+    {
+        "id": "32e9ed8660fb2fde",
+        "type": "subflow",
+        "name": "jwt-verify",
+        "info": "## input:\non msg.sub assign an a token string like this:\n\n\n    'eyJhbGciOiJIUzI1NiI...'\n\n\n## output:\ninside msg.sub:\n\n\n\n    {\n        token: 'eyJhbGciOiJIUzI1NiI...',\n        decoded: {},\n        error: {\n            message: 'jwt expired',\n            stack: '',\n            arguments: null,\n            name: 'TokenExpiredError',\n            expiredAt: '2023-02-19T07:49:01.000Z'\n        }  \n    }\n\n// nrlint function-eslint:off\n",
+        "category": "",
+        "in": [
+            {
+                "x": 60,
+                "y": 80,
+                "wires": [
+                    {
+                        "id": "98d349474a76dad2"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 340,
+                "y": 80,
+                "wires": [
+                    {
+                        "id": "98d349474a76dad2",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [],
+        "meta": {},
+        "color": "#DDAA99"
+    },
+    {
         "id": "784d89e62dfb5070",
         "type": "cloudantplus",
         "host": "http://diga:password@localhost:5930",
@@ -38,6 +104,50 @@
         "password": "password",
         "db": "${DIGA_MYSQL_DBNAME}",
         "servername": ""
+    },
+    {
+        "id": "156f4bd7081013b2",
+        "type": "function",
+        "z": "77002254b872fa8e",
+        "name": "jwt sign",
+        "func": "let secret = env.get('JWTSECRET');\nlet options = { expiresIn: '2 days' };\nlet token = jwt.sign(msg.sub, secret, options);\nlet decoded = jwt.verify(token, secret);\nmsg.sub = {\n    token: token,\n    decoded: decoded\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "jwt",
+                "module": "jsonwebtoken"
+            }
+        ],
+        "x": 200,
+        "y": 80,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "98d349474a76dad2",
+        "type": "function",
+        "z": "32e9ed8660fb2fde",
+        "name": "jwt verify",
+        "func": "let secret = env.get('JWTSECRET');\nlet error = null;\nlet decoded = null;\njwt.verify(msg.sub, secret, (err, dec) => {\n    if(err) error = err;\n    decoded = dec;\n});\nmsg.sub = {\n    token: msg.sub,\n    decoded: decoded,\n    error: error\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "jwt",
+                "module": "jsonwebtoken"
+            }
+        ],
+        "x": 200,
+        "y": 80,
+        "wires": [
+            []
+        ]
     },
     {
         "id": "07090842a5b11d57",
@@ -90,7 +200,7 @@
         "type": "function",
         "z": "68f1d2b77bbdcda6",
         "name": "check apps",
-        "func": "let id = msg.req.params.id;\nmsg.found = msg.payload.data.some(x => x.code === id);\nif(msg.found){\n    msg.result = msg.payload.data.find(x => x.code === id);\n    msg.payload = {\n        key: id\n    }\n}else{\n    msg.payload = \"not found\";\n}\nreturn msg;",
+        "func": "let id = msg.req.params.id;\nmsg.found = msg.payload.data.some(x => x.code === id);\nif(msg.found){\n    msg.result = msg.payload.data.find(x => x.code === id);\n    msg.payload = {\n        key: [\"schema\", \"page\"]\n    }\n}else{\n    msg.payload = \"not found\";\n}\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -234,11 +344,11 @@
         "z": "68f1d2b77bbdcda6",
         "name": "",
         "cloudant": "784d89e62dfb5070",
-        "database": "smart-configs",
+        "database": "smart-blueprint",
         "service": "_ext_",
         "search": "_view_",
-        "design": "pages",
-        "index": "all-pages",
+        "design": "type",
+        "index": "type-topic",
         "x": 820,
         "y": 60,
         "wires": [
@@ -283,7 +393,7 @@
         "z": "68f1d2b77bbdcda6",
         "name": "",
         "cloudant": "784d89e62dfb5070",
-        "database": "smart-configs",
+        "database": "smart-blueprint",
         "service": "_ext_",
         "search": "_view_",
         "design": "navigations",
@@ -312,6 +422,162 @@
         "wires": [
             [
                 "cd0e89b2981e6227"
+            ]
+        ]
+    },
+    {
+        "id": "9ae2b5c84660f97f",
+        "type": "inject",
+        "z": "68f1d2b77bbdcda6",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 100,
+        "y": 380,
+        "wires": [
+            [
+                "e55f4d0f605df90a"
+            ]
+        ]
+    },
+    {
+        "id": "54ae63fd2179cae5",
+        "type": "debug",
+        "z": "68f1d2b77bbdcda6",
+        "name": "debug 5",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 520,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "e55f4d0f605df90a",
+        "type": "function",
+        "z": "68f1d2b77bbdcda6",
+        "name": "prepare jwt payload",
+        "func": "msg.sub = {\n    nik: '09001040',\n    fullName: 'Ahmad Nuroffiq',\n    email: 'staff.rc.pmse@sinarmas-agri.com',\n    occupation: 'RCS',\n    roles: ['SFR']\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 310,
+        "y": 380,
+        "wires": [
+            [
+                "5a727d33d0fe446c"
+            ]
+        ]
+    },
+    {
+        "id": "5a727d33d0fe446c",
+        "type": "subflow:77002254b872fa8e",
+        "z": "68f1d2b77bbdcda6",
+        "name": "",
+        "x": 280,
+        "y": 420,
+        "wires": [
+            [
+                "54ae63fd2179cae5"
+            ]
+        ]
+    },
+    {
+        "id": "a77291f3c5c33cc0",
+        "type": "inject",
+        "z": "68f1d2b77bbdcda6",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 100,
+        "y": 520,
+        "wires": [
+            [
+                "1755b545d754801e"
+            ]
+        ]
+    },
+    {
+        "id": "993afa7afcd3c77b",
+        "type": "debug",
+        "z": "68f1d2b77bbdcda6",
+        "name": "debug 6",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 520,
+        "y": 560,
+        "wires": []
+    },
+    {
+        "id": "1755b545d754801e",
+        "type": "function",
+        "z": "68f1d2b77bbdcda6",
+        "name": "prepare jwt payload",
+        "func": "// msg.sub = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuaWsiOiIwOTAwMTA0MCIsImZ1bGxOYW1lIjoiQWhtYWQgTnVyb2ZmaXEiLCJlbWFpbCI6InN0YWZmLnJjLnBtc2VAc2luYXJtYXMtYWdyaS5jb20iLCJvY2N1cGF0aW9uIjoiUkNTIiwicm9sZXMiOlsiU0ZSIl0sImlhdCI6MTY3NjYyMDE0MSwiZXhwIjoxNjc2NzkyOTQxfQ.LycdE5eTfYbAecB5cJ2JW8EQShn5NPpvDGxvP1qPq_c`;\nmsg.sub = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuaWsiOiIwOTAwMTA0MCIsImZ1bGxOYW1lIjoiQWhtYWQgTnVyb2ZmaXEiLCJlbWFpbCI6InN0YWZmLnJjLnBtc2VAc2luYXJtYXMtYWdyaS5jb20iLCJvY2N1cGF0aW9uIjoiUkNTIiwicm9sZXMiOlsiU0ZSIl0sImlhdCI6MTY3Njg2MTYyMywiZXhwIjoxNjc3MDM0NDIzfQ.2qCafDVE3C6NiO5V1Gt_PeKN5LSfc_1j1c-SLlkuWgw`;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 310,
+        "y": 520,
+        "wires": [
+            [
+                "a175eeab9871e24a"
+            ]
+        ]
+    },
+    {
+        "id": "a175eeab9871e24a",
+        "type": "subflow:32e9ed8660fb2fde",
+        "z": "68f1d2b77bbdcda6",
+        "name": "",
+        "x": 280,
+        "y": 560,
+        "wires": [
+            [
+                "993afa7afcd3c77b"
             ]
         ]
     },
@@ -495,7 +761,7 @@
                 "t": "set",
                 "p": "sysRoles",
                 "pt": "msg",
-                "to": "payload.configs",
+                "to": "payload.data",
                 "tot": "msg"
             },
             {
@@ -676,6 +942,206 @@
         "wires": [
             [
                 "24214884693edfa2"
+            ]
+        ]
+    },
+    {
+        "id": "5b4debb4c819653b",
+        "type": "function",
+        "z": "35d2cc8d792ddb2a",
+        "name": "set query",
+        "func": "msg.topic = `\nselect\n\ttab.iOrgID,\n\tvalRef.szValueRef as cCategory,\n\ttab.szOrgName as ChildName,\n\ttab.szDescription as ChildDesc,\n\tparent.iOrgID as ParentID,\n\tparRef.szValueRef as pCategory,\n\tparent.szOrgName as ParentName,\n\tparent.szDescription as ParentDesc\nfrom\n\tdigaportal.oa_organization tab\nleft join digaportal.oa_organization parent on\n\ttab.szParentOrgID = parent.iOrgID\nleft join digaportal.gn_valueref valRef on\n\ttab.iOrgCatID = valRef.iValueRefID\nleft join digaportal.gn_valueref parRef on\n\tparent.iOrgCatID = parRef.iValueRefID\norder by\n\ttab.iOrgID\n`;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 300,
+        "y": 340,
+        "wires": [
+            [
+                "39b354d40ed8a1be"
+            ]
+        ]
+    },
+    {
+        "id": "39b354d40ed8a1be",
+        "type": "mysql2",
+        "z": "35d2cc8d792ddb2a",
+        "name": "",
+        "server": "9dc2644ec5b51cb2",
+        "bind": "",
+        "topic": "",
+        "x": 300,
+        "y": 380,
+        "wires": [
+            [
+                "99053d0de0ebc04b"
+            ]
+        ]
+    },
+    {
+        "id": "c6797d015f1c1a35",
+        "type": "debug",
+        "z": "35d2cc8d792ddb2a",
+        "name": "debug 3",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 520,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "99053d0de0ebc04b",
+        "type": "function",
+        "z": "35d2cc8d792ddb2a",
+        "name": "function 3",
+        "func": "let root = msg.payload.filter(x => x.ParentID === null);\nlet rs = [];\nroot.forEach(x => {\n    rs.push({\n        id: x.iOrgID,\n        name: x.ChildName.toUpperCase(),\n        desc: x.ChildDesc,\n        category: x.cCategory.toUpperCase(),\n        children: getHierarchy(msg.payload, x.iOrgID)\n    });\n});\nmsg.payload = rs;\nreturn msg;\n\nfunction getHierarchy(data, parentID, limit = 0) {\n    if (limit > 10) {\n        return;\n    }\n    let result = [];\n    for (let i = 0; i < data.length; i++) {\n        let item = data[i];\n        if (item.ParentID === parentID) {\n            result.push({\n                id: item.iOrgID,\n                name: item.ChildName.toUpperCase(),\n                desc: item.ChildDesc,\n                category: item.cCategory.toUpperCase(),\n                children: (data.some(x => x.ParentID === parentID)) ? getHierarchy(data, item.iOrgID, limit + 1) : null\n            })\n        }\n    }\n    return result;\n}",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 300,
+        "y": 420,
+        "wires": [
+            [
+                "c6797d015f1c1a35"
+            ]
+        ]
+    },
+    {
+        "id": "9a395cb0556025f3",
+        "type": "inject",
+        "z": "35d2cc8d792ddb2a",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 340,
+        "wires": [
+            [
+                "5b4debb4c819653b"
+            ]
+        ]
+    },
+    {
+        "id": "5074b4b5d2488f4c",
+        "type": "function",
+        "z": "35d2cc8d792ddb2a",
+        "name": "set query",
+        "func": "msg.topic = `\nselect\n\tszValueRef as label,\n\tszValueRefDescription as description,\n\tszCategory as category,\n\tszCategory2 as category2,\n\tszCategory3 as category3,\n\tszCategory4 as category4,\n\tszCategory5 as category5\nfrom\n\tgn_valueref gv\norder by\n\tszCategory,\n\tszCategory2,\n\tszCategory3,\n\tszCategory4,\n\tszCategory5\n`;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 300,
+        "y": 500,
+        "wires": [
+            [
+                "53b9204cb4d470b1"
+            ]
+        ]
+    },
+    {
+        "id": "53b9204cb4d470b1",
+        "type": "mysql2",
+        "z": "35d2cc8d792ddb2a",
+        "name": "",
+        "server": "9dc2644ec5b51cb2",
+        "bind": "",
+        "topic": "",
+        "x": 300,
+        "y": 540,
+        "wires": [
+            [
+                "a78e0a347e852e3d"
+            ]
+        ]
+    },
+    {
+        "id": "d616f6a00d4a5f6d",
+        "type": "debug",
+        "z": "35d2cc8d792ddb2a",
+        "name": "debug 4",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 520,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "a78e0a347e852e3d",
+        "type": "function",
+        "z": "35d2cc8d792ddb2a",
+        "name": "function 4",
+        "func": "\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 300,
+        "y": 580,
+        "wires": [
+            [
+                "d616f6a00d4a5f6d"
+            ]
+        ]
+    },
+    {
+        "id": "5270905cc4ac9962",
+        "type": "inject",
+        "z": "35d2cc8d792ddb2a",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 500,
+        "wires": [
+            [
+                "5074b4b5d2488f4c"
             ]
         ]
     }
