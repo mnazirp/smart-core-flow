@@ -101,7 +101,7 @@
         "id": "0f802e687dcc9e4a",
         "type": "subflow",
         "name": "hashing",
-        "info": "## Input\r\nset msg.sub with the password string that neet to be hashing\r\n\r\n    `MyPassword`\r\n\r\n## Output\r\nit will produce msg.sub a hasing string\r\n\r\n    ``\r\n\r\n    ",
+        "info": "## Input\r\nset msg.sub with the password string that neet to be hashing\r\n\r\n    `MyPassword`\r\n\r\n## Output\r\nit will produce msg.sub a hasing string\r\n\r\n    ``\n\n// nrlint function-eslint:off\n",
         "category": "",
         "in": [
             {
@@ -134,7 +134,7 @@
         "id": "c9c1579a9da27745",
         "type": "subflow",
         "name": "hashing compare",
-        "info": "## Input\r\nassign msg.sub with an object:\r\n\r\n    {\r\n        password: 'MyPassword',\r\n        hash: '$2b$10$...'\r\n    }\r\n\r\n## Output\r\nit will produce msg.sub with object:\r\n\r\n    {\r\n        isValid: true //or false\r\n    }\r\n\r\n    ",
+        "info": "## Input\r\nassign msg.sub with an object:\r\n\r\n    {\r\n        password: 'MyPassword',\r\n        hash: '$2b$10$...'\r\n    }\r\n\r\n## Output\r\nit will produce msg.sub with object:\r\n\r\n    {\r\n        isValid: true //or false\r\n    }\n\n// nrlint function-eslint:off\n",
         "category": "",
         "in": [
             {
