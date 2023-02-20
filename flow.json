@@ -24,6 +24,14 @@
         "env": []
     },
     {
+        "id": "bf22cd3c7ed55a35",
+        "type": "tab",
+        "label": "R&D",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
         "id": "77002254b872fa8e",
         "type": "subflow",
         "name": "jwt-sign",
@@ -90,6 +98,72 @@
         "color": "#DDAA99"
     },
     {
+        "id": "0f802e687dcc9e4a",
+        "type": "subflow",
+        "name": "hashing",
+        "info": "## Input\r\nset msg.sub with the password string that neet to be hashing\r\n\r\n    `MyPassword`\r\n\r\n## Output\r\nit will produce msg.sub a hasing string\r\n\r\n    ``\r\n\r\n    ",
+        "category": "",
+        "in": [
+            {
+                "x": 60,
+                "y": 80,
+                "wires": [
+                    {
+                        "id": "ae6193f87f0b9e1e"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 340,
+                "y": 80,
+                "wires": [
+                    {
+                        "id": "ae6193f87f0b9e1e",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [],
+        "meta": {},
+        "color": "#DDAA99"
+    },
+    {
+        "id": "c9c1579a9da27745",
+        "type": "subflow",
+        "name": "hashing compare",
+        "info": "## Input\r\nassign msg.sub with an object:\r\n\r\n    {\r\n        password: 'MyPassword',\r\n        hash: '$2b$10$...'\r\n    }\r\n\r\n## Output\r\nit will produce msg.sub with object:\r\n\r\n    {\r\n        isValid: true //or false\r\n    }\r\n\r\n    ",
+        "category": "",
+        "in": [
+            {
+                "x": 60,
+                "y": 80,
+                "wires": [
+                    {
+                        "id": "c1d5ea079e920d21"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 340,
+                "y": 80,
+                "wires": [
+                    {
+                        "id": "c1d5ea079e920d21",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [],
+        "meta": {},
+        "color": "#DDAA99"
+    },
+    {
         "id": "784d89e62dfb5070",
         "type": "cloudantplus",
         "host": "http://diga:password@localhost:5930",
@@ -141,6 +215,50 @@
             {
                 "var": "jwt",
                 "module": "jsonwebtoken"
+            }
+        ],
+        "x": 200,
+        "y": 80,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ae6193f87f0b9e1e",
+        "type": "function",
+        "z": "0f802e687dcc9e4a",
+        "name": "hashing",
+        "func": "let pass = bcrypt.hashSync(msg.sub, 10);\nmsg.sub = pass;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "bcrypt",
+                "module": "bcrypt"
+            }
+        ],
+        "x": 200,
+        "y": 80,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "c1d5ea079e920d21",
+        "type": "function",
+        "z": "c9c1579a9da27745",
+        "name": "compare",
+        "func": "let {password, hash} = msg.sub;\nlet rs = '';\nrs = bcrypt.compareSync(password, hash);\nmsg.sub = {\n    isValid: rs\n};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "bcrypt",
+                "module": "bcrypt"
             }
         ],
         "x": 200,
@@ -422,162 +540,6 @@
         "wires": [
             [
                 "cd0e89b2981e6227"
-            ]
-        ]
-    },
-    {
-        "id": "9ae2b5c84660f97f",
-        "type": "inject",
-        "z": "68f1d2b77bbdcda6",
-        "name": "",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 100,
-        "y": 380,
-        "wires": [
-            [
-                "e55f4d0f605df90a"
-            ]
-        ]
-    },
-    {
-        "id": "54ae63fd2179cae5",
-        "type": "debug",
-        "z": "68f1d2b77bbdcda6",
-        "name": "debug 5",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 520,
-        "y": 420,
-        "wires": []
-    },
-    {
-        "id": "e55f4d0f605df90a",
-        "type": "function",
-        "z": "68f1d2b77bbdcda6",
-        "name": "prepare jwt payload",
-        "func": "msg.sub = {\n    nik: '09001040',\n    fullName: 'Ahmad Nuroffiq',\n    email: 'staff.rc.pmse@sinarmas-agri.com',\n    occupation: 'RCS',\n    roles: ['SFR']\n}\n\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 310,
-        "y": 380,
-        "wires": [
-            [
-                "5a727d33d0fe446c"
-            ]
-        ]
-    },
-    {
-        "id": "5a727d33d0fe446c",
-        "type": "subflow:77002254b872fa8e",
-        "z": "68f1d2b77bbdcda6",
-        "name": "",
-        "x": 280,
-        "y": 420,
-        "wires": [
-            [
-                "54ae63fd2179cae5"
-            ]
-        ]
-    },
-    {
-        "id": "a77291f3c5c33cc0",
-        "type": "inject",
-        "z": "68f1d2b77bbdcda6",
-        "name": "",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 100,
-        "y": 520,
-        "wires": [
-            [
-                "1755b545d754801e"
-            ]
-        ]
-    },
-    {
-        "id": "993afa7afcd3c77b",
-        "type": "debug",
-        "z": "68f1d2b77bbdcda6",
-        "name": "debug 6",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 520,
-        "y": 560,
-        "wires": []
-    },
-    {
-        "id": "1755b545d754801e",
-        "type": "function",
-        "z": "68f1d2b77bbdcda6",
-        "name": "prepare jwt payload",
-        "func": "// msg.sub = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuaWsiOiIwOTAwMTA0MCIsImZ1bGxOYW1lIjoiQWhtYWQgTnVyb2ZmaXEiLCJlbWFpbCI6InN0YWZmLnJjLnBtc2VAc2luYXJtYXMtYWdyaS5jb20iLCJvY2N1cGF0aW9uIjoiUkNTIiwicm9sZXMiOlsiU0ZSIl0sImlhdCI6MTY3NjYyMDE0MSwiZXhwIjoxNjc2NzkyOTQxfQ.LycdE5eTfYbAecB5cJ2JW8EQShn5NPpvDGxvP1qPq_c`;\nmsg.sub = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuaWsiOiIwOTAwMTA0MCIsImZ1bGxOYW1lIjoiQWhtYWQgTnVyb2ZmaXEiLCJlbWFpbCI6InN0YWZmLnJjLnBtc2VAc2luYXJtYXMtYWdyaS5jb20iLCJvY2N1cGF0aW9uIjoiUkNTIiwicm9sZXMiOlsiU0ZSIl0sImlhdCI6MTY3Njg2MTYyMywiZXhwIjoxNjc3MDM0NDIzfQ.2qCafDVE3C6NiO5V1Gt_PeKN5LSfc_1j1c-SLlkuWgw`;\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 310,
-        "y": 520,
-        "wires": [
-            [
-                "a175eeab9871e24a"
-            ]
-        ]
-    },
-    {
-        "id": "a175eeab9871e24a",
-        "type": "subflow:32e9ed8660fb2fde",
-        "z": "68f1d2b77bbdcda6",
-        "name": "",
-        "x": 280,
-        "y": 560,
-        "wires": [
-            [
-                "993afa7afcd3c77b"
             ]
         ]
     },
@@ -1142,6 +1104,464 @@
         "wires": [
             [
                 "5074b4b5d2488f4c"
+            ]
+        ]
+    },
+    {
+        "id": "1f0713df38c92163",
+        "type": "inject",
+        "z": "35d2cc8d792ddb2a",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 660,
+        "wires": [
+            [
+                "28b44ca8a2233941"
+            ]
+        ]
+    },
+    {
+        "id": "28b44ca8a2233941",
+        "type": "cloudantplus in",
+        "z": "35d2cc8d792ddb2a",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-users",
+        "service": "_ext_",
+        "search": "_all_",
+        "design": "",
+        "index": "",
+        "x": 310,
+        "y": 660,
+        "wires": [
+            [
+                "101b00cc7e45abf6"
+            ]
+        ]
+    },
+    {
+        "id": "101b00cc7e45abf6",
+        "type": "debug",
+        "z": "35d2cc8d792ddb2a",
+        "name": "debug 7",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 540,
+        "y": 660,
+        "wires": []
+    },
+    {
+        "id": "709c13d3600615a8",
+        "type": "function",
+        "z": "35d2cc8d792ddb2a",
+        "name": "set query",
+        "func": "msg.topic = `\nkill 6;\n`;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 300,
+        "y": 780,
+        "wires": [
+            [
+                "0c254209d5877be2"
+            ]
+        ]
+    },
+    {
+        "id": "0c254209d5877be2",
+        "type": "mysql2",
+        "z": "35d2cc8d792ddb2a",
+        "name": "",
+        "server": "9dc2644ec5b51cb2",
+        "bind": "",
+        "topic": "",
+        "x": 300,
+        "y": 820,
+        "wires": [
+            [
+                "7e4b341e2bc78eb5"
+            ]
+        ]
+    },
+    {
+        "id": "7e4b341e2bc78eb5",
+        "type": "debug",
+        "z": "35d2cc8d792ddb2a",
+        "name": "debug 8",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 520,
+        "y": 820,
+        "wires": []
+    },
+    {
+        "id": "f76a86ee0417d6ce",
+        "type": "inject",
+        "z": "35d2cc8d792ddb2a",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 780,
+        "wires": [
+            [
+                "709c13d3600615a8"
+            ]
+        ]
+    },
+    {
+        "id": "9ae2b5c84660f97f",
+        "type": "inject",
+        "z": "bf22cd3c7ed55a35",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 100,
+        "y": 60,
+        "wires": [
+            [
+                "e55f4d0f605df90a"
+            ]
+        ]
+    },
+    {
+        "id": "54ae63fd2179cae5",
+        "type": "debug",
+        "z": "bf22cd3c7ed55a35",
+        "name": "debug 5",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 520,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "e55f4d0f605df90a",
+        "type": "function",
+        "z": "bf22cd3c7ed55a35",
+        "name": "prepare jwt payload",
+        "func": "msg.sub = {\n    nik: '09001040',\n    fullName: 'Ahmad Nuroffiq',\n    email: 'staff.rc.pmse@sinarmas-agri.com',\n    occupation: 'RCS',\n    roles: ['SFR']\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 310,
+        "y": 60,
+        "wires": [
+            [
+                "5a727d33d0fe446c"
+            ]
+        ]
+    },
+    {
+        "id": "5a727d33d0fe446c",
+        "type": "subflow:77002254b872fa8e",
+        "z": "bf22cd3c7ed55a35",
+        "name": "",
+        "x": 280,
+        "y": 100,
+        "wires": [
+            [
+                "54ae63fd2179cae5"
+            ]
+        ]
+    },
+    {
+        "id": "a77291f3c5c33cc0",
+        "type": "inject",
+        "z": "bf22cd3c7ed55a35",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 100,
+        "y": 200,
+        "wires": [
+            [
+                "1755b545d754801e"
+            ]
+        ]
+    },
+    {
+        "id": "993afa7afcd3c77b",
+        "type": "debug",
+        "z": "bf22cd3c7ed55a35",
+        "name": "debug 6",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 520,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "1755b545d754801e",
+        "type": "function",
+        "z": "bf22cd3c7ed55a35",
+        "name": "prepare jwt payload",
+        "func": "// msg.sub = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuaWsiOiIwOTAwMTA0MCIsImZ1bGxOYW1lIjoiQWhtYWQgTnVyb2ZmaXEiLCJlbWFpbCI6InN0YWZmLnJjLnBtc2VAc2luYXJtYXMtYWdyaS5jb20iLCJvY2N1cGF0aW9uIjoiUkNTIiwicm9sZXMiOlsiU0ZSIl0sImlhdCI6MTY3NjYyMDE0MSwiZXhwIjoxNjc2NzkyOTQxfQ.LycdE5eTfYbAecB5cJ2JW8EQShn5NPpvDGxvP1qPq_c`;\nmsg.sub = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuaWsiOiIwOTAwMTA0MCIsImZ1bGxOYW1lIjoiQWhtYWQgTnVyb2ZmaXEiLCJlbWFpbCI6InN0YWZmLnJjLnBtc2VAc2luYXJtYXMtYWdyaS5jb20iLCJvY2N1cGF0aW9uIjoiUkNTIiwicm9sZXMiOlsiU0ZSIl0sImlhdCI6MTY3Njg2MTYyMywiZXhwIjoxNjc3MDM0NDIzfQ.2qCafDVE3C6NiO5V1Gt_PeKN5LSfc_1j1c-SLlkuWgw`;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 310,
+        "y": 200,
+        "wires": [
+            [
+                "a175eeab9871e24a"
+            ]
+        ]
+    },
+    {
+        "id": "a175eeab9871e24a",
+        "type": "subflow:32e9ed8660fb2fde",
+        "z": "bf22cd3c7ed55a35",
+        "name": "",
+        "x": 280,
+        "y": 240,
+        "wires": [
+            [
+                "993afa7afcd3c77b"
+            ]
+        ]
+    },
+    {
+        "id": "3e66c4a31f8d9450",
+        "type": "inject",
+        "z": "bf22cd3c7ed55a35",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 100,
+        "y": 340,
+        "wires": [
+            [
+                "7d867c3ead24190c"
+            ]
+        ]
+    },
+    {
+        "id": "82e9d4324cdb2728",
+        "type": "debug",
+        "z": "bf22cd3c7ed55a35",
+        "name": "debug 9",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 520,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "ee46f0cd97686a3b",
+        "type": "inject",
+        "z": "bf22cd3c7ed55a35",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 100,
+        "y": 460,
+        "wires": [
+            [
+                "5a0ec661e1909bfd"
+            ]
+        ]
+    },
+    {
+        "id": "01da5252c1115b9a",
+        "type": "debug",
+        "z": "bf22cd3c7ed55a35",
+        "name": "debug 10",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 520,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "f21bf607484f07da",
+        "type": "subflow:0f802e687dcc9e4a",
+        "z": "bf22cd3c7ed55a35",
+        "name": "",
+        "x": 280,
+        "y": 380,
+        "wires": [
+            [
+                "82e9d4324cdb2728"
+            ]
+        ]
+    },
+    {
+        "id": "7d867c3ead24190c",
+        "type": "function",
+        "z": "bf22cd3c7ed55a35",
+        "name": "prepare jwt payload",
+        "func": "msg.sub = `MyPassword`;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 310,
+        "y": 340,
+        "wires": [
+            [
+                "f21bf607484f07da"
+            ]
+        ]
+    },
+    {
+        "id": "85bdb66ce6238ce7",
+        "type": "subflow:c9c1579a9da27745",
+        "z": "bf22cd3c7ed55a35",
+        "name": "",
+        "x": 310,
+        "y": 500,
+        "wires": [
+            [
+                "01da5252c1115b9a"
+            ]
+        ]
+    },
+    {
+        "id": "5a0ec661e1909bfd",
+        "type": "function",
+        "z": "bf22cd3c7ed55a35",
+        "name": "prepare jwt payload",
+        "func": "msg.sub = {\n    password: 'MyPassword',\n    hash: '$2b$10$UsmqL2Pt3SwjJWXtAmT14OVEYUSiceuFL92gjQD/bEM.eWMWypqfi'\n};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 310,
+        "y": 460,
+        "wires": [
+            [
+                "85bdb66ce6238ce7"
             ]
         ]
     }
