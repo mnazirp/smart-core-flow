@@ -1694,6 +1694,38 @@
         ]
     },
     {
+        "id": "95c371352dac6288",
+        "type": "catch",
+        "z": "bf22cd3c7ed55a35",
+        "name": "",
+        "scope": null,
+        "uncaught": false,
+        "x": 760,
+        "y": 100,
+        "wires": [
+            [
+                "9c4c5aa5bc6d0c04"
+            ]
+        ]
+    },
+    {
+        "id": "9c4c5aa5bc6d0c04",
+        "type": "debug",
+        "z": "bf22cd3c7ed55a35",
+        "name": "debug 14",
+        "active": true,
+        "tosidebar": false,
+        "console": true,
+        "tostatus": false,
+        "complete": "error",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 970,
+        "y": 100,
+        "wires": []
+    },
+    {
         "id": "2a4feb8a87d0a7c4",
         "type": "http in",
         "z": "3a3a41a0d95d74c4",
