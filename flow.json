@@ -175,7 +175,7 @@
         "id": "cfa2e326ca547b07",
         "type": "subflow",
         "name": "crypto-encrypt",
-        "info": "## Input\r\nset msg.sub into a string that want to encrypt\r\n\r\n    msg.sub = \"some random text\"\r\n\r\n## output\r\nit will produce encrypted text in msg.sub",
+        "info": "## Input\r\nset msg.sub into a string that want to encrypt\r\n\r\n    msg.sub = \"some random text\"\r\n\r\n## output\r\nit will produce encrypted text in msg.sub\n\n// nrlint function-eslint:off\n",
         "category": "",
         "in": [
             {
@@ -208,7 +208,7 @@
         "id": "c2f437acbbab02bd",
         "type": "subflow",
         "name": "crypto-dencrypt",
-        "info": "## Input\r\nassign msg.sub with encrypted text like:\r\n\r\n    msg.sub = \"d15cac3ea87e3fca0b51b\"\r\n\r\n## output\r\nit will produce dencrypted text in msg.sub",
+        "info": "## Input\r\nassign msg.sub with encrypted text like:\r\n\r\n    msg.sub = \"d15cac3ea87e3fca0b51b\"\r\n\r\n## output\r\nit will produce dencrypted text in msg.sub\n\n// nrlint function-eslint:off\n",
         "category": "",
         "in": [
             {
