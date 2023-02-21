@@ -32,6 +32,14 @@
         "env": []
     },
     {
+        "id": "3a3a41a0d95d74c4",
+        "type": "tab",
+        "label": "Auth",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
         "id": "77002254b872fa8e",
         "type": "subflow",
         "name": "jwt-sign",
@@ -164,6 +172,72 @@
         "color": "#DDAA99"
     },
     {
+        "id": "cfa2e326ca547b07",
+        "type": "subflow",
+        "name": "crypto-encrypt",
+        "info": "## Input\r\nset msg.sub into a string that want to encrypt\r\n\r\n    msg.sub = \"some random text\"\r\n\r\n## output\r\nit will produce encrypted text in msg.sub",
+        "category": "",
+        "in": [
+            {
+                "x": 40,
+                "y": 80,
+                "wires": [
+                    {
+                        "id": "a91ed5f774324e22"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 360,
+                "y": 80,
+                "wires": [
+                    {
+                        "id": "a91ed5f774324e22",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [],
+        "meta": {},
+        "color": "#DDAA99"
+    },
+    {
+        "id": "c2f437acbbab02bd",
+        "type": "subflow",
+        "name": "crypto-dencrypt",
+        "info": "## Input\r\nassign msg.sub with encrypted text like:\r\n\r\n    msg.sub = \"d15cac3ea87e3fca0b51b\"\r\n\r\n## output\r\nit will produce dencrypted text in msg.sub",
+        "category": "",
+        "in": [
+            {
+                "x": 40,
+                "y": 80,
+                "wires": [
+                    {
+                        "id": "1dc8e5a1237fe665"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 360,
+                "y": 80,
+                "wires": [
+                    {
+                        "id": "1dc8e5a1237fe665",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [],
+        "meta": {},
+        "color": "#DDAA99"
+    },
+    {
         "id": "784d89e62dfb5070",
         "type": "cloudantplus",
         "host": "http://diga:password@localhost:5930",
@@ -259,6 +333,50 @@
             {
                 "var": "bcrypt",
                 "module": "bcrypt"
+            }
+        ],
+        "x": 200,
+        "y": 80,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "a91ed5f774324e22",
+        "type": "function",
+        "z": "cfa2e326ca547b07",
+        "name": "crypto-encrypt",
+        "func": "let algorithm = 'aes256';\nlet key = env.get('CRYPTO_KEY');\nlet iv = env.get('CRYPTO_IV');\nlet cipher = crypto.createCipheriv(algorithm, key, iv);\nlet encrypted = cipher.update(msg.sub, 'utf8', 'hex') + cipher.final('hex');\nmsg.sub = encrypted;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "crypto",
+                "module": "crypto"
+            }
+        ],
+        "x": 200,
+        "y": 80,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "1dc8e5a1237fe665",
+        "type": "function",
+        "z": "c2f437acbbab02bd",
+        "name": "crypto-dencrypt",
+        "func": "let algorithm = 'aes256';\nlet key = env.get('CRYPTO_KEY');\nlet iv = env.get('CRYPTO_IV');\nlet decipher = crypto.createDecipheriv(algorithm, key, iv);\nlet decrypted = decipher.update(msg.sub, 'hex', 'utf8') + decipher.final('utf8');\nmsg.sub = decrypted;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "crypto",
+                "module": "crypto"
             }
         ],
         "x": 200,
@@ -1564,5 +1682,207 @@
                 "85bdb66ce6238ce7"
             ]
         ]
+    },
+    {
+        "id": "28c35bf75fb40d3c",
+        "type": "inject",
+        "z": "bf22cd3c7ed55a35",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 100,
+        "y": 580,
+        "wires": [
+            [
+                "6e6b190070972e0d"
+            ]
+        ]
+    },
+    {
+        "id": "aa11f6c7f9ace759",
+        "type": "debug",
+        "z": "bf22cd3c7ed55a35",
+        "name": "debug 12",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 520,
+        "y": 620,
+        "wires": []
+    },
+    {
+        "id": "6e6b190070972e0d",
+        "type": "function",
+        "z": "bf22cd3c7ed55a35",
+        "name": "function 5",
+        "func": "msg.sub = \"some random text\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 280,
+        "y": 580,
+        "wires": [
+            [
+                "046cff1505c0dc35"
+            ]
+        ]
+    },
+    {
+        "id": "e6d2df7c5e4c084d",
+        "type": "inject",
+        "z": "bf22cd3c7ed55a35",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 100,
+        "y": 680,
+        "wires": [
+            [
+                "85ac96e7de1d3a13"
+            ]
+        ]
+    },
+    {
+        "id": "14d0cc3b742d1f15",
+        "type": "debug",
+        "z": "bf22cd3c7ed55a35",
+        "name": "debug 13",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 520,
+        "y": 720,
+        "wires": []
+    },
+    {
+        "id": "85ac96e7de1d3a13",
+        "type": "function",
+        "z": "bf22cd3c7ed55a35",
+        "name": "function 6",
+        "func": "msg.sub = \"d15cac3ea87e3fca0b51be2662c4e48135679b8ab52ab656ef3309e35d9e43d4\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 280,
+        "y": 680,
+        "wires": [
+            [
+                "e1957673de771643"
+            ]
+        ]
+    },
+    {
+        "id": "046cff1505c0dc35",
+        "type": "subflow:cfa2e326ca547b07",
+        "z": "bf22cd3c7ed55a35",
+        "name": "",
+        "x": 300,
+        "y": 620,
+        "wires": [
+            [
+                "aa11f6c7f9ace759"
+            ]
+        ]
+    },
+    {
+        "id": "e1957673de771643",
+        "type": "subflow:c2f437acbbab02bd",
+        "z": "bf22cd3c7ed55a35",
+        "name": "",
+        "x": 300,
+        "y": 720,
+        "wires": [
+            [
+                "14d0cc3b742d1f15"
+            ]
+        ]
+    },
+    {
+        "id": "2a4feb8a87d0a7c4",
+        "type": "http in",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "url": "/api/auth/sign-in",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 140,
+        "y": 60,
+        "wires": [
+            [
+                "9ed6e261b82dc55d",
+                "ee8440cb12dd43fb"
+            ]
+        ]
+    },
+    {
+        "id": "9ed6e261b82dc55d",
+        "type": "http response",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 460,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "ee8440cb12dd43fb",
+        "type": "debug",
+        "z": "3a3a41a0d95d74c4",
+        "name": "debug 11",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 460,
+        "y": 100,
+        "wires": []
     }
 ]
