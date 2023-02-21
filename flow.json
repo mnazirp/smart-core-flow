@@ -1037,7 +1037,7 @@
         "finalize": "",
         "libs": [],
         "x": 300,
-        "y": 340,
+        "y": 300,
         "wires": [
             [
                 "39b354d40ed8a1be"
@@ -1053,7 +1053,7 @@
         "bind": "",
         "topic": "",
         "x": 300,
-        "y": 380,
+        "y": 340,
         "wires": [
             [
                 "99053d0de0ebc04b"
@@ -1089,7 +1089,7 @@
         "finalize": "",
         "libs": [],
         "x": 300,
-        "y": 420,
+        "y": 380,
         "wires": [
             [
                 "c6797d015f1c1a35"
@@ -1118,7 +1118,7 @@
         "payload": "",
         "payloadType": "date",
         "x": 120,
-        "y": 340,
+        "y": 300,
         "wires": [
             [
                 "5b4debb4c819653b"
@@ -1137,7 +1137,7 @@
         "finalize": "",
         "libs": [],
         "x": 300,
-        "y": 500,
+        "y": 460,
         "wires": [
             [
                 "53b9204cb4d470b1"
@@ -1153,7 +1153,7 @@
         "bind": "",
         "topic": "",
         "x": 300,
-        "y": 540,
+        "y": 500,
         "wires": [
             [
                 "a78e0a347e852e3d"
@@ -1189,7 +1189,7 @@
         "finalize": "",
         "libs": [],
         "x": 300,
-        "y": 580,
+        "y": 540,
         "wires": [
             [
                 "d616f6a00d4a5f6d"
@@ -1218,156 +1218,10 @@
         "payload": "",
         "payloadType": "date",
         "x": 120,
-        "y": 500,
+        "y": 460,
         "wires": [
             [
                 "5074b4b5d2488f4c"
-            ]
-        ]
-    },
-    {
-        "id": "1f0713df38c92163",
-        "type": "inject",
-        "z": "35d2cc8d792ddb2a",
-        "name": "",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 120,
-        "y": 660,
-        "wires": [
-            [
-                "28b44ca8a2233941"
-            ]
-        ]
-    },
-    {
-        "id": "28b44ca8a2233941",
-        "type": "cloudantplus in",
-        "z": "35d2cc8d792ddb2a",
-        "name": "",
-        "cloudant": "784d89e62dfb5070",
-        "database": "smart-users",
-        "service": "_ext_",
-        "search": "_all_",
-        "design": "",
-        "index": "",
-        "x": 310,
-        "y": 660,
-        "wires": [
-            [
-                "101b00cc7e45abf6"
-            ]
-        ]
-    },
-    {
-        "id": "101b00cc7e45abf6",
-        "type": "debug",
-        "z": "35d2cc8d792ddb2a",
-        "name": "debug 7",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 540,
-        "y": 660,
-        "wires": []
-    },
-    {
-        "id": "709c13d3600615a8",
-        "type": "function",
-        "z": "35d2cc8d792ddb2a",
-        "name": "set query",
-        "func": "msg.topic = `\nkill 6;\n`;\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 300,
-        "y": 780,
-        "wires": [
-            [
-                "0c254209d5877be2"
-            ]
-        ]
-    },
-    {
-        "id": "0c254209d5877be2",
-        "type": "mysql2",
-        "z": "35d2cc8d792ddb2a",
-        "name": "",
-        "server": "9dc2644ec5b51cb2",
-        "bind": "",
-        "topic": "",
-        "x": 300,
-        "y": 820,
-        "wires": [
-            [
-                "7e4b341e2bc78eb5"
-            ]
-        ]
-    },
-    {
-        "id": "7e4b341e2bc78eb5",
-        "type": "debug",
-        "z": "35d2cc8d792ddb2a",
-        "name": "debug 8",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 520,
-        "y": 820,
-        "wires": []
-    },
-    {
-        "id": "f76a86ee0417d6ce",
-        "type": "inject",
-        "z": "35d2cc8d792ddb2a",
-        "name": "",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 120,
-        "y": 780,
-        "wires": [
-            [
-                "709c13d3600615a8"
             ]
         ]
     },
@@ -1852,8 +1706,8 @@
         "y": 60,
         "wires": [
             [
-                "9ed6e261b82dc55d",
-                "ee8440cb12dd43fb"
+                "ee8440cb12dd43fb",
+                "9ed6e261b82dc55d"
             ]
         ]
     },
