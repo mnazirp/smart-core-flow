@@ -1869,14 +1869,14 @@
         "id": "f76eb5c7ca814e7f",
         "type": "function",
         "z": "3a3a41a0d95d74c4",
-        "name": "function 8",
+        "name": "prepare sub",
         "func": "msg.user = msg.payload[0].value;\nlet pass = msg.user.authorizations.find(x => x.type === 'password').passwords\nmsg.sub = pass[pass.length - 1];\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 940,
+        "x": 950,
         "y": 60,
         "wires": [
             [
@@ -1901,14 +1901,14 @@
         "id": "0460f41c928aef8f",
         "type": "function",
         "z": "3a3a41a0d95d74c4",
-        "name": "function 9",
+        "name": "check account",
         "func": "let isValid = false;\nlet {nik, password} = msg.req.body;\nif(`${nik};${password}` === msg.sub){\n    isValid = true;\n    msg.sub = {\n        nik: msg.user.nik,\n        fullName: msg.user.fullName,\n        email: msg.user.email,\n        occupation: msg.user.occupation,\n        roles: msg.user.roles\n    }\n}\nmsg.isValid = isValid;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 940,
+        "x": 960,
         "y": 140,
         "wires": [
             [
