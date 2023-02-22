@@ -1754,7 +1754,7 @@
         "name": "",
         "statusCode": "200",
         "headers": {},
-        "x": 1000,
+        "x": 1200,
         "y": 140,
         "wires": []
     },
@@ -1769,7 +1769,7 @@
         "search": "_view_",
         "design": "view-user",
         "index": "by-nik",
-        "x": 390,
+        "x": 590,
         "y": 100,
         "wires": [
             [
@@ -1781,18 +1781,18 @@
         "id": "1139aaeb805d591e",
         "type": "function",
         "z": "3a3a41a0d95d74c4",
-        "name": "function 7",
-        "func": "msg.payload = {\n    key: msg.payload.NIK\n}\nreturn msg;",
+        "name": "check body",
+        "func": "let {nik, password} = msg.payload;\nlet isValid = false;\nif(nik && password){\n    isValid = true;\n    msg.payload = {\n        key: nik\n    }\n}\nmsg.isValid = isValid;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 380,
+        "x": 390,
         "y": 60,
         "wires": [
             [
-                "24dfaa402842999c"
+                "5dbfca463b8f94ea"
             ]
         ]
     },
@@ -1816,7 +1816,7 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 550,
+        "x": 750,
         "y": 100,
         "wires": [
             [
@@ -1834,7 +1834,7 @@
         "name": "",
         "statusCode": "400",
         "headers": {},
-        "x": 740,
+        "x": 940,
         "y": 280,
         "wires": []
     },
@@ -1857,7 +1857,7 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 760,
+        "x": 960,
         "y": 240,
         "wires": [
             [
@@ -1876,7 +1876,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 740,
+        "x": 940,
         "y": 60,
         "wires": [
             [
@@ -1889,7 +1889,7 @@
         "type": "subflow:c2f437acbbab02bd",
         "z": "3a3a41a0d95d74c4",
         "name": "",
-        "x": 760,
+        "x": 960,
         "y": 100,
         "wires": [
             [
@@ -1902,13 +1902,13 @@
         "type": "function",
         "z": "3a3a41a0d95d74c4",
         "name": "function 9",
-        "func": "let isValid = false;\nlet {NIK, password} = msg.req.body;\nif(`${NIK};${password}` === msg.sub){\n    isValid = true;\n    msg.sub = {\n        nik: msg.user.nik,\n        fullName: msg.user.fullName,\n        email: msg.user.email,\n        occupation: msg.user.occupation,\n        roles: msg.user.roles\n    }\n}\nmsg.isValid = isValid;\nreturn msg;",
+        "func": "let isValid = false;\nlet {nik, password} = msg.req.body;\nif(`${nik};${password}` === msg.sub){\n    isValid = true;\n    msg.sub = {\n        nik: msg.user.nik,\n        fullName: msg.user.fullName,\n        email: msg.user.email,\n        occupation: msg.user.occupation,\n        roles: msg.user.roles\n    }\n}\nmsg.isValid = isValid;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 740,
+        "x": 940,
         "y": 140,
         "wires": [
             [
@@ -1921,7 +1921,7 @@
         "type": "subflow:77002254b872fa8e",
         "z": "3a3a41a0d95d74c4",
         "name": "",
-        "x": 1000,
+        "x": 1200,
         "y": 60,
         "wires": [
             [
@@ -1948,7 +1948,7 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1020,
+        "x": 1220,
         "y": 100,
         "wires": [
             [
@@ -1974,7 +1974,7 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 790,
+        "x": 990,
         "y": 180,
         "wires": [
             [
@@ -1992,7 +1992,7 @@
         "name": "",
         "statusCode": "400",
         "headers": {},
-        "x": 1000,
+        "x": 1200,
         "y": 260,
         "wires": []
     },
@@ -2015,11 +2015,78 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1020,
+        "x": 1220,
         "y": 220,
         "wires": [
             [
                 "11fc9ef3ad64cf3c"
+            ]
+        ]
+    },
+    {
+        "id": "5dbfca463b8f94ea",
+        "type": "switch",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "property": "isValid",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 410,
+        "y": 140,
+        "wires": [
+            [
+                "24dfaa402842999c"
+            ],
+            [
+                "1b09477332150a88"
+            ]
+        ]
+    },
+    {
+        "id": "96353977042ba7f3",
+        "type": "http response",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "statusCode": "400",
+        "headers": {},
+        "x": 580,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "1b09477332150a88",
+        "type": "change",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"code\":400,\"error\":\"invalid-parameter\",\"message\":\"check your parameters\"}",
+                "tot": "json"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 600,
+        "y": 180,
+        "wires": [
+            [
+                "96353977042ba7f3"
             ]
         ]
     }
