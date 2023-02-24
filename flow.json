@@ -2171,23 +2171,6 @@
         ]
     },
     {
-        "id": "4c6f739c2ad3d1c6",
-        "type": "debug",
-        "z": "3a3a41a0d95d74c4",
-        "name": "debug 15",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 1380,
-        "y": 260,
-        "wires": []
-    },
-    {
         "id": "38aab1868e7e1fc8",
         "type": "subflow:4c9a3cd45f1fbba4",
         "z": "3a3a41a0d95d74c4",
