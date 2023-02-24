@@ -2187,7 +2187,7 @@
         "id": "20f7357695b26aa8",
         "type": "function",
         "z": "3a3a41a0d95d74c4",
-        "name": "function 9",
+        "name": "set result",
         "func": "msg.result = msg.sub;\nmsg.payload = {\n    key: [\"reference\", \"smart-system-role\"]\n}\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
