@@ -238,6 +238,39 @@
         "color": "#DDAA99"
     },
     {
+        "id": "4c9a3cd45f1fbba4",
+        "type": "subflow",
+        "name": "nested:search",
+        "info": "",
+        "category": "",
+        "in": [
+            {
+                "x": 40,
+                "y": 80,
+                "wires": [
+                    {
+                        "id": "75edc86f30b0b589"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 360,
+                "y": 80,
+                "wires": [
+                    {
+                        "id": "75edc86f30b0b589",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [],
+        "meta": {},
+        "color": "#DDAA99"
+    },
+    {
         "id": "784d89e62dfb5070",
         "type": "cloudantplus",
         "host": "http://diga:password@localhost:5930",
@@ -379,6 +412,23 @@
                 "module": "crypto"
             }
         ],
+        "x": 200,
+        "y": 80,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "75edc86f30b0b589",
+        "type": "function",
+        "z": "4c9a3cd45f1fbba4",
+        "name": "find-in-nested",
+        "func": "let { obj, key, val } = msg.sub;\nlet nest = findNestedObj(obj, key, val);\nmsg.sub = nest;\nreturn msg;\n\nfunction findNestedObj(entireObj, keyToFind, valToFind) {\n    let foundObj;\n    JSON.stringify(entireObj, (_, nestedValue) => {\n        if (nestedValue && nestedValue[keyToFind] === valToFind) {\n            foundObj = nestedValue;\n        }\n        return nestedValue;\n    });\n    return foundObj;\n};",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
         "x": 200,
         "y": 80,
         "wires": [
@@ -1740,7 +1790,7 @@
         "upload": false,
         "swaggerDoc": "",
         "x": 140,
-        "y": 140,
+        "y": 220,
         "wires": [
             [
                 "1139aaeb805d591e"
@@ -1754,8 +1804,8 @@
         "name": "",
         "statusCode": "200",
         "headers": {},
-        "x": 1380,
-        "y": 160,
+        "x": 1620,
+        "y": 220,
         "wires": []
     },
     {
@@ -1770,7 +1820,7 @@
         "design": "view-user",
         "index": "by-nik",
         "x": 590,
-        "y": 140,
+        "y": 220,
         "wires": [
             [
                 "b3f14e2a3a967408"
@@ -1789,7 +1839,7 @@
         "finalize": "",
         "libs": [],
         "x": 390,
-        "y": 140,
+        "y": 220,
         "wires": [
             [
                 "5dbfca463b8f94ea"
@@ -1817,7 +1867,7 @@
         "repair": false,
         "outputs": 2,
         "x": 750,
-        "y": 140,
+        "y": 220,
         "wires": [
             [
                 "f76eb5c7ca814e7f"
@@ -1835,7 +1885,7 @@
         "statusCode": "400",
         "headers": {},
         "x": 940,
-        "y": 280,
+        "y": 360,
         "wires": []
     },
     {
@@ -1858,7 +1908,7 @@
         "to": "",
         "reg": false,
         "x": 960,
-        "y": 240,
+        "y": 320,
         "wires": [
             [
                 "c9f15de4fba5c2e0"
@@ -1877,7 +1927,7 @@
         "finalize": "",
         "libs": [],
         "x": 950,
-        "y": 60,
+        "y": 140,
         "wires": [
             [
                 "12be102bd5a5549e"
@@ -1890,7 +1940,7 @@
         "z": "3a3a41a0d95d74c4",
         "name": "",
         "x": 960,
-        "y": 100,
+        "y": 180,
         "wires": [
             [
                 "0460f41c928aef8f"
@@ -1909,7 +1959,7 @@
         "finalize": "",
         "libs": [],
         "x": 960,
-        "y": 140,
+        "y": 220,
         "wires": [
             [
                 "5ef56066432171ba"
@@ -1922,37 +1972,10 @@
         "z": "3a3a41a0d95d74c4",
         "name": "",
         "x": 1180,
-        "y": 120,
+        "y": 140,
         "wires": [
             [
-                "2a07ec0c43ae40e4"
-            ]
-        ]
-    },
-    {
-        "id": "2a07ec0c43ae40e4",
-        "type": "change",
-        "z": "3a3a41a0d95d74c4",
-        "name": "",
-        "rules": [
-            {
-                "t": "set",
-                "p": "payload",
-                "pt": "msg",
-                "to": "sub",
-                "tot": "msg"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 1200,
-        "y": 160,
-        "wires": [
-            [
-                "9ed6e261b82dc55d"
+                "20f7357695b26aa8"
             ]
         ]
     },
@@ -1975,7 +1998,7 @@
         "repair": false,
         "outputs": 2,
         "x": 990,
-        "y": 180,
+        "y": 260,
         "wires": [
             [
                 "ab91fa5df5761e58"
@@ -1993,7 +2016,7 @@
         "statusCode": "400",
         "headers": {},
         "x": 1180,
-        "y": 280,
+        "y": 340,
         "wires": []
     },
     {
@@ -2016,7 +2039,7 @@
         "to": "",
         "reg": false,
         "x": 1200,
-        "y": 240,
+        "y": 300,
         "wires": [
             [
                 "11fc9ef3ad64cf3c"
@@ -2042,7 +2065,7 @@
         "repair": false,
         "outputs": 2,
         "x": 410,
-        "y": 180,
+        "y": 260,
         "wires": [
             [
                 "24dfaa402842999c"
@@ -2060,7 +2083,7 @@
         "statusCode": "400",
         "headers": {},
         "x": 580,
-        "y": 260,
+        "y": 340,
         "wires": []
     },
     {
@@ -2083,10 +2106,116 @@
         "to": "",
         "reg": false,
         "x": 600,
-        "y": 220,
+        "y": 300,
         "wires": [
             [
                 "96353977042ba7f3"
+            ]
+        ]
+    },
+    {
+        "id": "946615b5dff60503",
+        "type": "cloudantplus in",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-libs",
+        "service": "_ext_",
+        "search": "_view_",
+        "design": "type",
+        "index": "by-topic",
+        "x": 1220,
+        "y": 220,
+        "wires": [
+            [
+                "17cf590e3d949f01"
+            ]
+        ]
+    },
+    {
+        "id": "17cf590e3d949f01",
+        "type": "function",
+        "z": "3a3a41a0d95d74c4",
+        "name": "function 7",
+        "func": "msg.sub = {\n    obj: msg.payload[0].value.data,\n    key: 'code',\n    val: (msg.result.decoded.roles.length > 0) ? msg.result.decoded.roles[0] : null\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1420,
+        "y": 140,
+        "wires": [
+            [
+                "38aab1868e7e1fc8"
+            ]
+        ]
+    },
+    {
+        "id": "3b111b6afac1790d",
+        "type": "function",
+        "z": "3a3a41a0d95d74c4",
+        "name": "function 8",
+        "func": "msg.payload = {...msg.result, sysRole: msg.sub};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1420,
+        "y": 220,
+        "wires": [
+            [
+                "9ed6e261b82dc55d"
+            ]
+        ]
+    },
+    {
+        "id": "4c6f739c2ad3d1c6",
+        "type": "debug",
+        "z": "3a3a41a0d95d74c4",
+        "name": "debug 15",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1380,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "38aab1868e7e1fc8",
+        "type": "subflow:4c9a3cd45f1fbba4",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "x": 1440,
+        "y": 180,
+        "wires": [
+            [
+                "3b111b6afac1790d"
+            ]
+        ]
+    },
+    {
+        "id": "20f7357695b26aa8",
+        "type": "function",
+        "z": "3a3a41a0d95d74c4",
+        "name": "function 9",
+        "func": "msg.result = msg.sub;\nmsg.payload = {\n    key: [\"reference\", \"smart-system-role\"]\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1180,
+        "y": 180,
+        "wires": [
+            [
+                "946615b5dff60503"
             ]
         ]
     }
