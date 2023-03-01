@@ -2,7 +2,7 @@
     {
         "id": "68f1d2b77bbdcda6",
         "type": "tab",
-        "label": "Apps",
+        "label": "Smart:Apps",
         "disabled": false,
         "info": "",
         "env": []
@@ -10,7 +10,7 @@
     {
         "id": "10a453599cf0bfe0",
         "type": "tab",
-        "label": "Forms",
+        "label": "Smart:Forms",
         "disabled": false,
         "info": "",
         "env": []
@@ -34,7 +34,7 @@
     {
         "id": "3a3a41a0d95d74c4",
         "type": "tab",
-        "label": "Auth",
+        "label": "Smart:Auth",
         "disabled": false,
         "info": "",
         "env": []
