@@ -249,7 +249,7 @@
         "id": "4c9a3cd45f1fbba4",
         "type": "subflow",
         "name": "nested:search",
-        "info": "## Input\r\non msg.sub you can assign an object containing\r\n{obj, key, val}\r\nval can be type of string or an Array like\r\n\r\n    msg.sub = {\r\n    obj: msg.payload.data,\r\n    key: 'id',\r\n    val: 5036\r\n    }\r\n\r\n    msg.sub = {\r\n    obj: msg.payload.data,\r\n    key: 'id',\r\n    val: [5036,5037,5038,5039,5041,5042,5070,5108]\r\n    }\r\n\r\n## Output\r\nthe result will be an Array of an object inside msg.sub",
+        "info": "## Input\r\non `msg.sub` you can assign an object containing\r\n`{obj, key, val}`\r\nval can be type of `single number or string` or an `Array` like\r\n\r\n    msg.sub = {\r\n    obj: msg.payload.data,\r\n    key: 'id',\r\n    val: 5036\r\n    }\r\n\r\n    msg.sub = {\r\n    obj: msg.payload.data,\r\n    key: 'id',\r\n    val: [5036,5037,5038,5039,5041,5042,5070,5108]\r\n    }\r\n\r\n## Output\r\nthe result will be an Array of an object inside `msg.sub`",
         "category": "",
         "in": [
             {
