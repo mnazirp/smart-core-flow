@@ -16,6 +16,22 @@
         "env": []
     },
     {
+        "id": "3a3a41a0d95d74c4",
+        "type": "tab",
+        "label": "Smart:Auth",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "786b2ecce5602d44",
+        "type": "tab",
+        "label": "Smart:List",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
         "id": "35d2cc8d792ddb2a",
         "type": "tab",
         "label": "Migrations",
@@ -27,14 +43,6 @@
         "id": "bf22cd3c7ed55a35",
         "type": "tab",
         "label": "R&D",
-        "disabled": false,
-        "info": "",
-        "env": []
-    },
-    {
-        "id": "3a3a41a0d95d74c4",
-        "type": "tab",
-        "label": "Smart:Auth",
         "disabled": false,
         "info": "",
         "env": []
@@ -241,7 +249,7 @@
         "id": "4c9a3cd45f1fbba4",
         "type": "subflow",
         "name": "nested:search",
-        "info": "",
+        "info": "## Input\r\non msg.sub you can assign an object containing\r\n{obj, key, val}\r\nval can be type of string or an Array like\r\n\r\n    msg.sub = {\r\n    obj: msg.payload.data,\r\n    key: 'id',\r\n    val: 5036\r\n    }\r\n\r\n    msg.sub = {\r\n    obj: msg.payload.data,\r\n    key: 'id',\r\n    val: [5036,5037,5038,5039,5041,5042,5070,5108]\r\n    }\r\n\r\n## Output\r\nthe result will be an Array of an object inside msg.sub",
         "category": "",
         "in": [
             {
@@ -423,7 +431,7 @@
         "type": "function",
         "z": "4c9a3cd45f1fbba4",
         "name": "find-in-nested",
-        "func": "let { obj, key, val } = msg.sub;\nlet nest = findNestedObj(obj, key, val);\nmsg.sub = nest;\nreturn msg;\n\nfunction findNestedObj(entireObj, keyToFind, valToFind) {\n    let foundObj;\n    JSON.stringify(entireObj, (_, nestedValue) => {\n        if (nestedValue && nestedValue[keyToFind] === valToFind) {\n            foundObj = nestedValue;\n        }\n        return nestedValue;\n    });\n    return foundObj;\n};",
+        "func": "let { obj, key, val } = msg.sub;\nlet nest = [];\nif (Array.isArray(val)) {\n    val.forEach(v => {\n        nest.push(findNestedObj(obj, key, v))\n    })\n} else {\n    nest = [findNestedObj(obj, key, val)]\n}\nmsg.sub = nest;\nreturn msg;\n\nfunction findNestedObj(entireObj, keyToFind, valToFind) {\n    let foundObj;\n    JSON.stringify(entireObj, (_, nestedValue) => {\n        if (nestedValue && nestedValue[keyToFind] === valToFind) {\n            foundObj = nestedValue;\n        }\n        return nestedValue;\n    });\n    return foundObj;\n};",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -758,6 +766,487 @@
         "wires": []
     },
     {
+        "id": "2a4feb8a87d0a7c4",
+        "type": "http in",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "url": "/api/auth/sign-in",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 140,
+        "y": 140,
+        "wires": [
+            [
+                "1139aaeb805d591e"
+            ]
+        ]
+    },
+    {
+        "id": "9ed6e261b82dc55d",
+        "type": "http response",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 1560,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "24dfaa402842999c",
+        "type": "cloudantplus in",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-users",
+        "service": "_ext_",
+        "search": "_view_",
+        "design": "view-user",
+        "index": "by-nik",
+        "x": 590,
+        "y": 140,
+        "wires": [
+            [
+                "b3f14e2a3a967408"
+            ]
+        ]
+    },
+    {
+        "id": "1139aaeb805d591e",
+        "type": "function",
+        "z": "3a3a41a0d95d74c4",
+        "name": "check body",
+        "func": "let {nik, password} = msg.payload;\nlet isValid = false;\nif(nik && password){\n    isValid = true;\n    msg.payload = {\n        key: nik\n    }\n}\nmsg.isValid = isValid;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 390,
+        "y": 140,
+        "wires": [
+            [
+                "5dbfca463b8f94ea"
+            ]
+        ]
+    },
+    {
+        "id": "b3f14e2a3a967408",
+        "type": "switch",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "property": "payload.length",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "gt",
+                "v": "0",
+                "vt": "num"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 750,
+        "y": 140,
+        "wires": [
+            [
+                "f76eb5c7ca814e7f"
+            ],
+            [
+                "f55844213af658cb"
+            ]
+        ]
+    },
+    {
+        "id": "c9f15de4fba5c2e0",
+        "type": "http response",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "statusCode": "400",
+        "headers": {},
+        "x": 940,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "f55844213af658cb",
+        "type": "change",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"code\":400,\"error\":\"user-not-found\",\"message\":\"user not found\"}",
+                "tot": "json"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 960,
+        "y": 240,
+        "wires": [
+            [
+                "c9f15de4fba5c2e0"
+            ]
+        ]
+    },
+    {
+        "id": "f76eb5c7ca814e7f",
+        "type": "function",
+        "z": "3a3a41a0d95d74c4",
+        "name": "prepare sub",
+        "func": "msg.user = msg.payload[0].value;\nlet pass = msg.user.authorizations.find(x => x.type === 'password').passwords\nmsg.sub = pass[pass.length - 1];\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 950,
+        "y": 60,
+        "wires": [
+            [
+                "12be102bd5a5549e"
+            ]
+        ]
+    },
+    {
+        "id": "12be102bd5a5549e",
+        "type": "subflow:c2f437acbbab02bd",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "x": 960,
+        "y": 100,
+        "wires": [
+            [
+                "0460f41c928aef8f"
+            ]
+        ]
+    },
+    {
+        "id": "0460f41c928aef8f",
+        "type": "function",
+        "z": "3a3a41a0d95d74c4",
+        "name": "check account",
+        "func": "let isValid = false;\nlet {nik, password} = msg.req.body;\nif(`${nik};${password}` === msg.sub){\n    isValid = true;\n    msg.sub = msg.user\n}\nmsg.isValid = isValid;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 960,
+        "y": 140,
+        "wires": [
+            [
+                "5ef56066432171ba"
+            ]
+        ]
+    },
+    {
+        "id": "ab91fa5df5761e58",
+        "type": "subflow:77002254b872fa8e",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "x": 1180,
+        "y": 60,
+        "wires": [
+            [
+                "20f7357695b26aa8"
+            ]
+        ]
+    },
+    {
+        "id": "5ef56066432171ba",
+        "type": "switch",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "property": "isValid",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 990,
+        "y": 180,
+        "wires": [
+            [
+                "ab91fa5df5761e58"
+            ],
+            [
+                "982ba459a96640b9"
+            ]
+        ]
+    },
+    {
+        "id": "11fc9ef3ad64cf3c",
+        "type": "http response",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "statusCode": "400",
+        "headers": {},
+        "x": 1180,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "982ba459a96640b9",
+        "type": "change",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"code\":400,\"error\":\"not-authorized\",\"message\":\"account not authorized\"}",
+                "tot": "json"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1200,
+        "y": 220,
+        "wires": [
+            [
+                "11fc9ef3ad64cf3c"
+            ]
+        ]
+    },
+    {
+        "id": "5dbfca463b8f94ea",
+        "type": "switch",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "property": "isValid",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 410,
+        "y": 180,
+        "wires": [
+            [
+                "24dfaa402842999c"
+            ],
+            [
+                "1b09477332150a88"
+            ]
+        ]
+    },
+    {
+        "id": "96353977042ba7f3",
+        "type": "http response",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "statusCode": "400",
+        "headers": {},
+        "x": 580,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "1b09477332150a88",
+        "type": "change",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"code\":400,\"error\":\"invalid-parameter\",\"message\":\"check your parameters\"}",
+                "tot": "json"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 600,
+        "y": 220,
+        "wires": [
+            [
+                "96353977042ba7f3"
+            ]
+        ]
+    },
+    {
+        "id": "946615b5dff60503",
+        "type": "cloudantplus in",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-libs",
+        "service": "_ext_",
+        "search": "_view_",
+        "design": "type",
+        "index": "by-topic",
+        "x": 1180,
+        "y": 140,
+        "wires": [
+            [
+                "17cf590e3d949f01"
+            ]
+        ]
+    },
+    {
+        "id": "17cf590e3d949f01",
+        "type": "function",
+        "z": "3a3a41a0d95d74c4",
+        "name": "prepare sub",
+        "func": "msg.sub = {\n    obj: msg.payload[0].value.data,\n    key: 'code',\n    val: (msg.result.decoded.roles.system.length > 0) ? msg.result.decoded.roles.system[0] : null\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1390,
+        "y": 60,
+        "wires": [
+            [
+                "38aab1868e7e1fc8"
+            ]
+        ]
+    },
+    {
+        "id": "3b111b6afac1790d",
+        "type": "function",
+        "z": "3a3a41a0d95d74c4",
+        "name": "return",
+        "func": "msg.payload = {...msg.result, systemRole: msg.sub};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1370,
+        "y": 140,
+        "wires": [
+            [
+                "9ed6e261b82dc55d"
+            ]
+        ]
+    },
+    {
+        "id": "38aab1868e7e1fc8",
+        "type": "subflow:4c9a3cd45f1fbba4",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "x": 1400,
+        "y": 100,
+        "wires": [
+            [
+                "3b111b6afac1790d"
+            ]
+        ]
+    },
+    {
+        "id": "20f7357695b26aa8",
+        "type": "function",
+        "z": "3a3a41a0d95d74c4",
+        "name": "set result",
+        "func": "msg.result = msg.sub;\nmsg.payload = {\n    key: [\"reference\", \"smart-system-role\"]\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1180,
+        "y": 100,
+        "wires": [
+            [
+                "946615b5dff60503"
+            ]
+        ]
+    },
+    {
+        "id": "d2f18a6f7f6e0afd",
+        "type": "promptinput",
+        "z": "786b2ecce5602d44",
+        "name": "",
+        "datatype": "str",
+        "prompt": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "x": 490,
+        "y": 160,
+        "wires": [
+            [
+                "58cf8fb4e8bd7ff9"
+            ]
+        ]
+    },
+    {
+        "id": "818230ca98664d48",
+        "type": "debug",
+        "z": "786b2ecce5602d44",
+        "name": "debug 15",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1060,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "58cf8fb4e8bd7ff9",
+        "type": "change",
+        "z": "786b2ecce5602d44",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "code",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 760,
+        "y": 160,
+        "wires": [
+            []
+        ]
+    },
+    {
         "id": "24214884693edfa2",
         "type": "function",
         "z": "35d2cc8d792ddb2a",
@@ -806,7 +1295,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 980,
-        "y": 200,
+        "y": 120,
         "wires": []
     },
     {
@@ -826,8 +1315,8 @@
                 "t": "set",
                 "p": "payload",
                 "pt": "msg",
-                "to": "smart-system-roles",
-                "tot": "str"
+                "to": "{\"keys\":[[\"reference\",\"smart-corp-role\"],[\"reference\",\"smart-system-role\"]]}",
+                "tot": "json"
             }
         ],
         "action": "",
@@ -849,16 +1338,16 @@
         "z": "35d2cc8d792ddb2a",
         "name": "",
         "cloudant": "784d89e62dfb5070",
-        "database": "smart-configs",
+        "database": "smart-libs",
         "service": "_ext_",
-        "search": "_id_",
-        "design": "",
-        "index": "",
-        "x": 320,
+        "search": "_view_",
+        "design": "type",
+        "index": "by-topic",
+        "x": 340,
         "y": 200,
         "wires": [
             [
-                "4627187758966a77"
+                "f5aa11d58f518d50"
             ]
         ]
     },
@@ -867,7 +1356,7 @@
         "type": "function",
         "z": "35d2cc8d792ddb2a",
         "name": "mapping result",
-        "func": "msg.corpRoles = msg.payload.data;\nlet users = msg.users.map(x => {\n    let algorithm = 'aes256';\n    let key = env.get('CRYPTO_KEY');\n    let iv = env.get('CRYPTO_IV');\n    let cipher = crypto.createCipheriv(algorithm, key, iv);\n    let encrypted = cipher.update(`${x.NIK};pass`, 'utf8', 'hex') + cipher.final('hex');\n    let type = 'non-adfs';\n    if (/^\\d+$/.test(x.NIK) && x.NIK.length === 8) type = 'adfs';\n\n    return {\n        nik: x.NIK,\n        type: type,\n        fullName: x.szFullName,\n        email: x.szEmailAddress,\n        occupation: msg.corpRoles.find(r => r.origin === x.szCorpRoleName)?.code || null,\n        roles: msg.sysRoles.filter(r => r.origin === x.szSysRoleName).map(r => r.code),\n        authorizations: [\n            {\n                type: 'password',\n                passwords: [encrypted]\n            }\n        ]\n    }\n});\nmsg.documents = {\n    docs: users\n};\nreturn msg;",
+        "func": "msg.corpRole = msg.payload.find(x => x.key[1] === 'smart-corp-role').value.data;\nmsg.systemRole = msg.corpRole = msg.payload.find(x => x.key[1] === 'smart-system-role').value.data;\nlet users = msg.users.map(x => {\n    let algorithm = 'aes256';\n    let key = env.get('CRYPTO_KEY');\n    let iv = env.get('CRYPTO_IV');\n    let cipher = crypto.createCipheriv(algorithm, key, iv);\n    let encrypted = cipher.update(`${x.NIK};pass`, 'utf8', 'hex') + cipher.final('hex');\n    let type = 'non-adfs';\n    if (/^\\d+$/.test(x.NIK) && x.NIK.length === 8) type = 'adfs';\n\n    return {\n        nik: x.NIK,\n        type: type,\n        fullName: x.szFullName,\n        email: x.szEmailAddress,\n        occupation: msg.corpRole.find(r => r.origin === x.szCorpRoleName)?.code || null,\n        roles: {\n            corp: msg.corpRole.find(r => r.origin === x.szCorpRoleName)?.code || null,\n            system: msg.systemRole.filter(r => r.origin === x.szSysRoleName).map(r => r.code) || null\n        },\n        authorizations: [\n            {\n                type: 'password',\n                passwords: [encrypted]\n            }\n        ]\n    }\n});\nmsg.documents = {\n    docs: users\n};\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -879,63 +1368,10 @@
             }
         ],
         "x": 560,
-        "y": 160,
-        "wires": [
-            [
-                "8f9ff0f95018dd01"
-            ]
-        ]
-    },
-    {
-        "id": "4627187758966a77",
-        "type": "change",
-        "z": "35d2cc8d792ddb2a",
-        "name": "",
-        "rules": [
-            {
-                "t": "set",
-                "p": "sysRoles",
-                "pt": "msg",
-                "to": "payload.data",
-                "tot": "msg"
-            },
-            {
-                "t": "set",
-                "p": "payload",
-                "pt": "msg",
-                "to": "smart-corp-roles",
-                "tot": "str"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 560,
         "y": 80,
         "wires": [
             [
-                "4105d7495b07d60f"
-            ]
-        ]
-    },
-    {
-        "id": "4105d7495b07d60f",
-        "type": "cloudantplus in",
-        "z": "35d2cc8d792ddb2a",
-        "name": "",
-        "cloudant": "784d89e62dfb5070",
-        "database": "smart-configs",
-        "service": "_ext_",
-        "search": "_id_",
-        "design": "",
-        "index": "",
-        "x": 560,
-        "y": 120,
-        "wires": [
-            [
-                "f5aa11d58f518d50"
+                "8f9ff0f95018dd01"
             ]
         ]
     },
@@ -956,7 +1392,7 @@
         "senderr": false,
         "headers": [],
         "x": 790,
-        "y": 200,
+        "y": 120,
         "wires": [
             [
                 "f183a287ee95d591"
@@ -979,8 +1415,8 @@
         "authType": "basic",
         "senderr": false,
         "headers": [],
-        "x": 800,
-        "y": 80,
+        "x": 560,
+        "y": 120,
         "wires": [
             [
                 "292e9cb262adf6cc"
@@ -1003,8 +1439,8 @@
         "authType": "basic",
         "senderr": false,
         "headers": [],
-        "x": 800,
-        "y": 120,
+        "x": 560,
+        "y": 160,
         "wires": [
             [
                 "b6ef183ef6f342f9"
@@ -1031,7 +1467,7 @@
         "to": "",
         "reg": false,
         "x": 800,
-        "y": 160,
+        "y": 80,
         "wires": [
             [
                 "36b892547277fd3e"
@@ -1137,7 +1573,7 @@
         "type": "function",
         "z": "35d2cc8d792ddb2a",
         "name": "function 3",
-        "func": "let root = msg.payload.filter(x => x.ParentID === null);\nlet rs = [];\nroot.forEach(x => {\n    rs.push({\n        id: x.iOrgID,\n        name: x.ChildName.toUpperCase(),\n        desc: x.ChildDesc,\n        category: x.cCategory.toUpperCase(),\n        children: getHierarchy(msg.payload, x.iOrgID)\n    });\n});\nmsg.payload = rs;\nreturn msg;\n\nfunction getHierarchy(data, parentID, limit = 0) {\n    if (limit > 10) {\n        return;\n    }\n    let result = [];\n    for (let i = 0; i < data.length; i++) {\n        let item = data[i];\n        if (item.ParentID === parentID) {\n            result.push({\n                id: item.iOrgID,\n                name: item.ChildName.toUpperCase(),\n                desc: item.ChildDesc,\n                category: item.cCategory.toUpperCase(),\n                children: (data.some(x => x.ParentID === parentID)) ? getHierarchy(data, item.iOrgID, limit + 1) : null\n            })\n        }\n    }\n    return result;\n}",
+        "func": "let root = msg.payload.filter(x => x.cCategory === 'PSM');\nlet rs = [];\nroot.forEach(x => {\n    rs.push({\n        id: x.iOrgID,\n        name: x.ChildName.toUpperCase(),\n        desc: x.ChildDesc,\n        category: x.cCategory.toUpperCase(),\n        children: getChildren(msg.payload, x.iOrgID)\n    });\n});\nmsg.payload = rs;\nreturn msg;\n\nfunction getChildren(data, parentID, limit = 0) {\n    if (limit > 10) {\n        return;\n    }\n    let result = [];\n    for (let i = 0; i < data.length; i++) {\n        let item = data[i];\n        if (item.ParentID === parentID) {\n            result.push({\n                id: item.iOrgID,\n                name: item.ChildName.toUpperCase(),\n                desc: item.ChildDesc,\n                category: item.cCategory.toUpperCase(),\n                children: (data.some(x => x.ParentID === parentID)) ? getChildren(data, item.iOrgID, limit + 1) : null\n            })\n        }\n    }\n    return result;\n}",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -1781,424 +2217,126 @@
         "wires": []
     },
     {
-        "id": "2a4feb8a87d0a7c4",
-        "type": "http in",
-        "z": "3a3a41a0d95d74c4",
+        "id": "0b10ffbee06f8be4",
+        "type": "subflow:4c9a3cd45f1fbba4",
+        "z": "bf22cd3c7ed55a35",
         "name": "",
-        "url": "/api/auth/sign-in",
-        "method": "post",
-        "upload": false,
-        "swaggerDoc": "",
-        "x": 140,
-        "y": 140,
+        "x": 920,
+        "y": 520,
         "wires": [
             [
-                "1139aaeb805d591e"
+                "4a2c9a9296b4570d"
             ]
         ]
     },
     {
-        "id": "9ed6e261b82dc55d",
-        "type": "http response",
-        "z": "3a3a41a0d95d74c4",
+        "id": "ec23984d38f1910d",
+        "type": "inject",
+        "z": "bf22cd3c7ed55a35",
         "name": "",
-        "statusCode": "200",
-        "headers": {},
-        "x": 1620,
-        "y": 140,
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 900,
+        "y": 360,
+        "wires": [
+            [
+                "9d922992467612d1"
+            ]
+        ]
+    },
+    {
+        "id": "4a2c9a9296b4570d",
+        "type": "debug",
+        "z": "bf22cd3c7ed55a35",
+        "name": "debug 16",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1140,
+        "y": 520,
         "wires": []
     },
     {
-        "id": "24dfaa402842999c",
+        "id": "9d922992467612d1",
+        "type": "change",
+        "z": "bf22cd3c7ed55a35",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "53d89bcba9e2c7202f43c9edcc02ad19",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 920,
+        "y": 400,
+        "wires": [
+            [
+                "8c1e46faeb6783f5"
+            ]
+        ]
+    },
+    {
+        "id": "8c1e46faeb6783f5",
         "type": "cloudantplus in",
-        "z": "3a3a41a0d95d74c4",
-        "name": "",
-        "cloudant": "784d89e62dfb5070",
-        "database": "smart-users",
-        "service": "_ext_",
-        "search": "_view_",
-        "design": "view-user",
-        "index": "by-nik",
-        "x": 590,
-        "y": 140,
-        "wires": [
-            [
-                "b3f14e2a3a967408"
-            ]
-        ]
-    },
-    {
-        "id": "1139aaeb805d591e",
-        "type": "function",
-        "z": "3a3a41a0d95d74c4",
-        "name": "check body",
-        "func": "let {nik, password} = msg.payload;\nlet isValid = false;\nif(nik && password){\n    isValid = true;\n    msg.payload = {\n        key: nik\n    }\n}\nmsg.isValid = isValid;\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 390,
-        "y": 140,
-        "wires": [
-            [
-                "5dbfca463b8f94ea"
-            ]
-        ]
-    },
-    {
-        "id": "b3f14e2a3a967408",
-        "type": "switch",
-        "z": "3a3a41a0d95d74c4",
-        "name": "",
-        "property": "payload.length",
-        "propertyType": "msg",
-        "rules": [
-            {
-                "t": "gt",
-                "v": "0",
-                "vt": "num"
-            },
-            {
-                "t": "else"
-            }
-        ],
-        "checkall": "true",
-        "repair": false,
-        "outputs": 2,
-        "x": 750,
-        "y": 140,
-        "wires": [
-            [
-                "f76eb5c7ca814e7f"
-            ],
-            [
-                "f55844213af658cb"
-            ]
-        ]
-    },
-    {
-        "id": "c9f15de4fba5c2e0",
-        "type": "http response",
-        "z": "3a3a41a0d95d74c4",
-        "name": "",
-        "statusCode": "400",
-        "headers": {},
-        "x": 940,
-        "y": 280,
-        "wires": []
-    },
-    {
-        "id": "f55844213af658cb",
-        "type": "change",
-        "z": "3a3a41a0d95d74c4",
-        "name": "",
-        "rules": [
-            {
-                "t": "set",
-                "p": "payload",
-                "pt": "msg",
-                "to": "{\"code\":400,\"error\":\"user-not-found\",\"message\":\"user not found\"}",
-                "tot": "json"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 960,
-        "y": 240,
-        "wires": [
-            [
-                "c9f15de4fba5c2e0"
-            ]
-        ]
-    },
-    {
-        "id": "f76eb5c7ca814e7f",
-        "type": "function",
-        "z": "3a3a41a0d95d74c4",
-        "name": "prepare sub",
-        "func": "msg.user = msg.payload[0].value;\nlet pass = msg.user.authorizations.find(x => x.type === 'password').passwords\nmsg.sub = pass[pass.length - 1];\n\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 950,
-        "y": 60,
-        "wires": [
-            [
-                "12be102bd5a5549e"
-            ]
-        ]
-    },
-    {
-        "id": "12be102bd5a5549e",
-        "type": "subflow:c2f437acbbab02bd",
-        "z": "3a3a41a0d95d74c4",
-        "name": "",
-        "x": 960,
-        "y": 100,
-        "wires": [
-            [
-                "0460f41c928aef8f"
-            ]
-        ]
-    },
-    {
-        "id": "0460f41c928aef8f",
-        "type": "function",
-        "z": "3a3a41a0d95d74c4",
-        "name": "check account",
-        "func": "let isValid = false;\nlet {nik, password} = msg.req.body;\nif(`${nik};${password}` === msg.sub){\n    isValid = true;\n    msg.sub = {\n        nik: msg.user.nik,\n        fullName: msg.user.fullName,\n        email: msg.user.email,\n        occupation: msg.user.occupation,\n        roles: msg.user.roles\n    }\n}\nmsg.isValid = isValid;\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 960,
-        "y": 140,
-        "wires": [
-            [
-                "5ef56066432171ba"
-            ]
-        ]
-    },
-    {
-        "id": "ab91fa5df5761e58",
-        "type": "subflow:77002254b872fa8e",
-        "z": "3a3a41a0d95d74c4",
-        "name": "",
-        "x": 1180,
-        "y": 60,
-        "wires": [
-            [
-                "20f7357695b26aa8"
-            ]
-        ]
-    },
-    {
-        "id": "5ef56066432171ba",
-        "type": "switch",
-        "z": "3a3a41a0d95d74c4",
-        "name": "",
-        "property": "isValid",
-        "propertyType": "msg",
-        "rules": [
-            {
-                "t": "true"
-            },
-            {
-                "t": "false"
-            }
-        ],
-        "checkall": "true",
-        "repair": false,
-        "outputs": 2,
-        "x": 990,
-        "y": 180,
-        "wires": [
-            [
-                "ab91fa5df5761e58"
-            ],
-            [
-                "982ba459a96640b9"
-            ]
-        ]
-    },
-    {
-        "id": "11fc9ef3ad64cf3c",
-        "type": "http response",
-        "z": "3a3a41a0d95d74c4",
-        "name": "",
-        "statusCode": "400",
-        "headers": {},
-        "x": 1180,
-        "y": 260,
-        "wires": []
-    },
-    {
-        "id": "982ba459a96640b9",
-        "type": "change",
-        "z": "3a3a41a0d95d74c4",
-        "name": "",
-        "rules": [
-            {
-                "t": "set",
-                "p": "payload",
-                "pt": "msg",
-                "to": "{\"code\":400,\"error\":\"not-authorized\",\"message\":\"account not authorized\"}",
-                "tot": "json"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 1200,
-        "y": 220,
-        "wires": [
-            [
-                "11fc9ef3ad64cf3c"
-            ]
-        ]
-    },
-    {
-        "id": "5dbfca463b8f94ea",
-        "type": "switch",
-        "z": "3a3a41a0d95d74c4",
-        "name": "",
-        "property": "isValid",
-        "propertyType": "msg",
-        "rules": [
-            {
-                "t": "true"
-            },
-            {
-                "t": "false"
-            }
-        ],
-        "checkall": "true",
-        "repair": false,
-        "outputs": 2,
-        "x": 410,
-        "y": 180,
-        "wires": [
-            [
-                "24dfaa402842999c"
-            ],
-            [
-                "1b09477332150a88"
-            ]
-        ]
-    },
-    {
-        "id": "96353977042ba7f3",
-        "type": "http response",
-        "z": "3a3a41a0d95d74c4",
-        "name": "",
-        "statusCode": "400",
-        "headers": {},
-        "x": 580,
-        "y": 260,
-        "wires": []
-    },
-    {
-        "id": "1b09477332150a88",
-        "type": "change",
-        "z": "3a3a41a0d95d74c4",
-        "name": "",
-        "rules": [
-            {
-                "t": "set",
-                "p": "payload",
-                "pt": "msg",
-                "to": "{\"code\":400,\"error\":\"invalid-parameter\",\"message\":\"check your parameters\"}",
-                "tot": "json"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 600,
-        "y": 220,
-        "wires": [
-            [
-                "96353977042ba7f3"
-            ]
-        ]
-    },
-    {
-        "id": "946615b5dff60503",
-        "type": "cloudantplus in",
-        "z": "3a3a41a0d95d74c4",
+        "z": "bf22cd3c7ed55a35",
         "name": "",
         "cloudant": "784d89e62dfb5070",
         "database": "smart-libs",
         "service": "_ext_",
-        "search": "_view_",
-        "design": "type",
-        "index": "by-topic",
-        "x": 1220,
-        "y": 140,
+        "search": "_id_",
+        "design": "",
+        "index": "",
+        "x": 900,
+        "y": 440,
         "wires": [
             [
-                "17cf590e3d949f01"
+                "b1650cde15ff2eed"
             ]
         ]
     },
     {
-        "id": "17cf590e3d949f01",
+        "id": "b1650cde15ff2eed",
         "type": "function",
-        "z": "3a3a41a0d95d74c4",
-        "name": "prepare sub",
-        "func": "msg.sub = {\n    obj: msg.payload[0].value.data,\n    key: 'code',\n    val: (msg.result.decoded.roles.length > 0) ? msg.result.decoded.roles[0] : null\n}\nreturn msg;",
+        "z": "bf22cd3c7ed55a35",
+        "name": "function 7",
+        "func": "msg.sub = {\n    obj: msg.payload.data,\n    key: 'id',\n    val: [5036,\n        5037,\n        5038,\n        5039,\n        5041,\n        5042,\n        5070,\n        5108]\n}\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1430,
-        "y": 60,
+        "x": 900,
+        "y": 480,
         "wires": [
             [
-                "38aab1868e7e1fc8"
-            ]
-        ]
-    },
-    {
-        "id": "3b111b6afac1790d",
-        "type": "function",
-        "z": "3a3a41a0d95d74c4",
-        "name": "return",
-        "func": "msg.payload = {...msg.result, systemRole: msg.sub};\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 1410,
-        "y": 140,
-        "wires": [
-            [
-                "9ed6e261b82dc55d"
-            ]
-        ]
-    },
-    {
-        "id": "38aab1868e7e1fc8",
-        "type": "subflow:4c9a3cd45f1fbba4",
-        "z": "3a3a41a0d95d74c4",
-        "name": "",
-        "x": 1440,
-        "y": 100,
-        "wires": [
-            [
-                "3b111b6afac1790d"
-            ]
-        ]
-    },
-    {
-        "id": "20f7357695b26aa8",
-        "type": "function",
-        "z": "3a3a41a0d95d74c4",
-        "name": "set result",
-        "func": "msg.result = msg.sub;\nmsg.payload = {\n    key: [\"reference\", \"smart-system-role\"]\n}\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 1180,
-        "y": 100,
-        "wires": [
-            [
-                "946615b5dff60503"
+                "0b10ffbee06f8be4"
             ]
         ]
     }
