@@ -249,7 +249,7 @@
         "id": "f804f4dc33b60992",
         "type": "subflow",
         "name": "hierarchy:search",
-        "info": "",
+        "info": "## Input on msg.sub\r\n\r\n    msg.sub = {\r\n        topic: 'area',\r\n        root: 5001,\r\n        pointer: 5068,\r\n        crit: [\r\n            {\r\n                key: 'category',\r\n                val: 'BLOCK'\r\n            }\r\n        ]\r\n    }\r\n\r\n`topic` is a topic for hierarchy in couchdb\r\n\r\n`root` is an id as starting point of all hierarchy tree \r\n\r\n`pointer` is starting point to search by id inside tree\r\n\r\n`crit` as a filter to define the final result\r\n\r\n## Output on msg.sub\r\n\r\n    msg.sub = {\r\n        result,\r\n        parents,\r\n        flatten\r\n    }\r\n\r\n`result` is the result after filter by criteria\r\n\r\n`parents` contains all superior node starting at pointer id\r\n\r\n`flatten` contains all objects starting at pointer id in flatten / not nested",
         "category": "",
         "in": [
             {
@@ -2251,7 +2251,7 @@
                 "type": "str"
             }
         ],
-        "x": 810,
+        "x": 800,
         "y": 280,
         "wires": [
             [
