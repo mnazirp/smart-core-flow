@@ -279,6 +279,39 @@
         "color": "#DDAA99"
     },
     {
+        "id": "44e549ae5408d3d3",
+        "type": "subflow",
+        "name": "reference:search",
+        "info": "",
+        "category": "",
+        "in": [
+            {
+                "x": 60,
+                "y": 100,
+                "wires": [
+                    {
+                        "id": "f6e36d93f7d62631"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 320,
+                "y": 100,
+                "wires": [
+                    {
+                        "id": "f6e36d93f7d62631",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [],
+        "meta": {},
+        "color": "#DDAA99"
+    },
+    {
         "id": "784d89e62dfb5070",
         "type": "cloudantplus",
         "host": "http://diga:password@localhost:5930",
@@ -479,6 +512,23 @@
             [
                 "5acd4c3122e3cf4d"
             ]
+        ]
+    },
+    {
+        "id": "f6e36d93f7d62631",
+        "type": "function",
+        "z": "44e549ae5408d3d3",
+        "name": "function 12",
+        "func": "let { obj, key, val } = msg.sub;\nlet nest = findNestedObj(obj, key, val);\nmsg.sub = nest;\nreturn msg;\n\nfunction findNestedObj(entireObj, keyToFind, valToFind) {\n    let foundObj;\n    JSON.stringify(entireObj, (_, nestedValue) => {\n        if (nestedValue && nestedValue[keyToFind] === valToFind) {\n            foundObj = nestedValue;\n        }\n        return nestedValue;\n    });\n    return foundObj;\n};",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 190,
+        "y": 100,
+        "wires": [
+            []
         ]
     },
     {
@@ -1169,7 +1219,9 @@
         "x": 1390,
         "y": 60,
         "wires": [
-            []
+            [
+                "33feea6c9732727e"
+            ]
         ]
     },
     {
@@ -1207,6 +1259,19 @@
         "wires": [
             [
                 "946615b5dff60503"
+            ]
+        ]
+    },
+    {
+        "id": "33feea6c9732727e",
+        "type": "subflow:44e549ae5408d3d3",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "x": 1400,
+        "y": 100,
+        "wires": [
+            [
+                "3b111b6afac1790d"
             ]
         ]
     },
@@ -2252,7 +2317,7 @@
                 "type": "str"
             }
         ],
-        "x": 800,
+        "x": 810,
         "y": 280,
         "wires": [
             [
