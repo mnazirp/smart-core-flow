@@ -48,6 +48,14 @@
         "env": []
     },
     {
+        "id": "c13d19c3dfb652c9",
+        "type": "tab",
+        "label": "Smart:Scope",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
         "id": "77002254b872fa8e",
         "type": "subflow",
         "name": "jwt-sign",
@@ -312,6 +320,39 @@
         "color": "#DDAA99"
     },
     {
+        "id": "63baa18a398cf25b",
+        "type": "subflow",
+        "name": "scope:finder",
+        "info": "",
+        "category": "",
+        "in": [
+            {
+                "x": 80,
+                "y": 100,
+                "wires": [
+                    {
+                        "id": "7a88b9a6f510af6e"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 640,
+                "y": 100,
+                "wires": [
+                    {
+                        "id": "5ed00e5c9996b0ba",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [],
+        "meta": {},
+        "color": "#DDAA99"
+    },
+    {
         "id": "784d89e62dfb5070",
         "type": "cloudantplus",
         "host": "http://diga:password@localhost:5930",
@@ -529,6 +570,42 @@
         "y": 100,
         "wires": [
             []
+        ]
+    },
+    {
+        "id": "5ed00e5c9996b0ba",
+        "type": "function",
+        "z": "63baa18a398cf25b",
+        "name": "mapping sub result",
+        "func": "let { obj, scopes } = msg.sub;\nlet rs = [];\nif (Array.isArray(scopes)) {\n    scopes.forEach(scope => {\n        let items = findNestedObj(obj, 'id', scope.ids);\n        let flat = flatten(items);\n        let fullFLat = flatten(obj);\n        let parents = getParents(fullFLat, scope.ids);\n        flat[0].parentId = parents[0].parentId;\n        parents.shift();\n        rs.push(parents.sort().reverse().concat(flat));\n    });\n}\nmsg.sub = rs;\n\nreturn msg;\n\nfunction findNestedObj(entireObj, keyToFind, valToFind) {\n    let foundObj = [];\n    JSON.stringify(entireObj, (_, nestedValue) => {\n        if (nestedValue && nestedValue[keyToFind] === valToFind) {\n            foundObj = nestedValue;\n        }\n        return nestedValue;\n    });\n    return [foundObj];\n}\n\nfunction flatten(arr, level = 0, filter = {}, parentId = null) {\n    const filterKeys = Object.keys(filter);\n    return arr.reduce((acc, { id, children, ...rest }) => {\n        const flattenedChildren = children ? flatten(children, level + 1, filter, id) : [];\n        const flattenedObject = { ...rest, id, level, parentId };\n        if (filterKeys.every(key => flattenedObject[key] === filter[key])) {\n            return [...acc, flattenedObject, ...flattenedChildren];\n        }\n        return acc.concat(flattenedChildren);\n    }, []);\n}\n\nfunction getParents(flatObj, childId) {\n    let parents = [];\n    let child = flatObj.find(x => x.id === childId);\n    if (child) {\n        parents.push(child);\n        do {\n            let parent = (child) ? flatObj.find(x => x.id === child.parentId) : [];\n            if (parent) parents.push(parent);\n            child = parent;\n        }\n        while (child && child.parentId != null);\n    }\n    return parents;\n}",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 290,
+        "y": 140,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "7a88b9a6f510af6e",
+        "type": "function",
+        "z": "63baa18a398cf25b",
+        "name": "function 14",
+        "func": "\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 270,
+        "y": 100,
+        "wires": [
+            [
+                "5ed00e5c9996b0ba"
+            ]
         ]
     },
     {
@@ -1661,7 +1738,7 @@
         "type": "function",
         "z": "35d2cc8d792ddb2a",
         "name": "function 3",
-        "func": "let root = msg.payload.filter(x => x.cCategory === 'PSM');\nlet rs = [];\nroot.forEach(x => {\n    rs.push({\n        id: x.iOrgID,\n        name: x.ChildName.toUpperCase(),\n        desc: x.ChildDesc,\n        category: x.cCategory.toUpperCase(),\n        children: getChildren(msg.payload, x.iOrgID)\n    });\n});\nmsg.payload = rs;\nreturn msg;\n\nfunction getChildren(data, parentID, limit = 0) {\n    if (limit > 10) {\n        return;\n    }\n    let result = [];\n    for (let i = 0; i < data.length; i++) {\n        let item = data[i];\n        if (item.ParentID === parentID) {\n            result.push({\n                id: item.iOrgID,\n                name: item.ChildName.toUpperCase(),\n                desc: item.ChildDesc,\n                category: item.cCategory.toUpperCase(),\n                children: (data.some(x => x.ParentID === parentID)) ? getChildren(data, item.iOrgID, limit + 1) : null\n            })\n        }\n    }\n    return result;\n}",
+        "func": "let root = msg.payload.filter(x => x.cCategory === 'PSM');\nlet rs = [];\nroot.forEach(x => {\n    rs.push({\n        id: x.iOrgID,\n        name: x.ChildName.toUpperCase(),\n        desc: x.ChildDesc,\n        category: x.cCategory.toUpperCase(),\n        children: getChildren(msg.payload, x.iOrgID)\n    });\n});\nmsg.payload = rs;\nreturn msg;\n\nfunction getChildren(data, parentID, limit = 0) {\n    if (limit > 10) {\n        return;\n    }\n    let result = [];\n    for (let i = 0; i < data.length; i++) {\n        let item = data[i];\n        if (item.ParentID === parentID) {\n            result.push({\n                id: item.iOrgID,\n                name: item.ChildName.toUpperCase(),\n                desc: item.ChildDesc,\n                category: item.cCategory.toUpperCase(),\n                children: (data.some(x => x.ParentID === parentID)) ? getChildren(data.filter(x => x.ParentID === parentID), item.iOrgID, limit + 1) : null\n            })\n        }\n    }\n    return result;\n}",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -2359,7 +2436,7 @@
         "type": "function",
         "z": "bf22cd3c7ed55a35",
         "name": "function 11",
-        "func": "msg.sub = {\n    root: 5008,\n    topic: 'area',\n    pointer: 5068,\n    crit: [\n        {\n            key: 'category',\n            val: 'BLOCK'\n        },\n        // {\n        //     key: 'parentId',\n        //     val: 5134\n        // }\n    ]\n}\nreturn msg;",
+        "func": "msg.sub = {\n    root: 5008,\n    topic: 'area',\n    pointer: 5068,\n    crit: [\n        {\n            key: 'category',\n            val: 'BLOCK'\n        },\n        {\n            key: 'parentId',\n            val: 5128\n        }\n    ]\n}\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -2389,5 +2466,347 @@
         "x": 1020,
         "y": 280,
         "wires": []
+    },
+    {
+        "id": "fe90bc21b37ff1a8",
+        "type": "inject",
+        "z": "c13d19c3dfb652c9",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "AD",
+        "payloadType": "str",
+        "x": 170,
+        "y": 80,
+        "wires": [
+            [
+                "03617adce40f2af3"
+            ]
+        ]
+    },
+    {
+        "id": "1979422651a1cc35",
+        "type": "debug",
+        "z": "c13d19c3dfb652c9",
+        "name": "debug 19",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 360,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "ac0c7b604e2b1c6e",
+        "type": "cloudantplus in",
+        "z": "c13d19c3dfb652c9",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-libs",
+        "service": "_ext_",
+        "search": "_view_",
+        "design": "type",
+        "index": "by-topic",
+        "x": 360,
+        "y": 120,
+        "wires": [
+            [
+                "9c708519cdfb5dcf"
+            ]
+        ]
+    },
+    {
+        "id": "03617adce40f2af3",
+        "type": "function",
+        "z": "c13d19c3dfb652c9",
+        "name": "set result",
+        "func": "msg.ori = msg.payload;\nmsg.payload = {\n    key: [\"reference\", \"smart-system-role\"]\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 360,
+        "y": 80,
+        "wires": [
+            [
+                "ac0c7b604e2b1c6e"
+            ]
+        ]
+    },
+    {
+        "id": "9c708519cdfb5dcf",
+        "type": "function",
+        "z": "c13d19c3dfb652c9",
+        "name": "prepare sub",
+        "func": "msg.sub = {\n    obj: msg.payload[0].value.data,\n    key: 'code',\n    val: msg.ori\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 160,
+        "wires": [
+            [
+                "34f89d912d038df4"
+            ]
+        ]
+    },
+    {
+        "id": "34f89d912d038df4",
+        "type": "subflow:44e549ae5408d3d3",
+        "z": "c13d19c3dfb652c9",
+        "name": "",
+        "x": 390,
+        "y": 200,
+        "wires": [
+            [
+                "1979422651a1cc35"
+            ]
+        ]
+    },
+    {
+        "id": "dc71136f5ffa8d31",
+        "type": "inject",
+        "z": "c13d19c3dfb652c9",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"scope\":\"SC-SAW-AREA-00001\",\"psm\":5001}",
+        "payloadType": "json",
+        "x": 650,
+        "y": 80,
+        "wires": [
+            [
+                "7f671249b1fca5f7"
+            ]
+        ]
+    },
+    {
+        "id": "c166188acfb350f3",
+        "type": "debug",
+        "z": "c13d19c3dfb652c9",
+        "name": "debug 20",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 820,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "7f671249b1fca5f7",
+        "type": "function",
+        "z": "c13d19c3dfb652c9",
+        "name": "get scopes",
+        "func": "msg.ori = msg.payload;\nmsg.payload = {\n    key: msg.payload.scope\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 830,
+        "y": 80,
+        "wires": [
+            [
+                "21d8f69d7fa91d52"
+            ]
+        ]
+    },
+    {
+        "id": "21d8f69d7fa91d52",
+        "type": "cloudantplus in",
+        "z": "c13d19c3dfb652c9",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-libs",
+        "service": "_ext_",
+        "search": "_view_",
+        "design": "type",
+        "index": "by-code",
+        "x": 820,
+        "y": 120,
+        "wires": [
+            [
+                "17ef63f096270b46"
+            ]
+        ]
+    },
+    {
+        "id": "17ef63f096270b46",
+        "type": "function",
+        "z": "c13d19c3dfb652c9",
+        "name": "get hierarchy",
+        "func": "msg.scope = msg.payload[0].value;\nmsg.payload = {\n    key: msg.scope.hierarchyCode\n};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 830,
+        "y": 160,
+        "wires": [
+            [
+                "551427b9d27acbfe"
+            ]
+        ]
+    },
+    {
+        "id": "551427b9d27acbfe",
+        "type": "cloudantplus in",
+        "z": "c13d19c3dfb652c9",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-libs",
+        "service": "_ext_",
+        "search": "_view_",
+        "design": "type",
+        "index": "by-code",
+        "x": 820,
+        "y": 200,
+        "wires": [
+            [
+                "a41f3231137e895e"
+            ]
+        ]
+    },
+    {
+        "id": "a41f3231137e895e",
+        "type": "function",
+        "z": "c13d19c3dfb652c9",
+        "name": "prepare sub",
+        "func": "msg.area = msg.payload[0].value;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 830,
+        "y": 240,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "a913be707788b4a3",
+        "type": "subflow:63baa18a398cf25b",
+        "z": "c13d19c3dfb652c9",
+        "name": "",
+        "x": 590,
+        "y": 340,
+        "wires": [
+            [
+                "c166188acfb350f3"
+            ]
+        ]
+    },
+    {
+        "id": "f8d777bea3c0d2f3",
+        "type": "inject",
+        "z": "c13d19c3dfb652c9",
+        "name": "",
+        "props": [
+            {
+                "p": "sub",
+                "v": "",
+                "vt": "date"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 150,
+        "y": 340,
+        "wires": [
+            [
+                "7f0d668f43a58f56"
+            ]
+        ]
+    },
+    {
+        "id": "e3217c7e3ff0b0fd",
+        "type": "cloudantplus in",
+        "z": "c13d19c3dfb652c9",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-libs",
+        "service": "_ext_",
+        "search": "_view_",
+        "design": "type",
+        "index": "by-topic",
+        "x": 360,
+        "y": 380,
+        "wires": [
+            [
+                "06ba7a2d683fd8ee"
+            ]
+        ]
+    },
+    {
+        "id": "7f0d668f43a58f56",
+        "type": "function",
+        "z": "c13d19c3dfb652c9",
+        "name": "prepare key",
+        "func": "msg.payload = {\n    key: ['hierarchy', 'area']\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 340,
+        "wires": [
+            [
+                "e3217c7e3ff0b0fd"
+            ]
+        ]
+    },
+    {
+        "id": "06ba7a2d683fd8ee",
+        "type": "function",
+        "z": "c13d19c3dfb652c9",
+        "name": "function 13",
+        "func": "msg.sub = {\n    obj: msg.payload[0].value.data,\n    scopes: [\n        {\n            \"type\": \"estate\",\n            \"ids\": 5069,\n            \"algo\": \"top-down\",\n            \"category\": \"COMPLEX\"\n        },\n        {\n            \"type\": \"estate\",\n            \"ids\": 5070,\n            \"algo\": \"self\"\n        },\n        {\n            \"type\": \"division\",\n            \"ids\": 5100,\n            \"algo\": \"self\"\n        }\n    ]\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 420,
+        "wires": [
+            [
+                "a913be707788b4a3"
+            ]
+        ]
     }
 ]
