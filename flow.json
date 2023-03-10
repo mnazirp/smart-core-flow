@@ -2948,7 +2948,7 @@
         "type": "function",
         "z": "c13d19c3dfb652c9",
         "name": "save to redis",
-        "func": "/**to set expire set topic into null\n * and set payload to an Array with EX on it [topic, value, EX, ex-value]\n */\nmsg.payload = [`scope:${msg.ori.nik}:${msg.ori.scopeCode}`, JSON.stringify(msg.sub), 'EX', 5 * 60];\nmsg.topic = null;\nreturn msg;",
+        "func": "/**to set expire set topic into null\n * and set payload to an Array with EX on it [topic, value, EX, ex-value]\n */\nmsg.payload = [`scope:${msg.ori.scopeCode}`, JSON.stringify(msg.sub), 'EX', 5 * 60];\nmsg.topic = null;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
