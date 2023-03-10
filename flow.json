@@ -2767,7 +2767,7 @@
         "type": "function",
         "z": "c13d19c3dfb652c9",
         "name": "get scope by code",
-        "func": "msg.ori = {\n    nik: 'N15000001',\n    scopeCode: 'SC-SAW-AREA-00001'\n}\nmsg.payload = `scope:${msg.ori.nik}:${msg.ori.scopeCode}`;\nreturn msg;",
+        "func": "msg.ori = {\n    nik: 'N15000001',\n    scopeCode: 'SC-SAW-AREA-00001'\n}\nmsg.payload = `scope:${msg.ori.scopeCode}`;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
