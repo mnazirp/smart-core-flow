@@ -2537,14 +2537,14 @@
         "id": "6e6b190070972e0d",
         "type": "function",
         "z": "bf22cd3c7ed55a35",
-        "name": "function 5",
+        "name": "prepare payload to encrypt",
         "func": "msg.sub = \"some random text\";\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 280,
+        "x": 340,
         "y": 580,
         "wires": [
             [
@@ -2574,7 +2574,7 @@
         "payload": "",
         "payloadType": "date",
         "x": 100,
-        "y": 680,
+        "y": 700,
         "wires": [
             [
                 "85ac96e7de1d3a13"
@@ -2595,22 +2595,22 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 520,
-        "y": 720,
+        "y": 740,
         "wires": []
     },
     {
         "id": "85ac96e7de1d3a13",
         "type": "function",
         "z": "bf22cd3c7ed55a35",
-        "name": "function 6",
+        "name": "prepare encrypt",
         "func": "msg.sub = \"d15cac3ea87e3fca0b51be2662c4e48135679b8ab52ab656ef3309e35d9e43d4\";\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 280,
-        "y": 680,
+        "x": 300,
+        "y": 700,
         "wires": [
             [
                 "e1957673de771643"
@@ -2636,7 +2636,7 @@
         "z": "bf22cd3c7ed55a35",
         "name": "",
         "x": 300,
-        "y": 720,
+        "y": 740,
         "wires": [
             [
                 "14d0cc3b742d1f15"
@@ -2688,8 +2688,8 @@
                 "type": "str"
             }
         ],
-        "x": 810,
-        "y": 280,
+        "x": 990,
+        "y": 240,
         "wires": [
             [
                 "c1f08ce0466fcbef"
@@ -2729,15 +2729,15 @@
         "id": "6328a57e47771e7b",
         "type": "function",
         "z": "bf22cd3c7ed55a35",
-        "name": "function 11",
+        "name": "prepare root, topic, pointer, criterya",
         "func": "msg.sub = {\n    root: 5008,\n    topic: 'area',\n    pointer: 5068,\n    crit: [\n        {\n            key: 'category',\n            val: 'BLOCK'\n        },\n        {\n            key: 'parentId',\n            val: 5128\n        }\n    ]\n}\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 790,
-        "y": 240,
+        "x": 1040,
+        "y": 200,
         "wires": [
             [
                 "fba20105cfbaa67f"
@@ -2757,244 +2757,14 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1020,
-        "y": 280,
-        "wires": []
-    },
-    {
-        "id": "fe90bc21b37ff1a8",
-        "type": "inject",
-        "z": "c13d19c3dfb652c9",
-        "name": "",
-        "props": [
-            {
-                "p": "payload"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "AD",
-        "payloadType": "str",
-        "x": 170,
-        "y": 80,
-        "wires": [
-            [
-                "03617adce40f2af3"
-            ]
-        ]
-    },
-    {
-        "id": "1979422651a1cc35",
-        "type": "debug",
-        "z": "c13d19c3dfb652c9",
-        "name": "debug 19",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 360,
+        "x": 1180,
         "y": 240,
         "wires": []
-    },
-    {
-        "id": "ac0c7b604e2b1c6e",
-        "type": "cloudantplus in",
-        "z": "c13d19c3dfb652c9",
-        "name": "",
-        "cloudant": "784d89e62dfb5070",
-        "database": "smart-libs",
-        "service": "_ext_",
-        "search": "_view_",
-        "design": "type",
-        "index": "by-topic",
-        "x": 360,
-        "y": 120,
-        "wires": [
-            [
-                "9c708519cdfb5dcf"
-            ]
-        ]
-    },
-    {
-        "id": "03617adce40f2af3",
-        "type": "function",
-        "z": "c13d19c3dfb652c9",
-        "name": "set result",
-        "func": "msg.ori = msg.payload;\nmsg.payload = {\n    key: [\"reference\", \"smart-system-role\"]\n}\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 360,
-        "y": 80,
-        "wires": [
-            [
-                "ac0c7b604e2b1c6e"
-            ]
-        ]
-    },
-    {
-        "id": "9c708519cdfb5dcf",
-        "type": "function",
-        "z": "c13d19c3dfb652c9",
-        "name": "prepare sub",
-        "func": "msg.sub = {\n    obj: msg.payload[0].value.data,\n    key: 'code',\n    val: msg.ori\n}\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 370,
-        "y": 160,
-        "wires": [
-            [
-                "34f89d912d038df4"
-            ]
-        ]
-    },
-    {
-        "id": "34f89d912d038df4",
-        "type": "subflow:44e549ae5408d3d3",
-        "z": "c13d19c3dfb652c9",
-        "name": "",
-        "x": 400,
-        "y": 200,
-        "wires": [
-            [
-                "1979422651a1cc35"
-            ]
-        ]
-    },
-    {
-        "id": "dc71136f5ffa8d31",
-        "type": "inject",
-        "z": "c13d19c3dfb652c9",
-        "name": "",
-        "props": [
-            {
-                "p": "payload"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "{\"scope\":\"SC-SAW-AREA-00001\",\"psm\":5001}",
-        "payloadType": "json",
-        "x": 650,
-        "y": 80,
-        "wires": [
-            [
-                "7f671249b1fca5f7"
-            ]
-        ]
-    },
-    {
-        "id": "7f671249b1fca5f7",
-        "type": "function",
-        "z": "c13d19c3dfb652c9",
-        "name": "get scopes",
-        "func": "msg.ori = msg.payload;\nmsg.payload = {\n    key: msg.payload.scope\n}\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 830,
-        "y": 80,
-        "wires": [
-            [
-                "21d8f69d7fa91d52"
-            ]
-        ]
-    },
-    {
-        "id": "21d8f69d7fa91d52",
-        "type": "cloudantplus in",
-        "z": "c13d19c3dfb652c9",
-        "name": "",
-        "cloudant": "784d89e62dfb5070",
-        "database": "smart-libs",
-        "service": "_ext_",
-        "search": "_view_",
-        "design": "type",
-        "index": "by-code",
-        "x": 820,
-        "y": 120,
-        "wires": [
-            [
-                "17ef63f096270b46"
-            ]
-        ]
-    },
-    {
-        "id": "17ef63f096270b46",
-        "type": "function",
-        "z": "c13d19c3dfb652c9",
-        "name": "get hierarchy",
-        "func": "msg.scope = msg.payload[0].value;\nmsg.payload = {\n    key: msg.scope.hierarchyCode\n};\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 830,
-        "y": 160,
-        "wires": [
-            [
-                "551427b9d27acbfe"
-            ]
-        ]
-    },
-    {
-        "id": "551427b9d27acbfe",
-        "type": "cloudantplus in",
-        "z": "c13d19c3dfb652c9",
-        "name": "",
-        "cloudant": "784d89e62dfb5070",
-        "database": "smart-libs",
-        "service": "_ext_",
-        "search": "_view_",
-        "design": "type",
-        "index": "by-code",
-        "x": 820,
-        "y": 200,
-        "wires": [
-            [
-                "a41f3231137e895e"
-            ]
-        ]
-    },
-    {
-        "id": "a41f3231137e895e",
-        "type": "function",
-        "z": "c13d19c3dfb652c9",
-        "name": "prepare sub",
-        "func": "msg.area = msg.payload[0].value;\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 830,
-        "y": 240,
-        "wires": [
-            []
-        ]
     },
     {
         "id": "f8d777bea3c0d2f3",
         "type": "inject",
-        "z": "c13d19c3dfb652c9",
+        "z": "bf22cd3c7ed55a35",
         "name": "",
         "props": [
             {
@@ -3008,8 +2778,8 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "x": 150,
-        "y": 340,
+        "x": 770,
+        "y": 300,
         "wires": [
             [
                 "d9cb860952c43548"
@@ -3019,10 +2789,10 @@
     {
         "id": "c6f1402a0e7d6be4",
         "type": "subflow:25a729f30c43b341",
-        "z": "c13d19c3dfb652c9",
+        "z": "bf22cd3c7ed55a35",
         "name": "",
-        "x": 380,
-        "y": 380,
+        "x": 1000,
+        "y": 340,
         "wires": [
             [
                 "90258e6c5dbb6759"
@@ -3032,7 +2802,7 @@
     {
         "id": "90258e6c5dbb6759",
         "type": "debug",
-        "z": "c13d19c3dfb652c9",
+        "z": "bf22cd3c7ed55a35",
         "name": "debug 20",
         "active": true,
         "tosidebar": true,
@@ -3042,23 +2812,23 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 660,
-        "y": 380,
+        "x": 1280,
+        "y": 340,
         "wires": []
     },
     {
         "id": "d9cb860952c43548",
         "type": "function",
-        "z": "c13d19c3dfb652c9",
-        "name": "function 15",
+        "z": "bf22cd3c7ed55a35",
+        "name": "prepare nik & scope code",
         "func": "msg.sub = {\n    nik: 'N15000001',\n    scopeCode: 'SC-SAW-AREA-00001'\n}\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 350,
-        "y": 340,
+        "x": 1010,
+        "y": 300,
         "wires": [
             [
                 "c6f1402a0e7d6be4"
