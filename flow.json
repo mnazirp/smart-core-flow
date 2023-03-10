@@ -322,7 +322,7 @@
     {
         "id": "63baa18a398cf25b",
         "type": "subflow",
-        "name": "scope:finder",
+        "name": "algo:scopeFinder",
         "info": "",
         "category": "",
         "in": [
@@ -355,7 +355,7 @@
     {
         "id": "784d89e62dfb5070",
         "type": "cloudantplus",
-        "host": "http://diga:password@localhost:5930",
+        "host": "${DIGA_COUCHDB}",
         "name": "diga-couchdb"
     },
     {
@@ -367,6 +367,14 @@
         "password": "password",
         "db": "${DIGA_MYSQL_DBNAME}",
         "servername": ""
+    },
+    {
+        "id": "0fb96b870afb5c15",
+        "type": "redis-config",
+        "name": "Local",
+        "options": "REDIS_URL",
+        "cluster": false,
+        "optionsType": "env"
     },
     {
         "id": "156f4bd7081013b2",
@@ -2605,23 +2613,6 @@
         ]
     },
     {
-        "id": "c166188acfb350f3",
-        "type": "debug",
-        "z": "c13d19c3dfb652c9",
-        "name": "debug 20",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 820,
-        "y": 340,
-        "wires": []
-    },
-    {
         "id": "7f671249b1fca5f7",
         "type": "function",
         "z": "c13d19c3dfb652c9",
@@ -2719,11 +2710,11 @@
         "type": "subflow:63baa18a398cf25b",
         "z": "c13d19c3dfb652c9",
         "name": "",
-        "x": 590,
+        "x": 950,
         "y": 340,
         "wires": [
             [
-                "c166188acfb350f3"
+                "d6d816aa7d1fd15a"
             ]
         ]
     },
@@ -2763,8 +2754,8 @@
         "search": "_view_",
         "design": "type",
         "index": "by-topic",
-        "x": 360,
-        "y": 380,
+        "x": 640,
+        "y": 460,
         "wires": [
             [
                 "06ba7a2d683fd8ee"
@@ -2775,18 +2766,18 @@
         "id": "7f0d668f43a58f56",
         "type": "function",
         "z": "c13d19c3dfb652c9",
-        "name": "prepare key",
-        "func": "msg.payload = {\n    key: ['hierarchy', 'area']\n}\nreturn msg;",
+        "name": "get scope by code",
+        "func": "msg.ori = {\n    nik: 'N15000001',\n    scopeCode: 'SC-SAW-AREA-00001'\n}\nmsg.payload = `scope:${msg.ori.nik}:${msg.ori.scopeCode}`;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 370,
+        "x": 390,
         "y": 340,
         "wires": [
             [
-                "e3217c7e3ff0b0fd"
+                "21f9205ec0644936"
             ]
         ]
     },
@@ -2794,19 +2785,217 @@
         "id": "06ba7a2d683fd8ee",
         "type": "function",
         "z": "c13d19c3dfb652c9",
-        "name": "function 13",
-        "func": "msg.sub = {\n    obj: msg.payload[0].value.data,\n    scopes: [\n        {\n            \"type\": \"estate\",\n            \"ids\": 5069,\n            \"algo\": \"top-down\",\n            \"category\": \"COMPLEX\"\n        },\n        {\n            \"type\": \"estate\",\n            \"ids\": 5070,\n            \"algo\": \"self\"\n        },\n        {\n            \"type\": \"division\",\n            \"ids\": 5100,\n            \"algo\": \"self\"\n        }\n    ]\n}\nreturn msg;",
+        "name": "prepare sub",
+        "func": "msg.sub = {\n    obj: msg.payload[0].value.data,\n    scopes: msg.scope.data\n}\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 370,
-        "y": 420,
+        "x": 690,
+        "y": 500,
         "wires": [
             [
                 "a913be707788b4a3"
             ]
         ]
+    },
+    {
+        "id": "915a77b65f7aa5ff",
+        "type": "cloudantplus in",
+        "z": "c13d19c3dfb652c9",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-libs",
+        "service": "_ext_",
+        "search": "_view_",
+        "design": "type",
+        "index": "by-code",
+        "x": 640,
+        "y": 380,
+        "wires": [
+            [
+                "cafade7146ea2c39"
+            ]
+        ]
+    },
+    {
+        "id": "cafade7146ea2c39",
+        "type": "function",
+        "z": "c13d19c3dfb652c9",
+        "name": "get area hierarchy",
+        "func": "msg.scope = msg.payload[0].value;\nmsg.payload = {\n    key: [\"hierarchy\", \"area\"]\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 670,
+        "y": 420,
+        "wires": [
+            [
+                "e3217c7e3ff0b0fd"
+            ]
+        ]
+    },
+    {
+        "id": "c166188acfb350f3",
+        "type": "debug",
+        "z": "c13d19c3dfb652c9",
+        "name": "debug 20",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1140,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "f8bd74c6b30d97c4",
+        "type": "redis-command",
+        "z": "c13d19c3dfb652c9",
+        "server": "0fb96b870afb5c15",
+        "command": "set",
+        "name": "",
+        "topic": "",
+        "params": "[]",
+        "paramsType": "json",
+        "payloadType": "json",
+        "block": false,
+        "x": 920,
+        "y": 420,
+        "wires": [
+            [
+                "c166188acfb350f3"
+            ]
+        ]
+    },
+    {
+        "id": "21f9205ec0644936",
+        "type": "redis-command",
+        "z": "c13d19c3dfb652c9",
+        "server": "0fb96b870afb5c15",
+        "command": "GET",
+        "name": "",
+        "topic": "",
+        "params": "[]",
+        "paramsType": "json",
+        "payloadType": "json",
+        "block": false,
+        "x": 360,
+        "y": 380,
+        "wires": [
+            [
+                "f240a561dacceaa9"
+            ]
+        ]
+    },
+    {
+        "id": "f240a561dacceaa9",
+        "type": "switch",
+        "z": "c13d19c3dfb652c9",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "null"
+            },
+            {
+                "t": "nnull"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 430,
+        "y": 420,
+        "wires": [
+            [
+                "534e74173a3dea50"
+            ],
+            [
+                "0a60a67d15c726a8"
+            ]
+        ]
+    },
+    {
+        "id": "534e74173a3dea50",
+        "type": "function",
+        "z": "c13d19c3dfb652c9",
+        "name": "get scope by code",
+        "func": "msg.payload = {\n    key: msg.ori.scopeCode\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 670,
+        "y": 340,
+        "wires": [
+            [
+                "915a77b65f7aa5ff"
+            ]
+        ]
+    },
+    {
+        "id": "d6d816aa7d1fd15a",
+        "type": "function",
+        "z": "c13d19c3dfb652c9",
+        "name": "save to redis",
+        "func": "/**to set expire set topic into null\n * and set payload to an Array with EX on it [topic, value, EX, ex-value]\n */\nmsg.payload = [`scope:${msg.ori.nik}:${msg.ori.scopeCode}`, JSON.stringify(msg.sub), 'EX', 5 * 60];\nmsg.topic = null;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 930,
+        "y": 380,
+        "wires": [
+            [
+                "f8bd74c6b30d97c4"
+            ]
+        ]
+    },
+    {
+        "id": "0a60a67d15c726a8",
+        "type": "function",
+        "z": "c13d19c3dfb652c9",
+        "name": "return from redis",
+        "func": "msg.sub = JSON.parse(msg.payload);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 660,
+        "y": 560,
+        "wires": [
+            [
+                "996d62c0a8a1b0e0"
+            ]
+        ]
+    },
+    {
+        "id": "996d62c0a8a1b0e0",
+        "type": "debug",
+        "z": "c13d19c3dfb652c9",
+        "name": "debug 21",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 920,
+        "y": 560,
+        "wires": []
     }
 ]
