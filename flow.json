@@ -50,7 +50,7 @@
     {
         "id": "c13d19c3dfb652c9",
         "type": "tab",
-        "label": "Smart:SelecOptions",
+        "label": "Smart:Select Options",
         "disabled": false,
         "info": "",
         "env": []
@@ -256,7 +256,7 @@
     {
         "id": "f804f4dc33b60992",
         "type": "subflow",
-        "name": "sub:searchOnHiearchyByCriteria",
+        "name": "sub:search-on-hierarchy",
         "info": "## Input on msg.sub\r\n\r\n    msg.sub = {\r\n        topic: 'area',\r\n        root: 5001,\r\n        pointer: 5068,\r\n        crit: [\r\n            {\r\n                key: 'category',\r\n                val: 'BLOCK'\r\n            }\r\n        ]\r\n    }\r\n\r\n`topic` is a topic for hierarchy in couchdb \r\n\r\n`root` is an id as starting point of all hierarchy tree \r\n\r\n`pointer` is starting point to search by id inside tree\r\n\r\n`crit` as a filter to define the final result\r\n\r\n## Output on msg.sub\r\n\r\n    msg.sub = {\r\n        result,\r\n        parents,\r\n        flatten\r\n    }\r\n\r\n`result` is the result after filter by criteria\r\n\r\n`parents` contains all superior node starting from pointer id\r\n\r\n`flatten` contains all flatten objects starting at pointer ",
         "category": "",
         "in": [
@@ -289,7 +289,7 @@
     {
         "id": "44e549ae5408d3d3",
         "type": "subflow",
-        "name": "algo:findInNestedObj",
+        "name": "algo:find-nested",
         "info": "",
         "category": "",
         "in": [
@@ -322,7 +322,7 @@
     {
         "id": "63baa18a398cf25b",
         "type": "subflow",
-        "name": "algo:scopeFinder",
+        "name": "algo:find-scope",
         "info": "",
         "category": "",
         "in": [
@@ -331,7 +331,7 @@
                 "y": 100,
                 "wires": [
                     {
-                        "id": "7a88b9a6f510af6e"
+                        "id": "5ed00e5c9996b0ba"
                     }
                 ]
             }
@@ -355,7 +355,7 @@
     {
         "id": "25a729f30c43b341",
         "type": "subflow",
-        "name": "sub:getScopeByCode",
+        "name": "sub:get-scope-by-code",
         "info": "",
         "category": "",
         "in": [
@@ -379,7 +379,7 @@
                         "port": 0
                     },
                     {
-                        "id": "074973f584ae3ece",
+                        "id": "f8bd74c6b30d97c4",
                         "port": 0
                     }
                 ]
@@ -629,28 +629,9 @@
         "finalize": "",
         "libs": [],
         "x": 290,
-        "y": 140,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "7a88b9a6f510af6e",
-        "type": "function",
-        "z": "63baa18a398cf25b",
-        "name": "function 14",
-        "func": "\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 270,
         "y": 100,
         "wires": [
-            [
-                "5ed00e5c9996b0ba"
-            ]
+            []
         ]
     },
     {
@@ -690,7 +671,7 @@
         "type": "function",
         "z": "25a729f30c43b341",
         "name": "get scope by code",
-        "func": "msg.ori = msg.sub;\nmsg.payload = `scope:${msg.ori.scopeCode}`;\nreturn msg;",
+        "func": "msg.ori = msg.sub;\nmsg.payload = `scope:${msg.sub}`;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -776,9 +757,7 @@
         "x": 760,
         "y": 160,
         "wires": [
-            [
-                "074973f584ae3ece"
-            ]
+            []
         ]
     },
     {
@@ -835,7 +814,7 @@
         "type": "function",
         "z": "25a729f30c43b341",
         "name": "get scope by code",
-        "func": "msg.payload = {\n    key: msg.ori.scopeCode\n}\nreturn msg;",
+        "func": "msg.payload = {\n    key: msg.ori\n}\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -854,7 +833,7 @@
         "type": "function",
         "z": "25a729f30c43b341",
         "name": "save to redis",
-        "func": "/**to set expire set topic into null\n * and set payload to an Array with EX on it [topic, value, EX, ex-value]\n */\nmsg.payload = [`scope:${msg.ori.scopeCode}`, JSON.stringify(msg.sub), 'EX', 5 * 60];\nmsg.topic = null;\nreturn msg;",
+        "func": "/**to set expire set topic into null\n * and set payload to an Array with EX on it [topic, value, EX, ex-value]\n */\nmsg.payload = [`scope:${msg.ori}`, JSON.stringify(msg.sub), 'EX', 5 * 60];\nmsg.topic = null;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -881,23 +860,6 @@
         "libs": [],
         "x": 500,
         "y": 300,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "074973f584ae3ece",
-        "type": "function",
-        "z": "25a729f30c43b341",
-        "name": "return value",
-        "func": "msg.sub = msg.payload;\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 770,
-        "y": 200,
         "wires": [
             []
         ]
@@ -2245,7 +2207,7 @@
         "type": "subflow:77002254b872fa8e",
         "z": "bf22cd3c7ed55a35",
         "name": "",
-        "x": 280,
+        "x": 290,
         "y": 100,
         "wires": [
             [
@@ -2323,7 +2285,7 @@
         "type": "subflow:32e9ed8660fb2fde",
         "z": "bf22cd3c7ed55a35",
         "name": "",
-        "x": 280,
+        "x": 300,
         "y": 240,
         "wires": [
             [
@@ -2428,7 +2390,7 @@
         "type": "subflow:0f802e687dcc9e4a",
         "z": "bf22cd3c7ed55a35",
         "name": "",
-        "x": 280,
+        "x": 290,
         "y": 380,
         "wires": [
             [
@@ -2460,7 +2422,7 @@
         "type": "subflow:c9c1579a9da27745",
         "z": "bf22cd3c7ed55a35",
         "name": "",
-        "x": 310,
+        "x": 320,
         "y": 500,
         "wires": [
             [
@@ -2622,7 +2584,7 @@
         "type": "subflow:cfa2e326ca547b07",
         "z": "bf22cd3c7ed55a35",
         "name": "",
-        "x": 300,
+        "x": 310,
         "y": 620,
         "wires": [
             [
@@ -2635,7 +2597,7 @@
         "type": "subflow:c2f437acbbab02bd",
         "z": "bf22cd3c7ed55a35",
         "name": "",
-        "x": 300,
+        "x": 320,
         "y": 740,
         "wires": [
             [
@@ -2821,7 +2783,7 @@
         "type": "function",
         "z": "bf22cd3c7ed55a35",
         "name": "prepare nik & scope code",
-        "func": "msg.sub = {\n    nik: 'N15000001',\n    scopeCode: 'SC-SAW-AREA-00001'\n}\nreturn msg;",
+        "func": "msg.sub = 'SC-SAW-AREA-00001';\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -2840,14 +2802,78 @@
         "type": "http in",
         "z": "c13d19c3dfb652c9",
         "name": "",
-        "url": "/api/select-options/by-scope",
+        "url": "/api/select-options",
         "method": "post",
         "upload": false,
         "swaggerDoc": "",
-        "x": 180,
+        "x": 150,
         "y": 60,
         "wires": [
-            []
+            [
+                "076170403571d03b"
+            ]
+        ]
+    },
+    {
+        "id": "db196246f04fa291",
+        "type": "subflow:25a729f30c43b341",
+        "z": "c13d19c3dfb652c9",
+        "name": "",
+        "x": 420,
+        "y": 100,
+        "wires": [
+            [
+                "53aaf6b82eabbc37"
+            ]
+        ]
+    },
+    {
+        "id": "0726dd0c9132bef2",
+        "type": "http response",
+        "z": "c13d19c3dfb652c9",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 640,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "076170403571d03b",
+        "type": "function",
+        "z": "c13d19c3dfb652c9",
+        "name": "function 13",
+        "func": "msg.sub = msg.payload.code;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 390,
+        "y": 60,
+        "wires": [
+            [
+                "db196246f04fa291"
+            ]
+        ]
+    },
+    {
+        "id": "53aaf6b82eabbc37",
+        "type": "function",
+        "z": "c13d19c3dfb652c9",
+        "name": "function 14",
+        "func": "msg.payload = msg.sub;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 390,
+        "y": 140,
+        "wires": [
+            [
+                "0726dd0c9132bef2"
+            ]
         ]
     }
 ]
