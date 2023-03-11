@@ -50,7 +50,7 @@
     {
         "id": "c13d19c3dfb652c9",
         "type": "tab",
-        "label": "Smart:Scope",
+        "label": "Smart:SelecOptions",
         "disabled": false,
         "info": "",
         "env": []
@@ -58,7 +58,7 @@
     {
         "id": "77002254b872fa8e",
         "type": "subflow",
-        "name": "jwt-sign",
+        "name": "algo:jwt-sign",
         "info": "## input:\r\non msg.sub assign an object like this:\r\n\r\n\r\n    {        \r\n        nik: '', \r\n        fullName: '',\r\n        email: '',\r\n        occupation: '',\r\n        roles: ['']\r\n    }\r\n\r\n\r\n\r\n## output:\r\ninside msg.sub:\r\n\r\n\r\n\r\n    {\r\n        token: 'eyJhbGciOiJIUzI1NiI...',\r\n        decoded: {}  \r\n    }\r\n\r\n// nrlint function-eslint:off\r\n",
         "category": "",
         "in": [
@@ -91,7 +91,7 @@
     {
         "id": "32e9ed8660fb2fde",
         "type": "subflow",
-        "name": "jwt-verify",
+        "name": "algo:jwt-verify",
         "info": "## input:\non msg.sub assign an a token string like this:\n\n\n    'eyJhbGciOiJIUzI1NiI...'\n\n\n## output:\ninside msg.sub:\n\n\n\n    {\n        token: 'eyJhbGciOiJIUzI1NiI...',\n        decoded: {},\n        error: {\n            message: 'jwt expired',\n            stack: '',\n            arguments: null,\n            name: 'TokenExpiredError',\n            expiredAt: '2023-02-19T07:49:01.000Z'\n        }  \n    }\n\n// nrlint function-eslint:off\n",
         "category": "",
         "in": [
@@ -124,8 +124,8 @@
     {
         "id": "0f802e687dcc9e4a",
         "type": "subflow",
-        "name": "hashing",
-        "info": "## Input\r\nset msg.sub with the password string that neet to be hashing\r\n\r\n    `MyPassword`\r\n\r\n## Output\r\nit will produce msg.sub a hasing string\r\n\r\n    ``\n\n// nrlint function-eslint:off\n",
+        "name": "algo:hashing",
+        "info": "## Input\r\nset msg.sub with the password string that neet to be hashing\r\n\r\n    `MyPassword`\r\n\r\n## Output\r\nit will produce msg.sub a hasing string\r\n\r\n    ``\r\n\r\n// nrlint function-eslint:off\r\n",
         "category": "",
         "in": [
             {
@@ -157,8 +157,8 @@
     {
         "id": "c9c1579a9da27745",
         "type": "subflow",
-        "name": "hashing compare",
-        "info": "## Input\r\nassign msg.sub with an object:\r\n\r\n    {\r\n        password: 'MyPassword',\r\n        hash: '$2b$10$...'\r\n    }\r\n\r\n## Output\r\nit will produce msg.sub with object:\r\n\r\n    {\r\n        isValid: true //or false\r\n    }\n\n// nrlint function-eslint:off\n",
+        "name": "algo:hashing-compare",
+        "info": "## Input\r\nassign msg.sub with an object:\r\n\r\n    {\r\n        password: 'MyPassword',\r\n        hash: '$2b$10$...'\r\n    }\r\n\r\n## Output\r\nit will produce msg.sub with object:\r\n\r\n    {\r\n        isValid: true //or false\r\n    }\r\n\r\n// nrlint function-eslint:off\r\n",
         "category": "",
         "in": [
             {
@@ -190,8 +190,8 @@
     {
         "id": "cfa2e326ca547b07",
         "type": "subflow",
-        "name": "crypto-encrypt",
-        "info": "## Input\r\nset msg.sub into a string that want to encrypt\r\n\r\n    msg.sub = \"some random text\"\r\n\r\n## output\r\nit will produce encrypted text in msg.sub\n\n// nrlint function-eslint:off\n",
+        "name": "algo:crypto-encrypt",
+        "info": "## Input\r\nset msg.sub into a string that want to encrypt\r\n\r\n    msg.sub = \"some random text\"\r\n\r\n## output\r\nit will produce encrypted text in msg.sub\r\n\r\n// nrlint function-eslint:off\r\n",
         "category": "",
         "in": [
             {
@@ -223,8 +223,8 @@
     {
         "id": "c2f437acbbab02bd",
         "type": "subflow",
-        "name": "crypto-dencrypt",
-        "info": "## Input\r\nassign msg.sub with encrypted text like:\r\n\r\n    msg.sub = \"d15cac3ea87e3fca0b51b\"\r\n\r\n## output\r\nit will produce dencrypted text in msg.sub\n\n// nrlint function-eslint:off\n",
+        "name": "algo:crypto-dencrypt",
+        "info": "## Input\r\nassign msg.sub with encrypted text like:\r\n\r\n    msg.sub = \"d15cac3ea87e3fca0b51b\"\r\n\r\n## output\r\nit will produce dencrypted text in msg.sub\r\n\r\n// nrlint function-eslint:off\r\n",
         "category": "",
         "in": [
             {
@@ -1638,7 +1638,7 @@
         "type": "subflow:44e549ae5408d3d3",
         "z": "3a3a41a0d95d74c4",
         "name": "",
-        "x": 1410,
+        "x": 1420,
         "y": 100,
         "wires": [
             [
@@ -2833,6 +2833,21 @@
             [
                 "c6f1402a0e7d6be4"
             ]
+        ]
+    },
+    {
+        "id": "f23842780cb1d49b",
+        "type": "http in",
+        "z": "c13d19c3dfb652c9",
+        "name": "",
+        "url": "/api/select-options/by-scope",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 180,
+        "y": 60,
+        "wires": [
+            []
         ]
     }
 ]
