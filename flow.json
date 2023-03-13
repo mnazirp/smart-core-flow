@@ -639,7 +639,7 @@
         "type": "subflow:63baa18a398cf25b",
         "z": "25a729f30c43b341",
         "name": "",
-        "x": 790,
+        "x": 780,
         "y": 80,
         "wires": [
             [
@@ -743,24 +743,6 @@
         ]
     },
     {
-        "id": "f8bd74c6b30d97c4",
-        "type": "redis-command",
-        "z": "25a729f30c43b341",
-        "server": "0fb96b870afb5c15",
-        "command": "set",
-        "name": "",
-        "topic": "",
-        "params": "[]",
-        "paramsType": "json",
-        "payloadType": "json",
-        "block": false,
-        "x": 760,
-        "y": 160,
-        "wires": [
-            []
-        ]
-    },
-    {
         "id": "21f9205ec0644936",
         "type": "redis-command",
         "z": "25a729f30c43b341",
@@ -829,6 +811,41 @@
         ]
     },
     {
+        "id": "0a60a67d15c726a8",
+        "type": "function",
+        "z": "25a729f30c43b341",
+        "name": "return from redis",
+        "func": "msg.sub = JSON.parse(msg.payload);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 500,
+        "y": 300,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "f8bd74c6b30d97c4",
+        "type": "redis-command",
+        "z": "25a729f30c43b341",
+        "server": "0fb96b870afb5c15",
+        "command": "set",
+        "name": "",
+        "topic": "",
+        "params": "[]",
+        "paramsType": "json",
+        "payloadType": "json",
+        "block": false,
+        "x": 760,
+        "y": 160,
+        "wires": [
+            []
+        ]
+    },
+    {
         "id": "d6d816aa7d1fd15a",
         "type": "function",
         "z": "25a729f30c43b341",
@@ -845,23 +862,6 @@
             [
                 "f8bd74c6b30d97c4"
             ]
-        ]
-    },
-    {
-        "id": "0a60a67d15c726a8",
-        "type": "function",
-        "z": "25a729f30c43b341",
-        "name": "return from redis",
-        "func": "msg.sub = JSON.parse(msg.payload);\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 500,
-        "y": 300,
-        "wires": [
-            []
         ]
     },
     {
@@ -1600,7 +1600,7 @@
         "type": "subflow:44e549ae5408d3d3",
         "z": "3a3a41a0d95d74c4",
         "name": "",
-        "x": 1420,
+        "x": 1400,
         "y": 100,
         "wires": [
             [
@@ -2815,19 +2815,6 @@
         ]
     },
     {
-        "id": "db196246f04fa291",
-        "type": "subflow:25a729f30c43b341",
-        "z": "c13d19c3dfb652c9",
-        "name": "",
-        "x": 420,
-        "y": 100,
-        "wires": [
-            [
-                "53aaf6b82eabbc37"
-            ]
-        ]
-    },
-    {
         "id": "0726dd0c9132bef2",
         "type": "http response",
         "z": "c13d19c3dfb652c9",
@@ -2842,18 +2829,18 @@
         "id": "076170403571d03b",
         "type": "function",
         "z": "c13d19c3dfb652c9",
-        "name": "function 13",
-        "func": "msg.sub = msg.payload.code;\nreturn msg;",
+        "name": "backup req body",
+        "func": "msg.body = msg.payload;\nmsg.sub = msg.payload.code;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 390,
+        "x": 410,
         "y": 60,
         "wires": [
             [
-                "db196246f04fa291"
+                "257f92ed99f76054"
             ]
         ]
     },
@@ -2861,18 +2848,31 @@
         "id": "53aaf6b82eabbc37",
         "type": "function",
         "z": "c13d19c3dfb652c9",
-        "name": "function 14",
-        "func": "msg.payload = msg.sub;\nreturn msg;",
+        "name": "filter by criteria",
+        "func": "let scope = msg.sub;\nmsg.payload = scope;\nif (msg.body.crit && msg.body.crit.length > 0) {\n    msg.payload = filterFlat(scope, msg.body.crit);\n}\nreturn msg;\n\nfunction filterFlat(flatObj, crit) {\n    return flatObj.filter(x => {\n        let params = [];\n        crit.forEach(c => {\n            let rs = false;\n            if (Array.isArray(c.val)) {\n                rs = c.val.some(s => x[c.key] === s)\n            } else {\n                rs = x[c.key] === c.val\n            }\n            params.push(rs);\n        });\n        return params.reduce((acc, val) => acc && val, true);\n    });\n}",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 390,
+        "x": 400,
         "y": 140,
         "wires": [
             [
                 "0726dd0c9132bef2"
+            ]
+        ]
+    },
+    {
+        "id": "257f92ed99f76054",
+        "type": "subflow:25a729f30c43b341",
+        "z": "c13d19c3dfb652c9",
+        "name": "",
+        "x": 420,
+        "y": 100,
+        "wires": [
+            [
+                "53aaf6b82eabbc37"
             ]
         ]
     }
