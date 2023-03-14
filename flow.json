@@ -50,7 +50,7 @@
     {
         "id": "c13d19c3dfb652c9",
         "type": "tab",
-        "label": "Smart:Select Options",
+        "label": "Smart:Scope",
         "disabled": false,
         "info": "",
         "env": []
@@ -2802,15 +2802,15 @@
         "type": "http in",
         "z": "c13d19c3dfb652c9",
         "name": "",
-        "url": "/api/select-options",
-        "method": "post",
+        "url": "/api/scope/:code",
+        "method": "get",
         "upload": false,
         "swaggerDoc": "",
-        "x": 150,
+        "x": 140,
         "y": 60,
         "wires": [
             [
-                "076170403571d03b"
+                "9f357abbdd2352e3"
             ]
         ]
     },
@@ -2826,7 +2826,37 @@
         "wires": []
     },
     {
-        "id": "076170403571d03b",
+        "id": "257f92ed99f76054",
+        "type": "subflow:25a729f30c43b341",
+        "z": "c13d19c3dfb652c9",
+        "name": "",
+        "x": 420,
+        "y": 100,
+        "wires": [
+            [
+                "40b9aaecbcd31887"
+            ]
+        ]
+    },
+    {
+        "id": "749b5d0f57e3a633",
+        "type": "http in",
+        "z": "c13d19c3dfb652c9",
+        "name": "",
+        "url": "/api/scope/filter",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 140,
+        "y": 220,
+        "wires": [
+            [
+                "01b2128d5af1714b"
+            ]
+        ]
+    },
+    {
+        "id": "01b2128d5af1714b",
         "type": "function",
         "z": "c13d19c3dfb652c9",
         "name": "backup req body",
@@ -2837,15 +2867,28 @@
         "finalize": "",
         "libs": [],
         "x": 410,
-        "y": 60,
+        "y": 220,
         "wires": [
             [
-                "257f92ed99f76054"
+                "3504d74febe43971"
             ]
         ]
     },
     {
-        "id": "53aaf6b82eabbc37",
+        "id": "3504d74febe43971",
+        "type": "subflow:25a729f30c43b341",
+        "z": "c13d19c3dfb652c9",
+        "name": "",
+        "x": 420,
+        "y": 260,
+        "wires": [
+            [
+                "5c4f365b10f99418"
+            ]
+        ]
+    },
+    {
+        "id": "5c4f365b10f99418",
         "type": "function",
         "z": "c13d19c3dfb652c9",
         "name": "filter by criteria",
@@ -2856,23 +2899,75 @@
         "finalize": "",
         "libs": [],
         "x": 400,
-        "y": 140,
+        "y": 300,
         "wires": [
             [
-                "0726dd0c9132bef2"
+                "f99e6d3131f88a2d"
             ]
         ]
     },
     {
-        "id": "257f92ed99f76054",
-        "type": "subflow:25a729f30c43b341",
+        "id": "f99e6d3131f88a2d",
+        "type": "http response",
         "z": "c13d19c3dfb652c9",
         "name": "",
-        "x": 420,
-        "y": 100,
+        "statusCode": "200",
+        "headers": {},
+        "x": 640,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "9f357abbdd2352e3",
+        "type": "change",
+        "z": "c13d19c3dfb652c9",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "sub",
+                "pt": "msg",
+                "to": "req.params.code",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 390,
+        "y": 60,
         "wires": [
             [
-                "53aaf6b82eabbc37"
+                "257f92ed99f76054"
+            ]
+        ]
+    },
+    {
+        "id": "40b9aaecbcd31887",
+        "type": "change",
+        "z": "c13d19c3dfb652c9",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "sub",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 400,
+        "y": 140,
+        "wires": [
+            [
+                "0726dd0c9132bef2"
             ]
         ]
     }
