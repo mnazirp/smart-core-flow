@@ -1562,7 +1562,7 @@
         "type": "function",
         "z": "3a3a41a0d95d74c4",
         "name": "return",
-        "func": "let sysRoles = { ...msg.result.decoded.roles.system };\nsysRoles = [msg.sub];\nmsg.result.decoded.roles.system = sysRoles;\nmsg.payload = { ...msg.result };\nreturn msg;",
+        "func": "let sysRoles = { ...msg.result.decoded.roles.system };\nsysRoles = [msg.sub];\nsysRoles.forEach(role => {\n    node.warn(role);\n    role.scopes = role.scopes.filter(x => x.psm === msg.result.decoded.psm);\n});\nmsg.result.decoded.roles.system = sysRoles;\nmsg.payload = { ...msg.result };\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
