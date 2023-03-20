@@ -56,6 +56,14 @@
         "env": []
     },
     {
+        "id": "0ee186eb42c82e4f",
+        "type": "tab",
+        "label": "Smart: User",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
         "id": "77002254b872fa8e",
         "type": "subflow",
         "name": "algo:jwt-sign",
@@ -622,7 +630,7 @@
         "type": "function",
         "z": "63baa18a398cf25b",
         "name": "mapping sub result",
-        "func": "let { obj, scopes } = msg.sub;\nlet rs = [];\nlet combineObj = [];\nif (Array.isArray(scopes)) {\n    scopes.forEach(scope => {\n        let items = findNestedObj(obj, 'id', scope.ids);\n        let flat = flatten(items);\n        let fullFLat = flatten(obj);\n        let parents = getParents(fullFLat, scope.ids);\n        flat[0].parentId = parents[0].parentId;\n        parents.shift();\n        rs.push(parents.sort().reverse().concat(flat));\n    });\n}\ncombineObj = combineArrays(...rs);\n\nmsg.sub = combineObj;\n\nreturn msg;\n\nfunction findNestedObj(entireObj, keyToFind, valToFind) {\n    let foundObj = [];\n    JSON.stringify(entireObj, (_, nestedValue) => {\n        if (nestedValue && nestedValue[keyToFind] === valToFind) {\n            foundObj = nestedValue;\n        }\n        return nestedValue;\n    });\n    return [foundObj];\n}\n\nfunction flatten(arr, level = 0, filter = {}, parentId = null) {\n    const filterKeys = Object.keys(filter);\n    return arr.reduce((acc, { id, children, ...rest }) => {\n        const flattenedChildren = children ? flatten(children, level + 1, filter, id) : [];\n        const flattenedObject = { ...rest, id, level, parentId };\n        if (filterKeys.every(key => flattenedObject[key] === filter[key])) {\n            return [...acc, flattenedObject, ...flattenedChildren];\n        }\n        return acc.concat(flattenedChildren);\n    }, []);\n}\n\nfunction getParents(flatObj, childId) {\n    let parents = [];\n    let child = flatObj.find(x => x.id === childId);\n    if (child) {\n        parents.push(child);\n        do {\n            let parent = (child) ? flatObj.find(x => x.id === child.parentId) : [];\n            if (parent) parents.push(parent);\n            child = parent;\n        }\n        while (child && child.parentId != null);\n    }\n    return parents;\n}\n\nfunction combineArrays(...arrays) {\n    const combinedArray = [].concat(...arrays);\n    const uniqueObject = {};\n    const uniqueArray = [];\n\n    for (let obj of combinedArray) {\n        const objString = JSON.stringify(obj);\n        if (!uniqueObject[objString]) {\n            uniqueObject[objString] = true;\n            uniqueArray.push(obj);\n        }\n    }\n\n    return uniqueArray;\n}\n",
+        "func": "let { obj, scopes } = msg.sub;\nlet rs = [];\nlet combineObj = [];\nif (Array.isArray(scopes)) {\n    scopes.forEach(id => {\n        let items = findNestedObj(obj, 'id', id);\n        let flat = flatten(items);\n        let fullFLat = flatten(obj);\n        let parents = getParents(fullFLat, id);\n        flat[0].parentId = parents[0].parentId;\n        parents.shift();\n        rs.push(parents.sort().reverse().concat(flat));\n    });\n}\ncombineObj = combineArrays(...rs);\n\nmsg.sub = combineObj;\n\nreturn msg;\n\nfunction findNestedObj(entireObj, keyToFind, valToFind) {\n    let foundObj = [];\n    JSON.stringify(entireObj, (_, nestedValue) => {\n        if (nestedValue && nestedValue[keyToFind] === valToFind) {\n            foundObj = nestedValue;\n        }\n        return nestedValue;\n    });\n    return [foundObj];\n}\n\nfunction flatten(arr, level = 0, filter = {}, parentId = null) {\n    const filterKeys = Object.keys(filter);\n    return arr.reduce((acc, { id, children, ...rest }) => {\n        const flattenedChildren = children ? flatten(children, level + 1, filter, id) : [];\n        const flattenedObject = { ...rest, id, level, parentId };\n        if (filterKeys.every(key => flattenedObject[key] === filter[key])) {\n            return [...acc, flattenedObject, ...flattenedChildren];\n        }\n        return acc.concat(flattenedChildren);\n    }, []);\n}\n\nfunction getParents(flatObj, childId) {\n    let parents = [];\n    let child = flatObj.find(x => x.id === childId);\n    if (child) {\n        parents.push(child);\n        do {\n            let parent = (child) ? flatObj.find(x => x.id === child.parentId) : [];\n            if (parent) parents.push(parent);\n            child = parent;\n        }\n        while (child && child.parentId != null);\n    }\n    return parents;\n}\n\nfunction combineArrays(...arrays) {\n    const combinedArray = [].concat(...arrays);\n    const uniqueObject = {};\n    const uniqueArray = [];\n\n    for (let obj of combinedArray) {\n        const objString = JSON.stringify(obj);\n        if (!uniqueObject[objString]) {\n            uniqueObject[objString] = true;\n            uniqueArray.push(obj);\n        }\n    }\n\n    return uniqueArray;\n}\n",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -1543,7 +1551,7 @@
         "type": "function",
         "z": "3a3a41a0d95d74c4",
         "name": "prepare sub",
-        "func": "msg.sub = {\n    obj: msg.payload[0].value.data,\n    key: 'code',\n    val: (msg.result.decoded.roles.system.length > 0) ? msg.result.decoded.roles.system[0] : null\n}\nreturn msg;",
+        "func": "msg.sub = {\n    obj: msg.payload[0].value.data,\n    key: 'code',\n    val: (msg.result.decoded.systemRoles.length > 0) ? msg.result.decoded.systemRoles[0] : null\n}\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -1562,7 +1570,7 @@
         "type": "function",
         "z": "3a3a41a0d95d74c4",
         "name": "return",
-        "func": "let sysRoles = { ...msg.result.decoded.roles.system };\nsysRoles = [msg.sub];\nsysRoles.forEach(role => {\n    node.warn(role);\n    role.scopes = role.scopes.filter(x => x.psm === msg.result.decoded.psm);\n});\nmsg.result.decoded.roles.system = sysRoles;\nmsg.payload = { ...msg.result };\nreturn msg;",
+        "func": "let sysRoles = { ...msg.result.decoded.systemRoles };\nsysRoles = [msg.sub];\nsysRoles.forEach(role => {\n    node.warn(role);\n    role.scopes = role.scopes.filter(x => x.psm === msg.result.decoded.psm);\n});\nmsg.result.decoded.systemRoles = sysRoles;\nmsg.payload = { ...msg.result };\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -1605,6 +1613,91 @@
         "wires": [
             [
                 "3b111b6afac1790d"
+            ]
+        ]
+    },
+    {
+        "id": "fa39ebf522cea73f",
+        "type": "inject",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "req.params.nik",
+                "v": "N15001888",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "N15001888",
+        "payloadType": "str",
+        "x": 470,
+        "y": 480,
+        "wires": [
+            [
+                "a60b1bbef92731d8"
+            ]
+        ]
+    },
+    {
+        "id": "ae55145967d462fb",
+        "type": "debug",
+        "z": "3a3a41a0d95d74c4",
+        "name": "debug 21",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 960,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "4df86a2b086f1336",
+        "type": "cloudantplus in",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-users",
+        "service": "_ext_",
+        "search": "_view_",
+        "design": "view-user",
+        "index": "by-nik",
+        "x": 670,
+        "y": 520,
+        "wires": [
+            [
+                "ae55145967d462fb"
+            ]
+        ]
+    },
+    {
+        "id": "a60b1bbef92731d8",
+        "type": "function",
+        "z": "3a3a41a0d95d74c4",
+        "name": "function 13",
+        "func": "msg.payload = {\n    \"key\": msg.req.params.nik\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 670,
+        "y": 480,
+        "wires": [
+            [
+                "4df86a2b086f1336"
             ]
         ]
     },
@@ -2802,11 +2895,11 @@
         "type": "http in",
         "z": "c13d19c3dfb652c9",
         "name": "",
-        "url": "/api/scope/:code",
+        "url": "/api/scope/by-code/:code",
         "method": "get",
         "upload": false,
         "swaggerDoc": "",
-        "x": 140,
+        "x": 160,
         "y": 60,
         "wires": [
             [
@@ -2968,6 +3061,99 @@
         "wires": [
             [
                 "0726dd0c9132bef2"
+            ]
+        ]
+    },
+    {
+        "id": "c4fea9f1ad696a34",
+        "type": "http in",
+        "z": "0ee186eb42c82e4f",
+        "name": "",
+        "url": "/api/user/by-nik/:nik",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 170,
+        "y": 80,
+        "wires": [
+            [
+                "d33d8c056a1f4d24"
+            ]
+        ]
+    },
+    {
+        "id": "380505713f9e3b39",
+        "type": "http response",
+        "z": "0ee186eb42c82e4f",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 660,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "6e11d0b7988b54f7",
+        "type": "cloudantplus in",
+        "z": "0ee186eb42c82e4f",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-users",
+        "service": "_ext_",
+        "search": "_view_",
+        "design": "view-user",
+        "index": "by-nik",
+        "x": 430,
+        "y": 120,
+        "wires": [
+            [
+                "d7308c07b96b7e55"
+            ]
+        ]
+    },
+    {
+        "id": "d33d8c056a1f4d24",
+        "type": "function",
+        "z": "0ee186eb42c82e4f",
+        "name": "function 14",
+        "func": "msg.payload = {\n    \"key\": msg.req.params.nik\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 80,
+        "wires": [
+            [
+                "6e11d0b7988b54f7"
+            ]
+        ]
+    },
+    {
+        "id": "d7308c07b96b7e55",
+        "type": "change",
+        "z": "0ee186eb42c82e4f",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload[0].value",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 440,
+        "y": 160,
+        "wires": [
+            [
+                "380505713f9e3b39"
             ]
         ]
     }
