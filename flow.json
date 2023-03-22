@@ -64,6 +64,14 @@
         "env": []
     },
     {
+        "id": "bef67a5c91d12113",
+        "type": "tab",
+        "label": "Smart:Hierarchy",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
         "id": "77002254b872fa8e",
         "type": "subflow",
         "name": "algo:jwt-sign",
@@ -1570,7 +1578,7 @@
         "type": "function",
         "z": "3a3a41a0d95d74c4",
         "name": "return",
-        "func": "let sysRoles = { ...msg.result.decoded.systemRoles };\nsysRoles = [msg.sub];\nsysRoles.forEach(role => {\n    node.warn(role);\n    role.scopes = role.scopes.filter(x => x.psm === msg.result.decoded.psm);\n});\nmsg.result.decoded.systemRoles = sysRoles;\nmsg.payload = { ...msg.result };\nreturn msg;",
+        "func": "msg.payload = { ...msg.result };\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -3156,5 +3164,90 @@
                 "380505713f9e3b39"
             ]
         ]
+    },
+    {
+        "id": "c86674137cc829c6",
+        "type": "cloudantplus in",
+        "z": "bef67a5c91d12113",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-libs",
+        "service": "_ext_",
+        "search": "_view_",
+        "design": "type",
+        "index": "by-topic",
+        "x": 440,
+        "y": 100,
+        "wires": [
+            [
+                "029f2e05aff9b94b"
+            ]
+        ]
+    },
+    {
+        "id": "029f2e05aff9b94b",
+        "type": "function",
+        "z": "bef67a5c91d12113",
+        "name": "function 15",
+        "func": "let rs = [];\nif(msg.payload.length > 0){\n    rs = msg.payload[0].value.data;\n}\nmsg.payload = rs;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 450,
+        "y": 140,
+        "wires": [
+            [
+                "92eccbb9fdeeb25a"
+            ]
+        ]
+    },
+    {
+        "id": "ad1137e2ade11e9d",
+        "type": "function",
+        "z": "bef67a5c91d12113",
+        "name": "function 16",
+        "func": "msg.payload = {\n    key: [\"hierarchy\", msg.req.params.topic]\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 450,
+        "y": 60,
+        "wires": [
+            [
+                "c86674137cc829c6"
+            ]
+        ]
+    },
+    {
+        "id": "8f44a35fde54323e",
+        "type": "http in",
+        "z": "bef67a5c91d12113",
+        "name": "",
+        "url": "/api/hierarchy/by-topic/:topic",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 170,
+        "y": 60,
+        "wires": [
+            [
+                "ad1137e2ade11e9d"
+            ]
+        ]
+    },
+    {
+        "id": "92eccbb9fdeeb25a",
+        "type": "http response",
+        "z": "bef67a5c91d12113",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 680,
+        "y": 140,
+        "wires": []
     }
 ]
