@@ -72,6 +72,14 @@
         "env": []
     },
     {
+        "id": "50baf2723fb4853b",
+        "type": "tab",
+        "label": "Smart: Libs",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
         "id": "77002254b872fa8e",
         "type": "subflow",
         "name": "algo:jwt-sign",
@@ -3248,6 +3256,91 @@
         "headers": {},
         "x": 680,
         "y": 140,
+        "wires": []
+    },
+    {
+        "id": "1f0a525d6655b092",
+        "type": "http in",
+        "z": "50baf2723fb4853b",
+        "name": "",
+        "url": "/api/libs/by-code/:code",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 150,
+        "y": 80,
+        "wires": [
+            [
+                "a850381a762322aa"
+            ]
+        ]
+    },
+    {
+        "id": "a850381a762322aa",
+        "type": "function",
+        "z": "50baf2723fb4853b",
+        "name": "function 17",
+        "func": "msg.payload = {\n    key: msg.req.params.code\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 390,
+        "y": 80,
+        "wires": [
+            [
+                "fbc6d0e4a84361e0"
+            ]
+        ]
+    },
+    {
+        "id": "fbc6d0e4a84361e0",
+        "type": "cloudantplus in",
+        "z": "50baf2723fb4853b",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-libs",
+        "service": "_ext_",
+        "search": "_view_",
+        "design": "type",
+        "index": "by-code",
+        "x": 380,
+        "y": 120,
+        "wires": [
+            [
+                "4862f871a79aaab3"
+            ]
+        ]
+    },
+    {
+        "id": "4862f871a79aaab3",
+        "type": "function",
+        "z": "50baf2723fb4853b",
+        "name": "function 18",
+        "func": "let rs = [];\nif(msg.payload.length > 0){\n    rs = msg.payload[0].value;\n}\nmsg.payload = rs;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 390,
+        "y": 160,
+        "wires": [
+            [
+                "bc12b569bb0fea58"
+            ]
+        ]
+    },
+    {
+        "id": "bc12b569bb0fea58",
+        "type": "http response",
+        "z": "50baf2723fb4853b",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 620,
+        "y": 160,
         "wires": []
     }
 ]
