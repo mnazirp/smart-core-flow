@@ -1633,91 +1633,6 @@
         ]
     },
     {
-        "id": "fa39ebf522cea73f",
-        "type": "inject",
-        "z": "3a3a41a0d95d74c4",
-        "name": "",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "req.params.nik",
-                "v": "N15001888",
-                "vt": "str"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "N15001888",
-        "payloadType": "str",
-        "x": 470,
-        "y": 480,
-        "wires": [
-            [
-                "a60b1bbef92731d8"
-            ]
-        ]
-    },
-    {
-        "id": "ae55145967d462fb",
-        "type": "debug",
-        "z": "3a3a41a0d95d74c4",
-        "name": "debug 21",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 960,
-        "y": 520,
-        "wires": []
-    },
-    {
-        "id": "4df86a2b086f1336",
-        "type": "cloudantplus in",
-        "z": "3a3a41a0d95d74c4",
-        "name": "",
-        "cloudant": "784d89e62dfb5070",
-        "database": "smart-users",
-        "service": "_ext_",
-        "search": "_view_",
-        "design": "view-user",
-        "index": "by-nik",
-        "x": 670,
-        "y": 520,
-        "wires": [
-            [
-                "ae55145967d462fb"
-            ]
-        ]
-    },
-    {
-        "id": "a60b1bbef92731d8",
-        "type": "function",
-        "z": "3a3a41a0d95d74c4",
-        "name": "function 13",
-        "func": "msg.payload = {\n    \"key\": msg.req.params.nik\n}\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 670,
-        "y": 480,
-        "wires": [
-            [
-                "4df86a2b086f1336"
-            ]
-        ]
-    },
-    {
         "id": "d2f18a6f7f6e0afd",
         "type": "promptinput",
         "z": "786b2ecce5602d44",
@@ -3341,6 +3256,151 @@
         "headers": {},
         "x": 620,
         "y": 160,
+        "wires": []
+    },
+    {
+        "id": "7156cad721d06526",
+        "type": "http in",
+        "z": "50baf2723fb4853b",
+        "name": "",
+        "url": "/api/libs/by-type-topic-code",
+        "method": "put",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 170,
+        "y": 280,
+        "wires": [
+            [
+                "fcdad3486c629196"
+            ]
+        ]
+    },
+    {
+        "id": "88c031c5f4967e47",
+        "type": "http response",
+        "z": "50baf2723fb4853b",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 840,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "7cdcac0ff194726d",
+        "type": "cloudantplus in",
+        "z": "50baf2723fb4853b",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-libs",
+        "service": "_ext_",
+        "search": "_view_",
+        "design": "type",
+        "index": "by-type-topic-code",
+        "x": 400,
+        "y": 320,
+        "wires": [
+            [
+                "c5564fd183212f1a"
+            ]
+        ]
+    },
+    {
+        "id": "fcdad3486c629196",
+        "type": "function",
+        "z": "50baf2723fb4853b",
+        "name": " [type, topic, code]",
+        "func": "msg.ori = msg.payload;\nlet {type, topic, code} = msg.payload;\nmsg.payload = {\n    key: [type, topic, code]\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 280,
+        "wires": [
+            [
+                "7cdcac0ff194726d"
+            ]
+        ]
+    },
+    {
+        "id": "2e1344e0cac458a7",
+        "type": "function",
+        "z": "50baf2723fb4853b",
+        "name": "prepare doc",
+        "func": "let { _id, _rev } = msg.payload[0].value;\nmsg.payload = {\n    _id,\n    _rev,\n    ...msg.ori\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 650,
+        "y": 280,
+        "wires": [
+            [
+                "d8522d60df53676d"
+            ]
+        ]
+    },
+    {
+        "id": "d8522d60df53676d",
+        "type": "cloudantplus out",
+        "z": "50baf2723fb4853b",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-libs",
+        "service": "_ext_",
+        "payonly": true,
+        "operation": "insert",
+        "x": 640,
+        "y": 320,
+        "wires": [
+            [
+                "88c031c5f4967e47"
+            ]
+        ]
+    },
+    {
+        "id": "c5564fd183212f1a",
+        "type": "switch",
+        "z": "50baf2723fb4853b",
+        "name": "",
+        "property": "payload.length",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "gt",
+                "v": "0",
+                "vt": "num"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 450,
+        "y": 360,
+        "wires": [
+            [
+                "2e1344e0cac458a7"
+            ],
+            [
+                "26d5ddc910e8b52f"
+            ]
+        ]
+    },
+    {
+        "id": "26d5ddc910e8b52f",
+        "type": "http response",
+        "z": "50baf2723fb4853b",
+        "name": "",
+        "statusCode": "400",
+        "headers": {},
+        "x": 640,
+        "y": 420,
         "wires": []
     }
 ]
