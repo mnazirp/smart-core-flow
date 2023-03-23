@@ -76,7 +76,7 @@
         "type": "tab",
         "label": "Smart: Libs",
         "disabled": false,
-        "info": "",
+        "info": "// nrlint function-eslint:off\n",
         "env": []
     },
     {
@@ -2674,7 +2674,7 @@
                 "type": "str"
             }
         ],
-        "x": 1040,
+        "x": 1010,
         "y": 240,
         "wires": [
             [
@@ -3310,7 +3310,7 @@
         "type": "function",
         "z": "50baf2723fb4853b",
         "name": " [type, topic, code]",
-        "func": "let {_id, _rev, ...rest} = msg.payload;\nmsg.ori = rest;\nlet {type, topic, code} = msg.payload;\nmsg.payload = _id\nreturn msg;",
+        "func": "let {_id, _rev, ...rest} = msg.payload;\nmsg.ori = rest;\nmsg.payload = _id\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
