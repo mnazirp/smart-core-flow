@@ -3263,11 +3263,11 @@
         "type": "http in",
         "z": "50baf2723fb4853b",
         "name": "",
-        "url": "/api/libs/by-type-topic-code",
+        "url": "/api/libs/by-id",
         "method": "put",
         "upload": false,
         "swaggerDoc": "",
-        "x": 170,
+        "x": 130,
         "y": 280,
         "wires": [
             [
@@ -3282,8 +3282,8 @@
         "name": "",
         "statusCode": "200",
         "headers": {},
-        "x": 840,
-        "y": 320,
+        "x": 820,
+        "y": 360,
         "wires": []
     },
     {
@@ -3294,10 +3294,10 @@
         "cloudant": "784d89e62dfb5070",
         "database": "smart-libs",
         "service": "_ext_",
-        "search": "_view_",
+        "search": "_id_",
         "design": "type",
         "index": "by-type-topic-code",
-        "x": 400,
+        "x": 380,
         "y": 320,
         "wires": [
             [
@@ -3310,13 +3310,13 @@
         "type": "function",
         "z": "50baf2723fb4853b",
         "name": " [type, topic, code]",
-        "func": "msg.ori = msg.payload;\nlet {type, topic, code} = msg.payload;\nmsg.payload = {\n    key: [type, topic, code]\n}\nreturn msg;",
+        "func": "let {_id, _rev, ...rest} = msg.payload;\nmsg.ori = rest;\nlet {type, topic, code} = msg.payload;\nmsg.payload = _id\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 430,
+        "x": 410,
         "y": 280,
         "wires": [
             [
@@ -3329,14 +3329,14 @@
         "type": "function",
         "z": "50baf2723fb4853b",
         "name": "prepare doc",
-        "func": "let { _id, _rev } = msg.payload[0].value;\nmsg.payload = {\n    _id,\n    _rev,\n    ...msg.ori\n}\nreturn msg;",
+        "func": "let {_id, _rev} = msg.payload;\nmsg.payload = {\n    _id,\n    _rev,\n    ...msg.ori\n}\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 650,
-        "y": 280,
+        "x": 630,
+        "y": 320,
         "wires": [
             [
                 "d8522d60df53676d"
@@ -3353,8 +3353,8 @@
         "service": "_ext_",
         "payonly": true,
         "operation": "insert",
-        "x": 640,
-        "y": 320,
+        "x": 620,
+        "y": 360,
         "wires": [
             [
                 "88c031c5f4967e47"
@@ -3366,13 +3366,11 @@
         "type": "switch",
         "z": "50baf2723fb4853b",
         "name": "",
-        "property": "payload.length",
+        "property": "payload",
         "propertyType": "msg",
         "rules": [
             {
-                "t": "gt",
-                "v": "0",
-                "vt": "num"
+                "t": "nnull"
             },
             {
                 "t": "else"
@@ -3399,7 +3397,7 @@
         "name": "",
         "statusCode": "400",
         "headers": {},
-        "x": 640,
+        "x": 620,
         "y": 420,
         "wires": []
     }
