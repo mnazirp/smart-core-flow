@@ -80,6 +80,14 @@
         "env": []
     },
     {
+        "id": "24807d91de0de59d",
+        "type": "tab",
+        "label": "Smart: References",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
         "id": "77002254b872fa8e",
         "type": "subflow",
         "name": "algo:jwt-sign",
@@ -3399,6 +3407,112 @@
         "headers": {},
         "x": 620,
         "y": 420,
+        "wires": []
+    },
+    {
+        "id": "7928259645991d91",
+        "type": "http in",
+        "z": "24807d91de0de59d",
+        "name": "",
+        "url": "/api/ref/select-options",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 160,
+        "y": 60,
+        "wires": [
+            [
+                "7b29f4717e35142e"
+            ]
+        ]
+    },
+    {
+        "id": "7b29f4717e35142e",
+        "type": "function",
+        "z": "24807d91de0de59d",
+        "name": "function 19",
+        "func": "msg.ori = msg.payload;\nlet {topic, keyToVal, keyToLabel} = msg.payload;\nlet valid = false;\nif(topic && keyToVal && keyToLabel) valid = true;\n\nmsg.isValid = valid;\nmsg.payload = {\n    key: msg.payload.topic\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 410,
+        "y": 60,
+        "wires": [
+            [
+                "2955f04667917859"
+            ]
+        ]
+    },
+    {
+        "id": "0688100feb02c9e6",
+        "type": "cloudantplus in",
+        "z": "24807d91de0de59d",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-libs",
+        "service": "_ext_",
+        "search": "_view_",
+        "design": "refs",
+        "index": "by-topic",
+        "x": 620,
+        "y": 60,
+        "wires": [
+            [
+                "bf3e7183af4f6b01"
+            ]
+        ]
+    },
+    {
+        "id": "bf3e7183af4f6b01",
+        "type": "http response",
+        "z": "24807d91de0de59d",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 900,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "2955f04667917859",
+        "type": "switch",
+        "z": "24807d91de0de59d",
+        "name": "",
+        "property": "isValid",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 430,
+        "y": 100,
+        "wires": [
+            [
+                "0688100feb02c9e6"
+            ],
+            [
+                "8edab228d804f32b"
+            ]
+        ]
+    },
+    {
+        "id": "8edab228d804f32b",
+        "type": "http response",
+        "z": "24807d91de0de59d",
+        "name": "",
+        "statusCode": "400",
+        "headers": {},
+        "x": 620,
+        "y": 240,
         "wires": []
     }
 ]
