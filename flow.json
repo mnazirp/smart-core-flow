@@ -3412,14 +3412,14 @@
     {
         "id": "7928259645991d91",
         "type": "http in",
-        "z": "24807d91de0de59d",
+        "z": "50baf2723fb4853b",
         "name": "",
         "url": "/api/ref/select-options",
         "method": "post",
         "upload": false,
         "swaggerDoc": "",
         "x": 160,
-        "y": 60,
+        "y": 520,
         "wires": [
             [
                 "7b29f4717e35142e"
@@ -3429,7 +3429,7 @@
     {
         "id": "7b29f4717e35142e",
         "type": "function",
-        "z": "24807d91de0de59d",
+        "z": "50baf2723fb4853b",
         "name": "function 19",
         "func": "msg.ori = msg.payload;\nlet {topic, keyToVal, keyToLabel} = msg.payload;\nlet valid = false;\nif(topic && keyToVal && keyToLabel) valid = true;\n\nmsg.isValid = valid;\nmsg.payload = {\n    key: msg.payload.topic\n}\n\nreturn msg;",
         "outputs": 1,
@@ -3438,7 +3438,7 @@
         "finalize": "",
         "libs": [],
         "x": 410,
-        "y": 60,
+        "y": 520,
         "wires": [
             [
                 "2955f04667917859"
@@ -3446,39 +3446,9 @@
         ]
     },
     {
-        "id": "0688100feb02c9e6",
-        "type": "cloudantplus in",
-        "z": "24807d91de0de59d",
-        "name": "",
-        "cloudant": "784d89e62dfb5070",
-        "database": "smart-libs",
-        "service": "_ext_",
-        "search": "_view_",
-        "design": "refs",
-        "index": "by-topic",
-        "x": 620,
-        "y": 60,
-        "wires": [
-            [
-                "3a48b6af21a8db75"
-            ]
-        ]
-    },
-    {
-        "id": "bf3e7183af4f6b01",
-        "type": "http response",
-        "z": "24807d91de0de59d",
-        "name": "",
-        "statusCode": "200",
-        "headers": {},
-        "x": 860,
-        "y": 100,
-        "wires": []
-    },
-    {
         "id": "2955f04667917859",
         "type": "switch",
-        "z": "24807d91de0de59d",
+        "z": "50baf2723fb4853b",
         "name": "",
         "property": "isValid",
         "propertyType": "msg",
@@ -3494,7 +3464,7 @@
         "repair": false,
         "outputs": 2,
         "x": 430,
-        "y": 100,
+        "y": 560,
         "wires": [
             [
                 "0688100feb02c9e6"
@@ -3505,33 +3475,63 @@
         ]
     },
     {
+        "id": "0688100feb02c9e6",
+        "type": "cloudantplus in",
+        "z": "50baf2723fb4853b",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-libs",
+        "service": "_ext_",
+        "search": "_view_",
+        "design": "refs",
+        "index": "by-topic",
+        "x": 620,
+        "y": 520,
+        "wires": [
+            [
+                "3a48b6af21a8db75"
+            ]
+        ]
+    },
+    {
         "id": "8edab228d804f32b",
         "type": "http response",
-        "z": "24807d91de0de59d",
+        "z": "50baf2723fb4853b",
         "name": "",
         "statusCode": "400",
         "headers": {},
         "x": 620,
-        "y": 240,
+        "y": 700,
         "wires": []
     },
     {
         "id": "3a48b6af21a8db75",
         "type": "function",
-        "z": "24807d91de0de59d",
+        "z": "50baf2723fb4853b",
         "name": "function 20",
-        "func": "let rs = [];\nlet { keyToVal, keyToLabel } = msg.ori;\n\nif (msg.payload && Array.isArray(msg.payload) && msg.payload.length > 0) {\n    let data = msg.payload[0].value.data;\n    if (data && Array.isArray(data)) {\n        data.forEach(d => {\n            rs.push({\n                value: d[keyToVal],\n                label: d[keyToLabel]\n            })\n        })\n    }\n}\nmsg.payload = rs;\nreturn msg;",
+        "func": "let rs = [];\nlet { keyToVal, keyToLabel } = msg.ori;\n\nif (msg.payload && Array.isArray(msg.payload) && msg.payload.length > 0) {\n    let data = msg.payload[0].value.data;\n    if (data && Array.isArray(data)) {\n        data.forEach(d => {\n            rs.push({\n                value: (d[keyToVal]) ? d[keyToVal] : null,\n                label: (d[keyToLabel]) ? d[keyToLabel] : null\n            })\n        })\n    }\n}\nmsg.payload = rs;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
         "x": 630,
-        "y": 100,
+        "y": 560,
         "wires": [
             [
                 "bf3e7183af4f6b01"
             ]
         ]
+    },
+    {
+        "id": "bf3e7183af4f6b01",
+        "type": "http response",
+        "z": "50baf2723fb4853b",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 860,
+        "y": 560,
+        "wires": []
     }
 ]
