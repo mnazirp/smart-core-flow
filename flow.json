@@ -3460,7 +3460,7 @@
         "y": 60,
         "wires": [
             [
-                "bf3e7183af4f6b01"
+                "3a48b6af21a8db75"
             ]
         ]
     },
@@ -3471,8 +3471,8 @@
         "name": "",
         "statusCode": "200",
         "headers": {},
-        "x": 900,
-        "y": 60,
+        "x": 860,
+        "y": 100,
         "wires": []
     },
     {
@@ -3514,5 +3514,24 @@
         "x": 620,
         "y": 240,
         "wires": []
+    },
+    {
+        "id": "3a48b6af21a8db75",
+        "type": "function",
+        "z": "24807d91de0de59d",
+        "name": "function 20",
+        "func": "let rs = [];\nlet { keyToVal, keyToLabel } = msg.ori;\n\nif (msg.payload && Array.isArray(msg.payload) && msg.payload.length > 0) {\n    let data = msg.payload[0].value.data;\n    if (data && Array.isArray(data)) {\n        data.forEach(d => {\n            rs.push({\n                value: d[keyToVal],\n                label: d[keyToLabel]\n            })\n        })\n    }\n}\nmsg.payload = rs;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 630,
+        "y": 100,
+        "wires": [
+            [
+                "bf3e7183af4f6b01"
+            ]
+        ]
     }
 ]
