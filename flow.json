@@ -80,14 +80,6 @@
         "env": []
     },
     {
-        "id": "24807d91de0de59d",
-        "type": "tab",
-        "label": "Smart: References",
-        "disabled": false,
-        "info": "",
-        "env": []
-    },
-    {
         "id": "77002254b872fa8e",
         "type": "subflow",
         "name": "algo:jwt-sign",
@@ -3202,14 +3194,14 @@
         "id": "a850381a762322aa",
         "type": "function",
         "z": "50baf2723fb4853b",
-        "name": "function 17",
+        "name": "prepare",
         "func": "msg.payload = {\n    key: msg.req.params.code\n}\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 390,
+        "x": 380,
         "y": 80,
         "wires": [
             [
@@ -3240,14 +3232,14 @@
         "id": "4862f871a79aaab3",
         "type": "function",
         "z": "50baf2723fb4853b",
-        "name": "function 18",
+        "name": "prepare payload",
         "func": "let rs = [];\nif(msg.payload.length > 0){\n    rs = msg.payload[0].value;\n}\nmsg.payload = rs;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 390,
+        "x": 400,
         "y": 160,
         "wires": [
             [
@@ -3430,14 +3422,14 @@
         "id": "7b29f4717e35142e",
         "type": "function",
         "z": "50baf2723fb4853b",
-        "name": "function 19",
+        "name": "check & prepare",
         "func": "msg.ori = msg.payload;\nlet {topic, keyToVal, keyToLabel} = msg.payload;\nlet valid = false;\nif(topic && keyToVal && keyToLabel) valid = true;\n\nmsg.isValid = valid;\nmsg.payload = {\n    key: msg.payload.topic\n}\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 410,
+        "x": 420,
         "y": 520,
         "wires": [
             [
@@ -3463,7 +3455,7 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 430,
+        "x": 450,
         "y": 560,
         "wires": [
             [
@@ -3485,7 +3477,7 @@
         "search": "_view_",
         "design": "refs",
         "index": "by-topic",
-        "x": 620,
+        "x": 640,
         "y": 520,
         "wires": [
             [
@@ -3500,22 +3492,22 @@
         "name": "",
         "statusCode": "400",
         "headers": {},
-        "x": 620,
-        "y": 700,
+        "x": 640,
+        "y": 640,
         "wires": []
     },
     {
         "id": "3a48b6af21a8db75",
         "type": "function",
         "z": "50baf2723fb4853b",
-        "name": "function 20",
+        "name": "prepare options",
         "func": "let rs = [];\nlet { keyToVal, keyToLabel } = msg.ori;\n\nif (msg.payload && Array.isArray(msg.payload) && msg.payload.length > 0) {\n    let data = msg.payload[0].value.data;\n    if (data && Array.isArray(data)) {\n        data.forEach(d => {\n            rs.push({\n                value: (d[keyToVal]) ? d[keyToVal] : null,\n                label: (d[keyToLabel]) ? d[keyToLabel] : null\n            })\n        })\n    }\n}\nmsg.payload = rs;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 630,
+        "x": 660,
         "y": 560,
         "wires": [
             [
@@ -3530,7 +3522,7 @@
         "name": "",
         "statusCode": "200",
         "headers": {},
-        "x": 860,
+        "x": 880,
         "y": 560,
         "wires": []
     }
