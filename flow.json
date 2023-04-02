@@ -3089,6 +3089,272 @@
         ]
     },
     {
+        "id": "b236983bf6c11150",
+        "type": "http in",
+        "z": "0ee186eb42c82e4f",
+        "name": "",
+        "url": "/api/user",
+        "method": "put",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 130,
+        "y": 300,
+        "wires": [
+            [
+                "f2a6f59cf563e88b"
+            ]
+        ]
+    },
+    {
+        "id": "f2a6f59cf563e88b",
+        "type": "function",
+        "z": "0ee186eb42c82e4f",
+        "name": "payload validation",
+        "func": "msg.ori = msg.payload;\nlet { loginType, fullName, corpRole, scopes } = msg.ori;\nlet valid = (loginType && fullName && corpRole && scopes) ? true : false;\nmsg.payload = {\n    \"key\": msg.payload.nik\n}\nmsg.isValid = valid;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 300,
+        "wires": [
+            [
+                "6ec134f08dfe67d9"
+            ]
+        ]
+    },
+    {
+        "id": "4277d03c960139cc",
+        "type": "cloudantplus in",
+        "z": "0ee186eb42c82e4f",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-users",
+        "service": "_ext_",
+        "search": "_view_",
+        "design": "view-user",
+        "index": "by-nik",
+        "x": 590,
+        "y": 300,
+        "wires": [
+            [
+                "c02494e3fc398076"
+            ]
+        ]
+    },
+    {
+        "id": "9829d70ab169979b",
+        "type": "change",
+        "z": "0ee186eb42c82e4f",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload[0].value",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 820,
+        "y": 280,
+        "wires": [
+            [
+                "03e0e7c02be30e91"
+            ]
+        ]
+    },
+    {
+        "id": "f884ce7714dd376d",
+        "type": "http response",
+        "z": "0ee186eb42c82e4f",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 1020,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "c02494e3fc398076",
+        "type": "switch",
+        "z": "0ee186eb42c82e4f",
+        "name": "",
+        "property": "payload.length",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "gt",
+                "v": "0",
+                "vt": "num"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 610,
+        "y": 340,
+        "wires": [
+            [
+                "9829d70ab169979b"
+            ],
+            [
+                "2cccae7699d81b5d"
+            ]
+        ]
+    },
+    {
+        "id": "313e72f6c5205046",
+        "type": "http response",
+        "z": "0ee186eb42c82e4f",
+        "name": "",
+        "statusCode": "400",
+        "headers": {},
+        "x": 800,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "6ec134f08dfe67d9",
+        "type": "switch",
+        "z": "0ee186eb42c82e4f",
+        "name": "",
+        "property": "isValid",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 410,
+        "y": 340,
+        "wires": [
+            [
+                "4277d03c960139cc"
+            ],
+            [
+                "14612c1bfec7d8cd"
+            ]
+        ]
+    },
+    {
+        "id": "8d23b3d447bb1347",
+        "type": "http response",
+        "z": "0ee186eb42c82e4f",
+        "name": "",
+        "statusCode": "400",
+        "headers": {},
+        "x": 580,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "03e0e7c02be30e91",
+        "type": "function",
+        "z": "0ee186eb42c82e4f",
+        "name": "function 18",
+        "func": "let user = msg.payload;\nlet { loginType, fullName, email, corpRole, combo, scopes} = msg.ori;\nuser['loginType'] = loginType;\nuser['fullName'] = fullName;\nuser['email'] = email;\nuser['corpRole'] = corpRole;\nuser['combo'] = combo;\nuser['scopes'] = scopes;\n// delete user._rev;\nmsg.payload = user;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 810,
+        "y": 320,
+        "wires": [
+            [
+                "c856f08909a66049"
+            ]
+        ]
+    },
+    {
+        "id": "c856f08909a66049",
+        "type": "cloudantplus out",
+        "z": "0ee186eb42c82e4f",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-users",
+        "service": "_ext_",
+        "payonly": true,
+        "operation": "insert",
+        "x": 810,
+        "y": 360,
+        "wires": [
+            [
+                "f884ce7714dd376d"
+            ]
+        ]
+    },
+    {
+        "id": "14612c1bfec7d8cd",
+        "type": "change",
+        "z": "0ee186eb42c82e4f",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload not valid",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 600,
+        "y": 420,
+        "wires": [
+            [
+                "8d23b3d447bb1347"
+            ]
+        ]
+    },
+    {
+        "id": "2cccae7699d81b5d",
+        "type": "change",
+        "z": "0ee186eb42c82e4f",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "user not found",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 820,
+        "y": 420,
+        "wires": [
+            [
+                "313e72f6c5205046"
+            ]
+        ]
+    },
+    {
         "id": "c86674137cc829c6",
         "type": "cloudantplus in",
         "z": "bef67a5c91d12113",
