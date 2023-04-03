@@ -3110,7 +3110,7 @@
         "type": "function",
         "z": "0ee186eb42c82e4f",
         "name": "payload validation",
-        "func": "msg.ori = msg.payload;\nlet { loginType, fullName, corpRole, scopes } = msg.ori;\nlet valid = (loginType && fullName && corpRole && scopes) ? true : false;\nmsg.payload = {\n    \"key\": msg.payload.nik\n}\nmsg.isValid = valid;\nreturn msg;",
+        "func": "msg.ori = msg.payload;\nlet { nik, loginType, fullName, corpRole, scopes } = msg.ori;\nlet valid = (nik && loginType && fullName && corpRole && scopes) ? true : false;\nmsg.payload = {\n    \"key\": msg.payload.nik\n}\nmsg.isValid = valid;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
