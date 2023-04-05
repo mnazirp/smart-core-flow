@@ -3019,7 +3019,7 @@
         "name": "",
         "statusCode": "200",
         "headers": {},
-        "x": 660,
+        "x": 680,
         "y": 160,
         "wires": []
     },
@@ -3038,7 +3038,7 @@
         "y": 120,
         "wires": [
             [
-                "d7308c07b96b7e55"
+                "64e77441ea08b126"
             ]
         ]
     },
@@ -3080,8 +3080,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 440,
-        "y": 160,
+        "x": 660,
+        "y": 120,
         "wires": [
             [
                 "380505713f9e3b39"
@@ -3098,7 +3098,7 @@
         "upload": false,
         "swaggerDoc": "",
         "x": 130,
-        "y": 300,
+        "y": 360,
         "wires": [
             [
                 "f2a6f59cf563e88b"
@@ -3117,7 +3117,7 @@
         "finalize": "",
         "libs": [],
         "x": 370,
-        "y": 300,
+        "y": 360,
         "wires": [
             [
                 "6ec134f08dfe67d9"
@@ -3136,7 +3136,7 @@
         "design": "view-user",
         "index": "by-nik",
         "x": 590,
-        "y": 300,
+        "y": 360,
         "wires": [
             [
                 "c02494e3fc398076"
@@ -3163,7 +3163,7 @@
         "to": "",
         "reg": false,
         "x": 820,
-        "y": 280,
+        "y": 340,
         "wires": [
             [
                 "03e0e7c02be30e91"
@@ -3178,7 +3178,7 @@
         "statusCode": "200",
         "headers": {},
         "x": 1020,
-        "y": 360,
+        "y": 420,
         "wires": []
     },
     {
@@ -3202,7 +3202,7 @@
         "repair": false,
         "outputs": 2,
         "x": 610,
-        "y": 340,
+        "y": 400,
         "wires": [
             [
                 "9829d70ab169979b"
@@ -3220,7 +3220,7 @@
         "statusCode": "400",
         "headers": {},
         "x": 800,
-        "y": 460,
+        "y": 520,
         "wires": []
     },
     {
@@ -3242,7 +3242,7 @@
         "repair": false,
         "outputs": 2,
         "x": 410,
-        "y": 340,
+        "y": 400,
         "wires": [
             [
                 "4277d03c960139cc"
@@ -3260,7 +3260,7 @@
         "statusCode": "400",
         "headers": {},
         "x": 580,
-        "y": 460,
+        "y": 520,
         "wires": []
     },
     {
@@ -3275,7 +3275,7 @@
         "finalize": "",
         "libs": [],
         "x": 810,
-        "y": 320,
+        "y": 380,
         "wires": [
             [
                 "c856f08909a66049"
@@ -3293,7 +3293,7 @@
         "payonly": true,
         "operation": "insert",
         "x": 810,
-        "y": 360,
+        "y": 420,
         "wires": [
             [
                 "f884ce7714dd376d"
@@ -3320,7 +3320,7 @@
         "to": "",
         "reg": false,
         "x": 600,
-        "y": 420,
+        "y": 480,
         "wires": [
             [
                 "8d23b3d447bb1347"
@@ -3347,10 +3347,79 @@
         "to": "",
         "reg": false,
         "x": 820,
-        "y": 420,
+        "y": 480,
         "wires": [
             [
                 "313e72f6c5205046"
+            ]
+        ]
+    },
+    {
+        "id": "64e77441ea08b126",
+        "type": "switch",
+        "z": "0ee186eb42c82e4f",
+        "name": "",
+        "property": "payload.length",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "gt",
+                "v": "0",
+                "vt": "num"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 450,
+        "y": 160,
+        "wires": [
+            [
+                "d7308c07b96b7e55"
+            ],
+            [
+                "a9196ec681d4b2bd"
+            ]
+        ]
+    },
+    {
+        "id": "4ced71eba12ca1fc",
+        "type": "http response",
+        "z": "0ee186eb42c82e4f",
+        "name": "",
+        "statusCode": "400",
+        "headers": {},
+        "x": 640,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "a9196ec681d4b2bd",
+        "type": "change",
+        "z": "0ee186eb42c82e4f",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "user not found",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 660,
+        "y": 200,
+        "wires": [
+            [
+                "4ced71eba12ca1fc"
             ]
         ]
     },
