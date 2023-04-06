@@ -1633,6 +1633,195 @@
         ]
     },
     {
+        "id": "a81e088149e4c8ef",
+        "type": "inject",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "props": [
+            {
+                "p": "sub",
+                "v": "{\"_id\":\"658b0941b29a7de43cd57aa4cb079c6b\",\"_rev\":\"84-5c5e043d22c25035912fdc15f21c8fed\",\"nik\":\"N15000001\",\"loginType\":\"non-adfs\",\"fullName\":\"Lamhot Nainggolan\",\"email\":\"\",\"authorizations\":[{\"type\":\"password\",\"passwords\":[\"0f2265f846d3fb96a6d7973ec609d597\"]}],\"corpRole\":\"AD\",\"scopes\":{\"useCombo\":true,\"areaCode\":\"SC-SAW-SIAK-00001\",\"combo\":\"COMB-00001\",\"sitemapCode\":\"SC-SAW-SIAK-00001\",\"organizationCode\":\"SC-SAW-SIAK-00001\"}}",
+                "vt": "json"
+            },
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "str",
+        "x": 330,
+        "y": 620,
+        "wires": [
+            [
+                "0a73e980ab04f0d2"
+            ]
+        ]
+    },
+    {
+        "id": "b84e2f99c203e6b5",
+        "type": "debug",
+        "z": "3a3a41a0d95d74c4",
+        "name": "debug 21",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1040,
+        "y": 780,
+        "wires": []
+    },
+    {
+        "id": "0a73e980ab04f0d2",
+        "type": "function",
+        "z": "3a3a41a0d95d74c4",
+        "name": "check sub payload",
+        "func": "let valid = false;\nlet useCombo = false;\nif (msg.sub && msg.sub.scopes) {\n    useCombo = msg.sub.scopes.useCombo;\n    msg.payload = {\n        key: (useCombo) ? msg.sub.scopes.combo : msg.sub.scopes.sitemapCode\n    }\n    valid = true;\n}\nmsg.useCombo = useCombo;\nmsg.isValid = valid;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 530,
+        "y": 620,
+        "wires": [
+            [
+                "08bcb48c676df886"
+            ]
+        ]
+    },
+    {
+        "id": "08bcb48c676df886",
+        "type": "switch",
+        "z": "3a3a41a0d95d74c4",
+        "name": "isValid",
+        "property": "isValid",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 570,
+        "y": 660,
+        "wires": [
+            [
+                "4dbabe3ecdd13759"
+            ],
+            [
+                "1442ce309155c0cb"
+            ]
+        ]
+    },
+    {
+        "id": "4dbabe3ecdd13759",
+        "type": "switch",
+        "z": "3a3a41a0d95d74c4",
+        "name": "useCombo",
+        "property": "useCombo",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 750,
+        "y": 620,
+        "wires": [
+            [
+                "c8f180872d2a8968"
+            ],
+            [
+                "02b378dce9bccf4a"
+            ]
+        ]
+    },
+    {
+        "id": "1442ce309155c0cb",
+        "type": "change",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "sub",
+                "pt": "msg",
+                "to": "null",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 750,
+        "y": 700,
+        "wires": [
+            [
+                "b84e2f99c203e6b5"
+            ]
+        ]
+    },
+    {
+        "id": "c8f180872d2a8968",
+        "type": "cloudantplus in",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-libs",
+        "service": "_ext_",
+        "search": "_view_",
+        "design": "type",
+        "index": "by-code",
+        "x": 940,
+        "y": 580,
+        "wires": [
+            [
+                "02b378dce9bccf4a"
+            ]
+        ]
+    },
+    {
+        "id": "02b378dce9bccf4a",
+        "type": "function",
+        "z": "3a3a41a0d95d74c4",
+        "name": "prepare scopes",
+        "func": "let scopes = { ...msg.sub.scopes };\nif(msg.useCombo){\n    let { sitemapCode, organizationCode } = msg.payload[0].value.data\n    scopes['sitemapCode'] = sitemapCode;\n    scopes['organizationCode'] = organizationCode;\n}\n\nmsg.scopes = scopes;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 960,
+        "y": 660,
+        "wires": [
+            [
+                "b84e2f99c203e6b5"
+            ]
+        ]
+    },
+    {
         "id": "d2f18a6f7f6e0afd",
         "type": "promptinput",
         "z": "786b2ecce5602d44",
