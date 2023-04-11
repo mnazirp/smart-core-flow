@@ -403,7 +403,44 @@
                         "port": 0
                     },
                     {
-                        "id": "f8bd74c6b30d97c4",
+                        "id": "1fec46abd06e6d30",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [],
+        "meta": {},
+        "color": "#DDAA99"
+    },
+    {
+        "id": "dbbf76b23c84dc6a",
+        "type": "subflow",
+        "name": "sub: get-scopes-from-user",
+        "info": "",
+        "category": "",
+        "in": [
+            {
+                "x": 20,
+                "y": 120,
+                "wires": [
+                    {
+                        "id": "0a73e980ab04f0d2"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 600,
+                "y": 380,
+                "wires": [
+                    {
+                        "id": "1442ce309155c0cb",
+                        "port": 0
+                    },
+                    {
+                        "id": "7511b016e524404c",
                         "port": 0
                     }
                 ]
@@ -695,7 +732,7 @@
         "type": "function",
         "z": "25a729f30c43b341",
         "name": "get scope by code",
-        "func": "msg.ori = msg.sub;\nmsg.payload = `scope:${msg.sub}`;\nreturn msg;",
+        "func": "msg.backup = msg.payload;\nmsg.ori = msg.sub;\nmsg.payload = `scope:${msg.sub}`;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -839,7 +876,7 @@
         "type": "function",
         "z": "25a729f30c43b341",
         "name": "return from redis",
-        "func": "msg.sub = JSON.parse(msg.payload);\nreturn msg;",
+        "func": "msg.sub = JSON.parse(msg.payload);\nmsg.payload = msg.backup;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -866,7 +903,9 @@
         "x": 760,
         "y": 160,
         "wires": [
-            []
+            [
+                "1fec46abd06e6d30"
+            ]
         ]
     },
     {
@@ -886,6 +925,307 @@
             [
                 "f8bd74c6b30d97c4"
             ]
+        ]
+    },
+    {
+        "id": "1fec46abd06e6d30",
+        "type": "change",
+        "z": "25a729f30c43b341",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "sub",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "backup",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 780,
+        "y": 200,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "0a73e980ab04f0d2",
+        "type": "function",
+        "z": "dbbf76b23c84dc6a",
+        "name": "check sub payload",
+        "func": "let valid = false;\nlet useCombo = false;\nif (msg.sub && msg.sub.scopes) {\n    useCombo = msg.sub.scopes.useCombo;\n    msg.payload = {\n        key: (useCombo) ? msg.sub.scopes.combo : msg.sub.scopes.sitemapCode\n    }\n    valid = true;\n}\nmsg.useCombo = useCombo;\nmsg.isValid = valid;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 190,
+        "y": 120,
+        "wires": [
+            [
+                "08bcb48c676df886"
+            ]
+        ]
+    },
+    {
+        "id": "08bcb48c676df886",
+        "type": "switch",
+        "z": "dbbf76b23c84dc6a",
+        "name": "isValid",
+        "property": "isValid",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 230,
+        "y": 160,
+        "wires": [
+            [
+                "4dbabe3ecdd13759"
+            ],
+            [
+                "1442ce309155c0cb"
+            ]
+        ]
+    },
+    {
+        "id": "4dbabe3ecdd13759",
+        "type": "switch",
+        "z": "dbbf76b23c84dc6a",
+        "name": "useCombo",
+        "property": "useCombo",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 410,
+        "y": 120,
+        "wires": [
+            [
+                "c8f180872d2a8968"
+            ],
+            [
+                "02b378dce9bccf4a"
+            ]
+        ]
+    },
+    {
+        "id": "1442ce309155c0cb",
+        "type": "change",
+        "z": "dbbf76b23c84dc6a",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "sub",
+                "pt": "msg",
+                "to": "null",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 410,
+        "y": 200,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "c8f180872d2a8968",
+        "type": "cloudantplus in",
+        "z": "dbbf76b23c84dc6a",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-libs",
+        "service": "_ext_",
+        "search": "_view_",
+        "design": "type",
+        "index": "by-code",
+        "x": 600,
+        "y": 80,
+        "wires": [
+            [
+                "02b378dce9bccf4a"
+            ]
+        ]
+    },
+    {
+        "id": "02b378dce9bccf4a",
+        "type": "function",
+        "z": "dbbf76b23c84dc6a",
+        "name": "prepare scopes",
+        "func": "let scopes = { ...msg.sub.scopes };\nif (msg.useCombo) {\n    let { sitemapCode, organizationCode } = msg.payload[0].value.data\n    scopes['sitemapCode'] = sitemapCode;\n    scopes['organizationCode'] = organizationCode;\n}\n\nmsg.scopes = Object.keys(scopes).map((key) => {\n    let topic = null;\n    switch (key) {\n        case 'areaCode':\n            topic = 'area';\n            break;\n        case 'sitemapCode':\n            topic = 'sitemap';\n            break;\n        case 'organizationCode':\n            topic = 'organization'\n            break;\n    }\n    if (topic) {\n        return {\n            type: topic,\n            code: scopes[key]\n        }\n    }\n}).filter(x => {\n    if (x) return x;\n});\nmsg.payload = msg.scopes;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 660,
+        "y": 140,
+        "wires": [
+            [
+                "07d3733446a87fc2"
+            ]
+        ]
+    },
+    {
+        "id": "07d3733446a87fc2",
+        "type": "split",
+        "z": "dbbf76b23c84dc6a",
+        "name": "",
+        "splt": "\\n",
+        "spltType": "str",
+        "arraySplt": 1,
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "x": 630,
+        "y": 180,
+        "wires": [
+            [
+                "20caee64052465cb"
+            ]
+        ]
+    },
+    {
+        "id": "9dc929318448b3ec",
+        "type": "join",
+        "z": "dbbf76b23c84dc6a",
+        "name": "",
+        "mode": "auto",
+        "build": "object",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "accumulate": true,
+        "timeout": "",
+        "count": "",
+        "reduceRight": false,
+        "reduceExp": "",
+        "reduceInit": "",
+        "reduceInitType": "",
+        "reduceFixup": "",
+        "x": 830,
+        "y": 300,
+        "wires": [
+            [
+                "7511b016e524404c"
+            ]
+        ]
+    },
+    {
+        "id": "20caee64052465cb",
+        "type": "function",
+        "z": "dbbf76b23c84dc6a",
+        "name": "prepare key",
+        "func": "msg.scope = msg.payload;\nmsg.payload = {\n    key: msg.payload.code\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 650,
+        "y": 220,
+        "wires": [
+            [
+                "7fe43a273cb59e0a"
+            ]
+        ]
+    },
+    {
+        "id": "7fe43a273cb59e0a",
+        "type": "cloudantplus in",
+        "z": "dbbf76b23c84dc6a",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-libs",
+        "service": "_ext_",
+        "search": "_view_",
+        "design": "type",
+        "index": "by-code",
+        "x": 640,
+        "y": 260,
+        "wires": [
+            [
+                "67a10894c30a68e6"
+            ]
+        ]
+    },
+    {
+        "id": "67a10894c30a68e6",
+        "type": "function",
+        "z": "dbbf76b23c84dc6a",
+        "name": "embed doc",
+        "func": "let scope = { ...msg.scope }\nscope['doc'] = null;\nif (msg.payload && Array.isArray(msg.payload) && msg.payload.length > 0) {\n    scope['doc'] = msg.payload[0].value\n}\n\nmsg.payload = scope;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 650,
+        "y": 300,
+        "wires": [
+            [
+                "9dc929318448b3ec"
+            ]
+        ]
+    },
+    {
+        "id": "7511b016e524404c",
+        "type": "change",
+        "z": "dbbf76b23c84dc6a",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "sub",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 850,
+        "y": 340,
+        "wires": [
+            []
         ]
     },
     {
@@ -1629,195 +1969,6 @@
         "wires": [
             [
                 "3b111b6afac1790d"
-            ]
-        ]
-    },
-    {
-        "id": "a81e088149e4c8ef",
-        "type": "inject",
-        "z": "3a3a41a0d95d74c4",
-        "name": "",
-        "props": [
-            {
-                "p": "sub",
-                "v": "{\"_id\":\"658b0941b29a7de43cd57aa4cb079c6b\",\"_rev\":\"84-5c5e043d22c25035912fdc15f21c8fed\",\"nik\":\"N15000001\",\"loginType\":\"non-adfs\",\"fullName\":\"Lamhot Nainggolan\",\"email\":\"\",\"authorizations\":[{\"type\":\"password\",\"passwords\":[\"0f2265f846d3fb96a6d7973ec609d597\"]}],\"corpRole\":\"AD\",\"scopes\":{\"useCombo\":true,\"areaCode\":\"SC-SAW-SIAK-00001\",\"combo\":\"COMB-00001\",\"sitemapCode\":\"SC-SAW-SIAK-00001\",\"organizationCode\":\"SC-SAW-SIAK-00001\"}}",
-                "vt": "json"
-            },
-            {
-                "p": "payload"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "",
-        "payloadType": "str",
-        "x": 330,
-        "y": 620,
-        "wires": [
-            [
-                "0a73e980ab04f0d2"
-            ]
-        ]
-    },
-    {
-        "id": "b84e2f99c203e6b5",
-        "type": "debug",
-        "z": "3a3a41a0d95d74c4",
-        "name": "debug 21",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 1040,
-        "y": 780,
-        "wires": []
-    },
-    {
-        "id": "0a73e980ab04f0d2",
-        "type": "function",
-        "z": "3a3a41a0d95d74c4",
-        "name": "check sub payload",
-        "func": "let valid = false;\nlet useCombo = false;\nif (msg.sub && msg.sub.scopes) {\n    useCombo = msg.sub.scopes.useCombo;\n    msg.payload = {\n        key: (useCombo) ? msg.sub.scopes.combo : msg.sub.scopes.sitemapCode\n    }\n    valid = true;\n}\nmsg.useCombo = useCombo;\nmsg.isValid = valid;\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 530,
-        "y": 620,
-        "wires": [
-            [
-                "08bcb48c676df886"
-            ]
-        ]
-    },
-    {
-        "id": "08bcb48c676df886",
-        "type": "switch",
-        "z": "3a3a41a0d95d74c4",
-        "name": "isValid",
-        "property": "isValid",
-        "propertyType": "msg",
-        "rules": [
-            {
-                "t": "true"
-            },
-            {
-                "t": "false"
-            }
-        ],
-        "checkall": "true",
-        "repair": false,
-        "outputs": 2,
-        "x": 570,
-        "y": 660,
-        "wires": [
-            [
-                "4dbabe3ecdd13759"
-            ],
-            [
-                "1442ce309155c0cb"
-            ]
-        ]
-    },
-    {
-        "id": "4dbabe3ecdd13759",
-        "type": "switch",
-        "z": "3a3a41a0d95d74c4",
-        "name": "useCombo",
-        "property": "useCombo",
-        "propertyType": "msg",
-        "rules": [
-            {
-                "t": "true"
-            },
-            {
-                "t": "false"
-            }
-        ],
-        "checkall": "true",
-        "repair": false,
-        "outputs": 2,
-        "x": 750,
-        "y": 620,
-        "wires": [
-            [
-                "c8f180872d2a8968"
-            ],
-            [
-                "02b378dce9bccf4a"
-            ]
-        ]
-    },
-    {
-        "id": "1442ce309155c0cb",
-        "type": "change",
-        "z": "3a3a41a0d95d74c4",
-        "name": "",
-        "rules": [
-            {
-                "t": "set",
-                "p": "sub",
-                "pt": "msg",
-                "to": "null",
-                "tot": "jsonata"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 750,
-        "y": 700,
-        "wires": [
-            [
-                "b84e2f99c203e6b5"
-            ]
-        ]
-    },
-    {
-        "id": "c8f180872d2a8968",
-        "type": "cloudantplus in",
-        "z": "3a3a41a0d95d74c4",
-        "name": "",
-        "cloudant": "784d89e62dfb5070",
-        "database": "smart-libs",
-        "service": "_ext_",
-        "search": "_view_",
-        "design": "type",
-        "index": "by-code",
-        "x": 940,
-        "y": 580,
-        "wires": [
-            [
-                "02b378dce9bccf4a"
-            ]
-        ]
-    },
-    {
-        "id": "02b378dce9bccf4a",
-        "type": "function",
-        "z": "3a3a41a0d95d74c4",
-        "name": "prepare scopes",
-        "func": "let scopes = { ...msg.sub.scopes };\nif(msg.useCombo){\n    let { sitemapCode, organizationCode } = msg.payload[0].value.data\n    scopes['sitemapCode'] = sitemapCode;\n    scopes['organizationCode'] = organizationCode;\n}\n\nmsg.scopes = scopes;\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 960,
-        "y": 660,
-        "wires": [
-            [
-                "b84e2f99c203e6b5"
             ]
         ]
     },
@@ -3181,6 +3332,66 @@
         "wires": [
             [
                 "0726dd0c9132bef2"
+            ]
+        ]
+    },
+    {
+        "id": "a81e088149e4c8ef",
+        "type": "inject",
+        "z": "c13d19c3dfb652c9",
+        "name": "",
+        "props": [
+            {
+                "p": "sub",
+                "v": "{\"_id\":\"658b0941b29a7de43cd57aa4cb079c6b\",\"_rev\":\"84-5c5e043d22c25035912fdc15f21c8fed\",\"nik\":\"N15000001\",\"loginType\":\"non-adfs\",\"fullName\":\"Lamhot Nainggolan\",\"email\":\"\",\"authorizations\":[{\"type\":\"password\",\"passwords\":[\"0f2265f846d3fb96a6d7973ec609d597\"]}],\"corpRole\":\"AD\",\"scopes\":{\"useCombo\":true,\"areaCode\":\"SC-SAW-SIAK-00001\",\"combo\":\"COMB-00001\",\"sitemapCode\":\"SC-SAW-SIAK-00001\",\"organizationCode\":\"SC-SAW-SIAK-00001\"}}",
+                "vt": "json"
+            },
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "str",
+        "x": 230,
+        "y": 480,
+        "wires": [
+            [
+                "d884900f99eac685"
+            ]
+        ]
+    },
+    {
+        "id": "b84e2f99c203e6b5",
+        "type": "debug",
+        "z": "c13d19c3dfb652c9",
+        "name": "debug 21",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 740,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "d884900f99eac685",
+        "type": "subflow:dbbf76b23c84dc6a",
+        "z": "c13d19c3dfb652c9",
+        "name": "",
+        "x": 490,
+        "y": 480,
+        "wires": [
+            [
+                "b84e2f99c203e6b5"
             ]
         ]
     },
