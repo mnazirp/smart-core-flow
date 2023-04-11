@@ -385,7 +385,7 @@
         "in": [
             {
                 "x": 40,
-                "y": 80,
+                "y": 140,
                 "wires": [
                     {
                         "id": "7f0d668f43a58f56"
@@ -395,15 +395,19 @@
         ],
         "out": [
             {
-                "x": 940,
-                "y": 300,
+                "x": 1480,
+                "y": 360,
                 "wires": [
                     {
                         "id": "0a60a67d15c726a8",
                         "port": 0
                     },
                     {
-                        "id": "1fec46abd06e6d30",
+                        "id": "b1937dbaaed86b43",
+                        "port": 0
+                    },
+                    {
+                        "id": "d23e487ead152956",
                         "port": 0
                     }
                 ]
@@ -421,7 +425,7 @@
         "category": "",
         "in": [
             {
-                "x": 20,
+                "x": 80,
                 "y": 120,
                 "wires": [
                     {
@@ -432,15 +436,15 @@
         ],
         "out": [
             {
-                "x": 600,
-                "y": 380,
+                "x": 1220,
+                "y": 280,
                 "wires": [
                     {
                         "id": "1442ce309155c0cb",
                         "port": 0
                     },
                     {
-                        "id": "7511b016e524404c",
+                        "id": "5646d036e73912b8",
                         "port": 0
                     }
                 ]
@@ -700,8 +704,8 @@
         "type": "subflow:63baa18a398cf25b",
         "z": "25a729f30c43b341",
         "name": "",
-        "x": 780,
-        "y": 80,
+        "x": 1060,
+        "y": 60,
         "wires": [
             [
                 "d6d816aa7d1fd15a"
@@ -719,8 +723,8 @@
         "search": "_view_",
         "design": "type",
         "index": "by-topic",
-        "x": 480,
-        "y": 200,
+        "x": 760,
+        "y": 180,
         "wires": [
             [
                 "06ba7a2d683fd8ee"
@@ -739,7 +743,7 @@
         "finalize": "",
         "libs": [],
         "x": 230,
-        "y": 80,
+        "y": 140,
         "wires": [
             [
                 "21f9205ec0644936"
@@ -757,8 +761,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 530,
-        "y": 240,
+        "x": 810,
+        "y": 220,
         "wires": [
             [
                 "a913be707788b4a3"
@@ -777,10 +781,10 @@
         "design": "type",
         "index": "by-code",
         "x": 480,
-        "y": 120,
+        "y": 180,
         "wires": [
             [
-                "cafade7146ea2c39"
+                "6c434f53bb47186d"
             ]
         ]
     },
@@ -795,8 +799,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 510,
-        "y": 160,
+        "x": 790,
+        "y": 140,
         "wires": [
             [
                 "e3217c7e3ff0b0fd"
@@ -816,7 +820,7 @@
         "payloadType": "json",
         "block": false,
         "x": 200,
-        "y": 120,
+        "y": 180,
         "wires": [
             [
                 "f240a561dacceaa9"
@@ -842,7 +846,7 @@
         "repair": false,
         "outputs": 2,
         "x": 270,
-        "y": 160,
+        "y": 220,
         "wires": [
             [
                 "534e74173a3dea50"
@@ -864,7 +868,7 @@
         "finalize": "",
         "libs": [],
         "x": 510,
-        "y": 80,
+        "y": 140,
         "wires": [
             [
                 "915a77b65f7aa5ff"
@@ -883,7 +887,7 @@
         "finalize": "",
         "libs": [],
         "x": 500,
-        "y": 300,
+        "y": 360,
         "wires": [
             []
         ]
@@ -900,12 +904,10 @@
         "paramsType": "json",
         "payloadType": "json",
         "block": false,
-        "x": 760,
-        "y": 160,
+        "x": 1280,
+        "y": 100,
         "wires": [
-            [
-                "1fec46abd06e6d30"
-            ]
+            []
         ]
     },
     {
@@ -919,42 +921,76 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 770,
-        "y": 120,
+        "x": 1050,
+        "y": 100,
         "wires": [
             [
-                "f8bd74c6b30d97c4"
+                "f8bd74c6b30d97c4",
+                "d23e487ead152956"
             ]
         ]
     },
     {
-        "id": "1fec46abd06e6d30",
-        "type": "change",
+        "id": "d23e487ead152956",
+        "type": "function",
+        "z": "25a729f30c43b341",
+        "name": "return scopes",
+        "func": "msg.payload = msg.backup;\ndelete msg.scope;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1060,
+        "y": 140,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "6c434f53bb47186d",
+        "type": "switch",
         "z": "25a729f30c43b341",
         "name": "",
+        "property": "payload.length",
+        "propertyType": "msg",
         "rules": [
             {
-                "t": "set",
-                "p": "sub",
-                "pt": "msg",
-                "to": "payload",
-                "tot": "msg"
+                "t": "gt",
+                "v": "0",
+                "vt": "num"
             },
             {
-                "t": "set",
-                "p": "payload",
-                "pt": "msg",
-                "to": "backup",
-                "tot": "msg"
+                "t": "else"
             }
         ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 780,
-        "y": 200,
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 550,
+        "y": 220,
+        "wires": [
+            [
+                "cafade7146ea2c39"
+            ],
+            [
+                "b1937dbaaed86b43"
+            ]
+        ]
+    },
+    {
+        "id": "b1937dbaaed86b43",
+        "type": "function",
+        "z": "25a729f30c43b341",
+        "name": "return empty",
+        "func": "msg.sub = null;\nmsg.payload = msg.backup;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 770,
+        "y": 280,
         "wires": [
             []
         ]
@@ -964,13 +1000,13 @@
         "type": "function",
         "z": "dbbf76b23c84dc6a",
         "name": "check sub payload",
-        "func": "let valid = false;\nlet useCombo = false;\nif (msg.sub && msg.sub.scopes) {\n    useCombo = msg.sub.scopes.useCombo;\n    msg.payload = {\n        key: (useCombo) ? msg.sub.scopes.combo : msg.sub.scopes.sitemapCode\n    }\n    valid = true;\n}\nmsg.useCombo = useCombo;\nmsg.isValid = valid;\nreturn msg;",
+        "func": "msg.backup02 = msg.payload;\nlet valid = false;\nlet useCombo = false;\nif (msg.sub && msg.sub.scopes) {\n    useCombo = msg.sub.scopes.useCombo;\n    msg.payload = {\n        key: (useCombo) ? msg.sub.scopes.combo : msg.sub.scopes.sitemapCode\n    }\n    valid = true;\n}\nmsg.useCombo = useCombo;\nmsg.isValid = valid;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 190,
+        "x": 250,
         "y": 120,
         "wires": [
             [
@@ -996,7 +1032,7 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 230,
+        "x": 290,
         "y": 160,
         "wires": [
             [
@@ -1025,7 +1061,7 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 410,
+        "x": 490,
         "y": 120,
         "wires": [
             [
@@ -1055,8 +1091,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 410,
-        "y": 200,
+        "x": 490,
+        "y": 280,
         "wires": [
             []
         ]
@@ -1072,7 +1108,7 @@
         "search": "_view_",
         "design": "type",
         "index": "by-code",
-        "x": 600,
+        "x": 680,
         "y": 80,
         "wires": [
             [
@@ -1091,8 +1127,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 660,
-        "y": 140,
+        "x": 700,
+        "y": 160,
         "wires": [
             [
                 "07d3733446a87fc2"
@@ -1110,11 +1146,11 @@
         "arraySpltType": "len",
         "stream": false,
         "addname": "",
-        "x": 630,
-        "y": 180,
+        "x": 670,
+        "y": 200,
         "wires": [
             [
-                "20caee64052465cb"
+                "7c14c0819a34ff22"
             ]
         ]
     },
@@ -1138,49 +1174,11 @@
         "reduceInit": "",
         "reduceInitType": "",
         "reduceFixup": "",
-        "x": 830,
-        "y": 300,
+        "x": 890,
+        "y": 240,
         "wires": [
             [
-                "7511b016e524404c"
-            ]
-        ]
-    },
-    {
-        "id": "20caee64052465cb",
-        "type": "function",
-        "z": "dbbf76b23c84dc6a",
-        "name": "prepare key",
-        "func": "msg.scope = msg.payload;\nmsg.payload = {\n    key: msg.payload.code\n}\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 650,
-        "y": 220,
-        "wires": [
-            [
-                "7fe43a273cb59e0a"
-            ]
-        ]
-    },
-    {
-        "id": "7fe43a273cb59e0a",
-        "type": "cloudantplus in",
-        "z": "dbbf76b23c84dc6a",
-        "name": "",
-        "cloudant": "784d89e62dfb5070",
-        "database": "smart-libs",
-        "service": "_ext_",
-        "search": "_view_",
-        "design": "type",
-        "index": "by-code",
-        "x": 640,
-        "y": 260,
-        "wires": [
-            [
-                "67a10894c30a68e6"
+                "5646d036e73912b8"
             ]
         ]
     },
@@ -1189,14 +1187,14 @@
         "type": "function",
         "z": "dbbf76b23c84dc6a",
         "name": "embed doc",
-        "func": "let scope = { ...msg.scope }\nscope['doc'] = null;\nif (msg.payload && Array.isArray(msg.payload) && msg.payload.length > 0) {\n    scope['doc'] = msg.payload[0].value\n}\n\nmsg.payload = scope;\nreturn msg;",
+        "func": "let scope = { ...msg.payload }\nscope['scopes'] = msg.sub;\nmsg.payload = scope;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 650,
-        "y": 300,
+        "x": 910,
+        "y": 200,
         "wires": [
             [
                 "9dc929318448b3ec"
@@ -1204,7 +1202,7 @@
         ]
     },
     {
-        "id": "7511b016e524404c",
+        "id": "7c14c0819a34ff22",
         "type": "change",
         "z": "dbbf76b23c84dc6a",
         "name": "",
@@ -1213,7 +1211,7 @@
                 "t": "set",
                 "p": "sub",
                 "pt": "msg",
-                "to": "payload",
+                "to": "payload.code",
                 "tot": "msg"
             }
         ],
@@ -1222,8 +1220,40 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 850,
-        "y": 340,
+        "x": 690,
+        "y": 240,
+        "wires": [
+            [
+                "28f09b396f5a23ee"
+            ]
+        ]
+    },
+    {
+        "id": "28f09b396f5a23ee",
+        "type": "subflow:25a729f30c43b341",
+        "z": "dbbf76b23c84dc6a",
+        "name": "",
+        "x": 940,
+        "y": 160,
+        "wires": [
+            [
+                "67a10894c30a68e6"
+            ]
+        ]
+    },
+    {
+        "id": "5646d036e73912b8",
+        "type": "function",
+        "z": "dbbf76b23c84dc6a",
+        "name": "return and clean up",
+        "func": "msg.sub = msg.payload;\nmsg.payload = msg.backup02;\n\ndelete msg.scopes;\ndelete msg.backup;\ndelete msg.backup02;\ndelete msg.isValid;\ndelete msg.useCombo;\ndelete msg.cloudant;\ndelete msg.ori;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1070,
+        "y": 240,
         "wires": [
             []
         ]
@@ -1560,7 +1590,7 @@
         "upload": false,
         "swaggerDoc": "",
         "x": 140,
-        "y": 140,
+        "y": 160,
         "wires": [
             [
                 "1139aaeb805d591e"
@@ -1574,8 +1604,8 @@
         "name": "",
         "statusCode": "200",
         "headers": {},
-        "x": 1580,
-        "y": 160,
+        "x": 1600,
+        "y": 220,
         "wires": []
     },
     {
@@ -1590,7 +1620,7 @@
         "design": "view-user",
         "index": "by-nik",
         "x": 590,
-        "y": 140,
+        "y": 160,
         "wires": [
             [
                 "b3f14e2a3a967408"
@@ -1609,7 +1639,7 @@
         "finalize": "",
         "libs": [],
         "x": 390,
-        "y": 140,
+        "y": 160,
         "wires": [
             [
                 "5dbfca463b8f94ea"
@@ -1637,7 +1667,7 @@
         "repair": false,
         "outputs": 2,
         "x": 750,
-        "y": 140,
+        "y": 160,
         "wires": [
             [
                 "f76eb5c7ca814e7f"
@@ -1655,7 +1685,7 @@
         "statusCode": "400",
         "headers": {},
         "x": 940,
-        "y": 280,
+        "y": 300,
         "wires": []
     },
     {
@@ -1678,7 +1708,7 @@
         "to": "",
         "reg": false,
         "x": 960,
-        "y": 240,
+        "y": 260,
         "wires": [
             [
                 "c9f15de4fba5c2e0"
@@ -1697,7 +1727,7 @@
         "finalize": "",
         "libs": [],
         "x": 950,
-        "y": 60,
+        "y": 80,
         "wires": [
             [
                 "12be102bd5a5549e"
@@ -1710,7 +1740,7 @@
         "z": "3a3a41a0d95d74c4",
         "name": "",
         "x": 980,
-        "y": 100,
+        "y": 120,
         "wires": [
             [
                 "0460f41c928aef8f"
@@ -1729,7 +1759,7 @@
         "finalize": "",
         "libs": [],
         "x": 960,
-        "y": 140,
+        "y": 160,
         "wires": [
             [
                 "5ef56066432171ba"
@@ -1741,8 +1771,8 @@
         "type": "subflow:77002254b872fa8e",
         "z": "3a3a41a0d95d74c4",
         "name": "",
-        "x": 1210,
-        "y": 80,
+        "x": 1230,
+        "y": 140,
         "wires": [
             [
                 "20f7357695b26aa8"
@@ -1767,8 +1797,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 990,
-        "y": 180,
+        "x": 1030,
+        "y": 200,
         "wires": [
             [
                 "ab91fa5df5761e58"
@@ -1785,8 +1815,8 @@
         "name": "",
         "statusCode": "400",
         "headers": {},
-        "x": 1200,
-        "y": 280,
+        "x": 1220,
+        "y": 340,
         "wires": []
     },
     {
@@ -1808,8 +1838,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1220,
-        "y": 240,
+        "x": 1240,
+        "y": 300,
         "wires": [
             [
                 "11fc9ef3ad64cf3c"
@@ -1835,7 +1865,7 @@
         "repair": false,
         "outputs": 2,
         "x": 410,
-        "y": 180,
+        "y": 200,
         "wires": [
             [
                 "24dfaa402842999c"
@@ -1853,7 +1883,7 @@
         "statusCode": "400",
         "headers": {},
         "x": 580,
-        "y": 260,
+        "y": 280,
         "wires": []
     },
     {
@@ -1876,7 +1906,7 @@
         "to": "",
         "reg": false,
         "x": 600,
-        "y": 220,
+        "y": 240,
         "wires": [
             [
                 "96353977042ba7f3"
@@ -1894,8 +1924,8 @@
         "search": "_view_",
         "design": "type",
         "index": "by-topic",
-        "x": 1200,
-        "y": 160,
+        "x": 1220,
+        "y": 220,
         "wires": [
             [
                 "17cf590e3d949f01"
@@ -1907,14 +1937,14 @@
         "type": "function",
         "z": "3a3a41a0d95d74c4",
         "name": "prepare sub",
-        "func": "msg.sub = {\n    obj: msg.payload[0].value.data,\n    key: 'code',\n    val: (msg.result.decoded.systemRoles.length > 0) ? msg.result.decoded.systemRoles[0] : null\n}\nreturn msg;",
+        "func": "msg.sub = {\n    obj: msg.payload[0].value.data,\n    key: 'code',\n    val: (msg.jwtSign.decoded.systemRoles.length > 0) ? msg.result.decoded.systemRoles[0] : null\n}\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1410,
-        "y": 80,
+        "x": 1430,
+        "y": 140,
         "wires": [
             [
                 "33feea6c9732727e"
@@ -1926,14 +1956,14 @@
         "type": "function",
         "z": "3a3a41a0d95d74c4",
         "name": "return",
-        "func": "msg.payload = { ...msg.result };\nreturn msg;",
+        "func": "msg.payload = { ...msg.jwtSign };\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1390,
-        "y": 160,
+        "x": 1410,
+        "y": 220,
         "wires": [
             [
                 "9ed6e261b82dc55d"
@@ -1945,14 +1975,14 @@
         "type": "function",
         "z": "3a3a41a0d95d74c4",
         "name": "set result",
-        "func": "msg.result = msg.sub;\nmsg.payload = {\n    key: [\"reference\", \"smart-system-role\"]\n}\nreturn msg;",
+        "func": "msg.jwtSign = msg.sub;\nmsg.payload = {\n    key: [\"reference\", \"smart-system-role\"]\n}\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1200,
-        "y": 120,
+        "x": 1220,
+        "y": 180,
         "wires": [
             [
                 "946615b5dff60503"
@@ -1964,11 +1994,71 @@
         "type": "subflow:44e549ae5408d3d3",
         "z": "3a3a41a0d95d74c4",
         "name": "",
-        "x": 1420,
-        "y": 120,
+        "x": 1440,
+        "y": 180,
         "wires": [
             [
                 "3b111b6afac1790d"
+            ]
+        ]
+    },
+    {
+        "id": "a81e088149e4c8ef",
+        "type": "inject",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "props": [
+            {
+                "p": "sub",
+                "v": "{\"_id\":\"658b0941b29a7de43cd57aa4cb079c6b\",\"_rev\":\"84-5c5e043d22c25035912fdc15f21c8fed\",\"nik\":\"N15000001\",\"loginType\":\"non-adfs\",\"fullName\":\"Lamhot Nainggolan\",\"email\":\"\",\"authorizations\":[{\"type\":\"password\",\"passwords\":[\"0f2265f846d3fb96a6d7973ec609d597\"]}],\"corpRole\":\"AD\",\"scopes\":{\"useCombo\":true,\"areaCode\":\"SC-SAW-SIAK-00001\",\"combo\":\"COMB-00001\",\"sitemapCode\":\"SC-SAW-SIAK-00001\",\"organizationCode\":\"SC-SAW-SIAK-00001\"}}",
+                "vt": "json"
+            },
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "something",
+        "payloadType": "str",
+        "x": 100,
+        "y": 640,
+        "wires": [
+            [
+                "d884900f99eac685"
+            ]
+        ]
+    },
+    {
+        "id": "b84e2f99c203e6b5",
+        "type": "debug",
+        "z": "3a3a41a0d95d74c4",
+        "name": "debug 21",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 600,
+        "y": 640,
+        "wires": []
+    },
+    {
+        "id": "d884900f99eac685",
+        "type": "subflow:dbbf76b23c84dc6a",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "x": 350,
+        "y": 640,
+        "wires": [
+            [
+                "b84e2f99c203e6b5"
             ]
         ]
     },
@@ -3332,66 +3422,6 @@
         "wires": [
             [
                 "0726dd0c9132bef2"
-            ]
-        ]
-    },
-    {
-        "id": "a81e088149e4c8ef",
-        "type": "inject",
-        "z": "c13d19c3dfb652c9",
-        "name": "",
-        "props": [
-            {
-                "p": "sub",
-                "v": "{\"_id\":\"658b0941b29a7de43cd57aa4cb079c6b\",\"_rev\":\"84-5c5e043d22c25035912fdc15f21c8fed\",\"nik\":\"N15000001\",\"loginType\":\"non-adfs\",\"fullName\":\"Lamhot Nainggolan\",\"email\":\"\",\"authorizations\":[{\"type\":\"password\",\"passwords\":[\"0f2265f846d3fb96a6d7973ec609d597\"]}],\"corpRole\":\"AD\",\"scopes\":{\"useCombo\":true,\"areaCode\":\"SC-SAW-SIAK-00001\",\"combo\":\"COMB-00001\",\"sitemapCode\":\"SC-SAW-SIAK-00001\",\"organizationCode\":\"SC-SAW-SIAK-00001\"}}",
-                "vt": "json"
-            },
-            {
-                "p": "payload"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "",
-        "payloadType": "str",
-        "x": 230,
-        "y": 480,
-        "wires": [
-            [
-                "d884900f99eac685"
-            ]
-        ]
-    },
-    {
-        "id": "b84e2f99c203e6b5",
-        "type": "debug",
-        "z": "c13d19c3dfb652c9",
-        "name": "debug 21",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 740,
-        "y": 480,
-        "wires": []
-    },
-    {
-        "id": "d884900f99eac685",
-        "type": "subflow:dbbf76b23c84dc6a",
-        "z": "c13d19c3dfb652c9",
-        "name": "",
-        "x": 490,
-        "y": 480,
-        "wires": [
-            [
-                "b84e2f99c203e6b5"
             ]
         ]
     },
