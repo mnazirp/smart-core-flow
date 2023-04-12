@@ -380,7 +380,7 @@
         "id": "25a729f30c43b341",
         "type": "subflow",
         "name": "sub:get-scope-by-code",
-        "info": "",
+        "info": "## Input\r\nassign msg.sub with string scope code like this:\r\n\r\n    \"SC-SAW-SIAK-00001\"\r\n\r\n## output\r\nit will an array of scopes in msg.sub\r\n\r\n    [\r\n        {\r\n            \"name\": \"UPSTREAM\",\r\n            \"desc\": \"UPSTREAM\",\r\n            \"category\": \"US\",\r\n            \"id\": 5001,\r\n            \"level\": 0,\r\n            \"parentId\": null\r\n        },\r\n        {\r\n            \"name\": \"DIRSERVICE\",\r\n            \"desc\": \"Directorate Service\",\r\n            \"category\": \"DIRECTORATE\",\r\n            \"id\": 5005,\r\n            \"level\": 1,\r\n            \"parentId\": 5001\r\n        },\r\n    ]\r\n\r\n",
         "category": "",
         "in": [
             {
