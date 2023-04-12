@@ -420,7 +420,7 @@
     {
         "id": "dbbf76b23c84dc6a",
         "type": "subflow",
-        "name": "sub: get-scopes-from-user",
+        "name": "sub: get-scopes",
         "info": "",
         "category": "",
         "in": [
@@ -483,7 +483,7 @@
         "type": "function",
         "z": "77002254b872fa8e",
         "name": "jwt sign",
-        "func": "let secret = env.get('JWTSECRET');\nlet options = { expiresIn: '2 days' };\nlet token = jwt.sign(msg.sub, secret, options);\nlet decoded = jwt.verify(token, secret);\nmsg.sub = {\n    token: token,\n    decoded: decoded\n}\nreturn msg;",
+        "func": "let secret = env.get('JWTSECRET');\nlet options = { expiresIn: '2 days' };\nlet token = jwt.sign(msg.sub, secret, options);\nlet decoded = jwt.verify(token, secret);\nmsg.sub = token;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -1000,7 +1000,7 @@
         "type": "function",
         "z": "dbbf76b23c84dc6a",
         "name": "check sub payload",
-        "func": "msg.backup02 = msg.payload;\nlet valid = false;\nlet useCombo = false;\nif (msg.sub && msg.sub.scopes) {\n    useCombo = msg.sub.scopes.useCombo;\n    msg.payload = {\n        key: (useCombo) ? msg.sub.scopes.combo : msg.sub.scopes.sitemapCode\n    }\n    valid = true;\n}\nmsg.useCombo = useCombo;\nmsg.isValid = valid;\nreturn msg;",
+        "func": "msg.backup02 = msg.payload;\nlet valid = false;\nlet useCombo = false;\nif (msg.sub) {\n    useCombo = msg.sub.useCombo;\n    msg.payload = {\n        key: (useCombo) ? msg.sub.combo : msg.sub.sitemapCode\n    }\n    valid = true;\n}\nmsg.useCombo = useCombo;\nmsg.isValid = valid;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -1121,7 +1121,7 @@
         "type": "function",
         "z": "dbbf76b23c84dc6a",
         "name": "prepare scopes",
-        "func": "let scopes = { ...msg.sub.scopes };\nif (msg.useCombo) {\n    let { sitemapCode, organizationCode } = msg.payload[0].value.data\n    scopes['sitemapCode'] = sitemapCode;\n    scopes['organizationCode'] = organizationCode;\n}\n\nmsg.scopes = Object.keys(scopes).map((key) => {\n    let topic = null;\n    switch (key) {\n        case 'areaCode':\n            topic = 'area';\n            break;\n        case 'sitemapCode':\n            topic = 'sitemap';\n            break;\n        case 'organizationCode':\n            topic = 'organization'\n            break;\n    }\n    if (topic) {\n        return {\n            type: topic,\n            code: scopes[key]\n        }\n    }\n}).filter(x => {\n    if (x) return x;\n});\nmsg.payload = msg.scopes;\nreturn msg;",
+        "func": "let scopes = { ...msg.sub };\nif (msg.useCombo) {\n    let { sitemapCode, organizationCode } = msg.payload[0].value.data\n    scopes['sitemapCode'] = sitemapCode;\n    scopes['organizationCode'] = organizationCode;\n}\n\nmsg.scopes = Object.keys(scopes).map((key) => {\n    let topic = null;\n    switch (key) {\n        case 'areaCode':\n            topic = 'area';\n            break;\n        case 'sitemapCode':\n            topic = 'sitemap';\n            break;\n        case 'organizationCode':\n            topic = 'organization'\n            break;\n    }\n    if (topic) {\n        return {\n            type: topic,\n            code: scopes[key]\n        }\n    }\n}).filter(x => {\n    if (x) return x;\n});\nmsg.payload = msg.scopes;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -1598,17 +1598,6 @@
         ]
     },
     {
-        "id": "9ed6e261b82dc55d",
-        "type": "http response",
-        "z": "3a3a41a0d95d74c4",
-        "name": "",
-        "statusCode": "200",
-        "headers": {},
-        "x": 1600,
-        "y": 220,
-        "wires": []
-    },
-    {
         "id": "24dfaa402842999c",
         "type": "cloudantplus in",
         "z": "3a3a41a0d95d74c4",
@@ -1937,7 +1926,7 @@
         "type": "function",
         "z": "3a3a41a0d95d74c4",
         "name": "prepare sub",
-        "func": "msg.sub = {\n    obj: msg.payload[0].value.data,\n    key: 'code',\n    val: (msg.jwtSign.decoded.systemRoles.length > 0) ? msg.result.decoded.systemRoles[0] : null\n}\nreturn msg;",
+        "func": "msg.sub = {\n    obj: msg.payload[0].value.data,\n    key: 'code',\n    val: (msg.user.systemRoles && msg.user.systemRoles.length > 0) ? msg.user.systemRoles[0] : null\n}\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -1952,30 +1941,11 @@
         ]
     },
     {
-        "id": "3b111b6afac1790d",
-        "type": "function",
-        "z": "3a3a41a0d95d74c4",
-        "name": "return",
-        "func": "msg.payload = { ...msg.jwtSign };\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 1410,
-        "y": 220,
-        "wires": [
-            [
-                "9ed6e261b82dc55d"
-            ]
-        ]
-    },
-    {
         "id": "20f7357695b26aa8",
         "type": "function",
         "z": "3a3a41a0d95d74c4",
         "name": "set result",
-        "func": "msg.jwtSign = msg.sub;\nmsg.payload = {\n    key: [\"reference\", \"smart-system-role\"]\n}\nreturn msg;",
+        "func": "msg.sign = msg.sub;\ndelete msg.sub;\nmsg.payload = {\n    key: [\"reference\", \"smart-system-role\"]\n}\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -2010,7 +1980,7 @@
         "props": [
             {
                 "p": "sub",
-                "v": "{\"_id\":\"658b0941b29a7de43cd57aa4cb079c6b\",\"_rev\":\"84-5c5e043d22c25035912fdc15f21c8fed\",\"nik\":\"N15000001\",\"loginType\":\"non-adfs\",\"fullName\":\"Lamhot Nainggolan\",\"email\":\"\",\"authorizations\":[{\"type\":\"password\",\"passwords\":[\"0f2265f846d3fb96a6d7973ec609d597\"]}],\"corpRole\":\"AD\",\"scopes\":{\"useCombo\":true,\"areaCode\":\"SC-SAW-SIAK-00001\",\"combo\":\"COMB-00001\",\"sitemapCode\":\"SC-SAW-SIAK-00001\",\"organizationCode\":\"SC-SAW-SIAK-00001\"}}",
+                "v": "{\"useCombo\":true,\"areaCode\":\"SC-SAW-SIAK-00001\",\"combo\":\"COMB-00001\",\"sitemapCode\":\"SC-SAW-SIAK-00001\",\"organizationCode\":\"SC-SAW-SIAK-00001\"}",
                 "vt": "json"
             },
             {
@@ -2054,11 +2024,73 @@
         "type": "subflow:dbbf76b23c84dc6a",
         "z": "3a3a41a0d95d74c4",
         "name": "",
-        "x": 350,
+        "x": 320,
         "y": 640,
         "wires": [
             [
                 "b84e2f99c203e6b5"
+            ]
+        ]
+    },
+    {
+        "id": "9ed6e261b82dc55d",
+        "type": "http response",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 1660,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "6de44606a029cc3e",
+        "type": "subflow:dbbf76b23c84dc6a",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "x": 1680,
+        "y": 140,
+        "wires": [
+            [
+                "ade671b97e908ca5"
+            ]
+        ]
+    },
+    {
+        "id": "ade671b97e908ca5",
+        "type": "function",
+        "z": "3a3a41a0d95d74c4",
+        "name": "return",
+        "func": "msg.user.scopes = msg.sub;\nmsg.payload = msg.user;\ndelete msg.user;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1650,
+        "y": 180,
+        "wires": [
+            [
+                "9ed6e261b82dc55d"
+            ]
+        ]
+    },
+    {
+        "id": "3b111b6afac1790d",
+        "type": "function",
+        "z": "3a3a41a0d95d74c4",
+        "name": "set system roles",
+        "func": "let user = { ...msg.user };\nuser.systemRoles = msg.sub;\nmsg.sub = msg.user.scopes;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1440,
+        "y": 220,
+        "wires": [
+            [
+                "6de44606a029cc3e"
             ]
         ]
     },
