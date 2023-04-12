@@ -421,7 +421,7 @@
         "id": "dbbf76b23c84dc6a",
         "type": "subflow",
         "name": "sub: get-scopes",
-        "info": "",
+        "info": "## Input\r\nassign msg.sub with object like this:\r\n\r\n    {\r\n        \"useCombo\": false,\r\n        \"areaCode\": \"SC-SAW-SIAK-00001\",\r\n        \"combo\": \"COMB-00001\",\r\n        \"sitemapCode\": \"SC-SAW-SIAK-00001\",\r\n        \"organizationCode\": \"SC-SAW-SIAK-00001\"\r\n    }\r\n\r\n## output\r\nit will produce the same object with scopes in msg.sub\r\n\r\n    [\r\n        {\r\n            \"type\": \"area\",\r\n            \"code\": \"SC-SAW-SIAK-00001\",\r\n            \"scopes\": []\r\n        },\r\n        {\r\n            \"type\": \"sitemap\",\r\n            \"code\": \"SC-SAW-SIAK-00001\",\r\n            \"scopes\": []\r\n        },\r\n        {\r\n            \"type\": \"organization\",\r\n            \"code\": \"SC-SAW-SIAK-00001\",\r\n            \"scopes\": []\r\n        },\r\n    ]\r\n\r\n",
         "category": "",
         "in": [
             {
@@ -3565,6 +3565,85 @@
                 "0726dd0c9132bef2"
             ]
         ]
+    },
+    {
+        "id": "21d45f21f7cdcbb5",
+        "type": "http in",
+        "z": "c13d19c3dfb652c9",
+        "name": "",
+        "url": "/api/scope/by-user-scopes",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 170,
+        "y": 440,
+        "wires": [
+            [
+                "bb396ecdcc26ed62"
+            ]
+        ]
+    },
+    {
+        "id": "bb396ecdcc26ed62",
+        "type": "function",
+        "z": "c13d19c3dfb652c9",
+        "name": "prepare sub",
+        "func": "msg.sub = msg.payload;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 450,
+        "y": 440,
+        "wires": [
+            [
+                "c7c888a9bc474236"
+            ]
+        ]
+    },
+    {
+        "id": "c7c888a9bc474236",
+        "type": "subflow:dbbf76b23c84dc6a",
+        "z": "c13d19c3dfb652c9",
+        "name": "",
+        "x": 460,
+        "y": 480,
+        "wires": [
+            [
+                "dd318b2a57cc1594"
+            ]
+        ]
+    },
+    {
+        "id": "dd318b2a57cc1594",
+        "type": "function",
+        "z": "c13d19c3dfb652c9",
+        "name": "return",
+        "func": "msg.payload = msg.sub;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 520,
+        "wires": [
+            [
+                "3fe12714d68fcc36"
+            ]
+        ]
+    },
+    {
+        "id": "3fe12714d68fcc36",
+        "type": "http response",
+        "z": "c13d19c3dfb652c9",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 680,
+        "y": 520,
+        "wires": []
     },
     {
         "id": "c4fea9f1ad696a34",
