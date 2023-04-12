@@ -1973,71 +1973,11 @@
         ]
     },
     {
-        "id": "a81e088149e4c8ef",
-        "type": "inject",
-        "z": "3a3a41a0d95d74c4",
-        "name": "",
-        "props": [
-            {
-                "p": "sub",
-                "v": "{\"useCombo\":true,\"areaCode\":\"SC-SAW-SIAK-00001\",\"combo\":\"COMB-00001\",\"sitemapCode\":\"SC-SAW-SIAK-00001\",\"organizationCode\":\"SC-SAW-SIAK-00001\"}",
-                "vt": "json"
-            },
-            {
-                "p": "payload"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "something",
-        "payloadType": "str",
-        "x": 100,
-        "y": 640,
-        "wires": [
-            [
-                "d884900f99eac685"
-            ]
-        ]
-    },
-    {
-        "id": "b84e2f99c203e6b5",
-        "type": "debug",
-        "z": "3a3a41a0d95d74c4",
-        "name": "debug 21",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 600,
-        "y": 640,
-        "wires": []
-    },
-    {
-        "id": "d884900f99eac685",
-        "type": "subflow:dbbf76b23c84dc6a",
-        "z": "3a3a41a0d95d74c4",
-        "name": "",
-        "x": 320,
-        "y": 640,
-        "wires": [
-            [
-                "b84e2f99c203e6b5"
-            ]
-        ]
-    },
-    {
         "id": "3b111b6afac1790d",
         "type": "function",
         "z": "3a3a41a0d95d74c4",
         "name": "set system roles",
-        "func": "try {\n    let user = { ...msg.user };\n    user.systemRoles[0] = msg.sub;\n    msg.statusCode = 200;\n    msg.payload = user;\n    delete msg.user;\n} catch (error) {\n    msg.statusCode = 500;\n    msg.payload = { error: error.message }\n}\nreturn msg;",
+        "func": "try {\n    let user = { ...msg.user };\n    user.systemRoles[0] = msg.sub;\n    msg.statusCode = 200;\n    msg.payload = user;\n    delete msg.user;\n} catch (error) {\n    msg.statusCode = 500;\n    msg.payload = { error: \"user don't have systemRoles\" }\n}\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -2049,43 +1989,6 @@
             [
                 "c41d95634343de45"
             ]
-        ]
-    },
-    {
-        "id": "a9a1177ca114eaea",
-        "type": "function",
-        "z": "3a3a41a0d95d74c4",
-        "name": "function 19",
-        "func": "msg.payload = [`login:${msg.payload.nik}`, JSON.stringify(msg.payload), 'EX', 5 * 60];\nmsg.topic = null;\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 670,
-        "y": 740,
-        "wires": [
-            [
-                "a4f226361cad87f5"
-            ]
-        ]
-    },
-    {
-        "id": "a4f226361cad87f5",
-        "type": "redis-command",
-        "z": "3a3a41a0d95d74c4",
-        "server": "0fb96b870afb5c15",
-        "command": "set",
-        "name": "",
-        "topic": "",
-        "params": "[]",
-        "paramsType": "json",
-        "payloadType": "json",
-        "block": false,
-        "x": 660,
-        "y": 780,
-        "wires": [
-            []
         ]
     },
     {
