@@ -593,7 +593,7 @@
         "type": "function",
         "z": "c2f437acbbab02bd",
         "name": "crypto-dencrypt",
-        "func": "let algorithm = 'aes256';\nlet key = env.get('CRYPTO_KEY');\nlet iv = env.get('CRYPTO_IV');\nlet decipher = crypto.createDecipheriv(algorithm, key, iv);\nlet decrypted = decipher.update(msg.sub, 'hex', 'utf8') + decipher.final('utf8');\nmsg.sub = decrypted;\nreturn msg;",
+        "func": "try {\n    let algorithm = 'aes256';\n    let key = env.get('CRYPTO_KEY');\n    let iv = env.get('CRYPTO_IV');\n    let decipher = crypto.createDecipheriv(algorithm, key, iv);\n    let decrypted = decipher.update(msg.sub, 'hex', 'utf8') + decipher.final('utf8');\n    msg.sub = decrypted;\n} catch (error) {\n    msg.sub = null;\n    msg.error = error.message;\n};\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -670,7 +670,7 @@
         "type": "function",
         "z": "44e549ae5408d3d3",
         "name": "function 12",
-        "func": "let { obj, key, val } = msg.sub;\nlet nest = findNestedObj(obj, key, val);\nmsg.sub = nest;\nreturn msg;\n\nfunction findNestedObj(entireObj, keyToFind, valToFind) {\n    let foundObj;\n    JSON.stringify(entireObj, (_, nestedValue) => {\n        if (nestedValue && nestedValue[keyToFind] === valToFind) {\n            foundObj = nestedValue;\n        }\n        return nestedValue;\n    });\n    return foundObj;\n};",
+        "func": "try {\n    let { obj, key, val } = msg.sub;\n    let nest = findNestedObj(obj, key, val);\n    msg.sub = nest;\n} catch (error) {\n    msg.sub = null;\n    msg.error = error.message;\n};\nreturn msg;\n\nfunction findNestedObj(entireObj, keyToFind, valToFind) {\n    try {\n        let foundObj;\n        JSON.stringify(entireObj, (_, nestedValue) => {\n            if (nestedValue && nestedValue[keyToFind] === valToFind) {\n                foundObj = nestedValue;\n            }\n            return nestedValue;\n        });\n        return foundObj;\n    } catch (error) {\n        throw error;\n    };\n};",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -1674,7 +1674,7 @@
         "statusCode": "400",
         "headers": {},
         "x": 940,
-        "y": 300,
+        "y": 260,
         "wires": []
     },
     {
@@ -1697,7 +1697,7 @@
         "to": "",
         "reg": false,
         "x": 960,
-        "y": 260,
+        "y": 220,
         "wires": [
             [
                 "c9f15de4fba5c2e0"
@@ -1732,7 +1732,7 @@
         "y": 120,
         "wires": [
             [
-                "0460f41c928aef8f"
+                "54a019b169729c69"
             ]
         ]
     },
@@ -1747,8 +1747,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 960,
-        "y": 160,
+        "x": 1240,
+        "y": 100,
         "wires": [
             [
                 "5ef56066432171ba"
@@ -1760,11 +1760,11 @@
         "type": "subflow:77002254b872fa8e",
         "z": "3a3a41a0d95d74c4",
         "name": "",
-        "x": 1230,
-        "y": 140,
+        "x": 1490,
+        "y": 80,
         "wires": [
             [
-                "20f7357695b26aa8"
+                "b2e40b5de9099cf4"
             ]
         ]
     },
@@ -1786,8 +1786,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 1030,
-        "y": 200,
+        "x": 1310,
+        "y": 140,
         "wires": [
             [
                 "ab91fa5df5761e58"
@@ -1804,8 +1804,8 @@
         "name": "",
         "statusCode": "400",
         "headers": {},
-        "x": 1220,
-        "y": 320,
+        "x": 1480,
+        "y": 240,
         "wires": []
     },
     {
@@ -1827,8 +1827,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1240,
-        "y": 280,
+        "x": 1500,
+        "y": 200,
         "wires": [
             [
                 "11fc9ef3ad64cf3c"
@@ -1913,8 +1913,8 @@
         "search": "_view_",
         "design": "type",
         "index": "by-topic",
-        "x": 1220,
-        "y": 220,
+        "x": 1700,
+        "y": 100,
         "wires": [
             [
                 "17cf590e3d949f01"
@@ -1932,8 +1932,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1450,
-        "y": 140,
+        "x": 1930,
+        "y": 100,
         "wires": [
             [
                 "33feea6c9732727e"
@@ -1951,8 +1951,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1220,
-        "y": 180,
+        "x": 1700,
+        "y": 60,
         "wires": [
             [
                 "946615b5dff60503"
@@ -1964,11 +1964,11 @@
         "type": "subflow:44e549ae5408d3d3",
         "z": "3a3a41a0d95d74c4",
         "name": "",
-        "x": 1460,
-        "y": 180,
+        "x": 1940,
+        "y": 140,
         "wires": [
             [
-                "3b111b6afac1790d"
+                "98a0c35f4d38f37f"
             ]
         ]
     },
@@ -2043,8 +2043,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1460,
-        "y": 220,
+        "x": 2160,
+        "y": 140,
         "wires": [
             [
                 "c41d95634343de45"
@@ -2062,8 +2062,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1730,
-        "y": 180,
+        "x": 670,
+        "y": 740,
         "wires": [
             [
                 "a4f226361cad87f5"
@@ -2082,8 +2082,8 @@
         "paramsType": "json",
         "payloadType": "json",
         "block": false,
-        "x": 1720,
-        "y": 220,
+        "x": 660,
+        "y": 780,
         "wires": [
             []
         ]
@@ -2095,8 +2095,209 @@
         "name": "",
         "statusCode": "",
         "headers": {},
-        "x": 1670,
-        "y": 140,
+        "x": 2190,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "54a019b169729c69",
+        "type": "switch",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "property": "error",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "null"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 1030,
+        "y": 160,
+        "wires": [
+            [
+                "0460f41c928aef8f"
+            ],
+            [
+                "fa20975b5ffde22c"
+            ]
+        ]
+    },
+    {
+        "id": "aa91185e5d5a25e1",
+        "type": "http response",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "statusCode": "500",
+        "headers": {},
+        "x": 1200,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "fa20975b5ffde22c",
+        "type": "change",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "error",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1220,
+        "y": 200,
+        "wires": [
+            [
+                "aa91185e5d5a25e1"
+            ]
+        ]
+    },
+    {
+        "id": "b2e40b5de9099cf4",
+        "type": "switch",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "property": "error",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "null"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 1510,
+        "y": 120,
+        "wires": [
+            [
+                "20f7357695b26aa8"
+            ],
+            [
+                "ed152ac4514b4399"
+            ]
+        ]
+    },
+    {
+        "id": "7670ff903689d835",
+        "type": "http response",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "statusCode": "500",
+        "headers": {},
+        "x": 1700,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "ed152ac4514b4399",
+        "type": "change",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "error",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1720,
+        "y": 180,
+        "wires": [
+            [
+                "7670ff903689d835"
+            ]
+        ]
+    },
+    {
+        "id": "98a0c35f4d38f37f",
+        "type": "switch",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "property": "error",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "null"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 1970,
+        "y": 180,
+        "wires": [
+            [
+                "3b111b6afac1790d"
+            ],
+            [
+                "e2adb7a604451e55"
+            ]
+        ]
+    },
+    {
+        "id": "e2adb7a604451e55",
+        "type": "change",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "error",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 2160,
+        "y": 220,
+        "wires": [
+            [
+                "2596021eeda7b11e"
+            ]
+        ]
+    },
+    {
+        "id": "2596021eeda7b11e",
+        "type": "http response",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "statusCode": "500",
+        "headers": {},
+        "x": 2180,
+        "y": 260,
         "wires": []
     },
     {
