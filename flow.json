@@ -436,15 +436,19 @@
         ],
         "out": [
             {
-                "x": 1220,
+                "x": 1500,
                 "y": 280,
                 "wires": [
                     {
-                        "id": "1442ce309155c0cb",
+                        "id": "5646d036e73912b8",
                         "port": 0
                     },
                     {
-                        "id": "5646d036e73912b8",
+                        "id": "ff3e5c5f37383acb",
+                        "port": 1
+                    },
+                    {
+                        "id": "1442ce309155c0cb",
                         "port": 0
                     }
                 ]
@@ -1121,7 +1125,7 @@
         "type": "function",
         "z": "dbbf76b23c84dc6a",
         "name": "prepare scopes",
-        "func": "let scopes = { ...msg.sub };\nif (msg.useCombo) {\n    let { sitemapCode, organizationCode } = msg.payload[0].value.data\n    scopes['sitemapCode'] = sitemapCode;\n    scopes['organizationCode'] = organizationCode;\n}\n\nmsg.scopes = Object.keys(scopes).map((key) => {\n    let topic = null;\n    switch (key) {\n        case 'areaCode':\n            topic = 'area';\n            break;\n        case 'sitemapCode':\n            topic = 'sitemap';\n            break;\n        case 'organizationCode':\n            topic = 'organization'\n            break;\n    }\n    if (topic) {\n        return {\n            type: topic,\n            code: scopes[key]\n        }\n    }\n}).filter(x => {\n    if (x) return x;\n});\nmsg.payload = msg.scopes;\nreturn msg;",
+        "func": "try {\n    let scopes = { ...msg.sub };\n    if (msg.useCombo) {\n        let { sitemapCode, organizationCode } = msg.payload[0].value.data\n        scopes['sitemapCode'] = sitemapCode;\n        scopes['organizationCode'] = organizationCode;\n    }\n\n    msg.scopes = Object.keys(scopes).map((key) => {\n        let topic = null;\n        switch (key) {\n            case 'areaCode':\n                topic = 'area';\n                break;\n            case 'sitemapCode':\n                topic = 'sitemap';\n                break;\n            case 'organizationCode':\n                topic = 'organization'\n                break;\n        }\n        if (topic) {\n            return {\n                type: topic,\n                code: scopes[key]\n            }\n        }\n    }).filter(x => {\n        if (x) return x;\n    });\n    msg.payload = msg.scopes;\n} catch (error) {\n    msg.sub = null;\n    msg.error = {\n        hint: 'combo not found',\n        error: error.message\n    }\n}\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -1131,7 +1135,7 @@
         "y": 160,
         "wires": [
             [
-                "07d3733446a87fc2"
+                "ff3e5c5f37383acb"
             ]
         ]
     },
@@ -1146,8 +1150,8 @@
         "arraySpltType": "len",
         "stream": false,
         "addname": "",
-        "x": 670,
-        "y": 200,
+        "x": 910,
+        "y": 160,
         "wires": [
             [
                 "7c14c0819a34ff22"
@@ -1174,8 +1178,8 @@
         "reduceInit": "",
         "reduceInitType": "",
         "reduceFixup": "",
-        "x": 890,
-        "y": 240,
+        "x": 1130,
+        "y": 200,
         "wires": [
             [
                 "5646d036e73912b8"
@@ -1193,8 +1197,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 910,
-        "y": 200,
+        "x": 1150,
+        "y": 160,
         "wires": [
             [
                 "9dc929318448b3ec"
@@ -1220,8 +1224,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 690,
-        "y": 240,
+        "x": 930,
+        "y": 200,
         "wires": [
             [
                 "28f09b396f5a23ee"
@@ -1233,8 +1237,8 @@
         "type": "subflow:25a729f30c43b341",
         "z": "dbbf76b23c84dc6a",
         "name": "",
-        "x": 940,
-        "y": 160,
+        "x": 1180,
+        "y": 120,
         "wires": [
             [
                 "67a10894c30a68e6"
@@ -1252,9 +1256,36 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1070,
-        "y": 240,
+        "x": 1310,
+        "y": 200,
         "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ff3e5c5f37383acb",
+        "type": "switch",
+        "z": "dbbf76b23c84dc6a",
+        "name": "",
+        "property": "error",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "null"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 730,
+        "y": 200,
+        "wires": [
+            [
+                "07d3733446a87fc2"
+            ],
             []
         ]
     },
@@ -3414,9 +3445,9 @@
         "type": "http response",
         "z": "c13d19c3dfb652c9",
         "name": "",
-        "statusCode": "200",
+        "statusCode": "",
         "headers": {},
-        "x": 760,
+        "x": 750,
         "y": 140,
         "wires": []
     },
@@ -3429,7 +3460,7 @@
         "y": 100,
         "wires": [
             [
-                "40b9aaecbcd31887"
+                "37b364bb5aa29dd3"
             ]
         ]
     },
@@ -3487,7 +3518,7 @@
         "type": "function",
         "z": "c13d19c3dfb652c9",
         "name": "filter by criteria",
-        "func": "let scope = msg.sub;\nmsg.payload = scope;\nif (msg.body.crit && msg.body.crit.length > 0) {\n    msg.payload = filterFlat(scope, msg.body.crit);\n}\nreturn msg;\n\nfunction filterFlat(flatObj, crit) {\n    return flatObj.filter(x => {\n        let params = [];\n        crit.forEach(c => {\n            let rs = false;\n            if (Array.isArray(c.val)) {\n                rs = c.val.some(s => x[c.key] === s)\n            } else {\n                rs = x[c.key] === c.val\n            }\n            params.push(rs);\n        });\n        return params.reduce((acc, val) => acc && val, true);\n    });\n}",
+        "func": "try {\n    let scope = msg.sub;\n    msg.payload = scope;\n    if (msg.body.crit && msg.body.crit.length > 0) {\n        msg.payload = filterFlat(scope, msg.body.crit);\n    }\n    msg.statusCode = 200;\n} catch (error) {\n    msg.payload = error.message;\n    msg.statusCode = 500;\n}\n\nreturn msg;\n\nfunction filterFlat(flatObj, crit) {\n    return flatObj.filter(x => {\n        let params = [];\n        crit.forEach(c => {\n            let rs = false;\n            if (Array.isArray(c.val)) {\n                rs = c.val.some(s => x[c.key] === s)\n            } else {\n                rs = x[c.key] === c.val\n            }\n            params.push(rs);\n        });\n        return params.reduce((acc, val) => acc && val, true);\n    });\n}",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -3506,9 +3537,9 @@
         "type": "http response",
         "z": "c13d19c3dfb652c9",
         "name": "",
-        "statusCode": "200",
+        "statusCode": "",
         "headers": {},
-        "x": 760,
+        "x": 750,
         "y": 300,
         "wires": []
     },
@@ -3536,33 +3567,6 @@
         "wires": [
             [
                 "257f92ed99f76054"
-            ]
-        ]
-    },
-    {
-        "id": "40b9aaecbcd31887",
-        "type": "change",
-        "z": "c13d19c3dfb652c9",
-        "name": "",
-        "rules": [
-            {
-                "t": "set",
-                "p": "payload",
-                "pt": "msg",
-                "to": "sub",
-                "tot": "msg"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 520,
-        "y": 140,
-        "wires": [
-            [
-                "0726dd0c9132bef2"
             ]
         ]
     },
@@ -3620,7 +3624,7 @@
         "type": "function",
         "z": "c13d19c3dfb652c9",
         "name": "return",
-        "func": "msg.payload = msg.sub;\nreturn msg;",
+        "func": "msg.payload = msg.sub;\nmsg.statusCode = 200;\nif(msg.error){\n    msg.payload = msg.error;\n    msg.statusCode = 500;\n}\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -3639,11 +3643,30 @@
         "type": "http response",
         "z": "c13d19c3dfb652c9",
         "name": "",
-        "statusCode": "200",
+        "statusCode": "",
         "headers": {},
-        "x": 740,
+        "x": 750,
         "y": 460,
         "wires": []
+    },
+    {
+        "id": "37b364bb5aa29dd3",
+        "type": "function",
+        "z": "c13d19c3dfb652c9",
+        "name": "return",
+        "func": "try {\n    msg.payload = msg.sub;\n    msg.statusCode = 200;\n} catch (error) {\n    msg.payload = error.message;\n    msg.statusCode = 500;\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 490,
+        "y": 140,
+        "wires": [
+            [
+                "0726dd0c9132bef2"
+            ]
+        ]
     },
     {
         "id": "c4fea9f1ad696a34",
