@@ -670,7 +670,7 @@
         "type": "function",
         "z": "44e549ae5408d3d3",
         "name": "function 12",
-        "func": "try {\n    let { obj, key, val } = msg.sub;\n    let nest = findNestedObj(obj, key, val);\n    msg.sub = nest;\n} catch (error) {\n    msg.sub = null;\n    msg.error = error.message;\n};\nreturn msg;\n\nfunction findNestedObj(entireObj, keyToFind, valToFind) {\n    try {\n        let foundObj;\n        JSON.stringify(entireObj, (_, nestedValue) => {\n            if (nestedValue && nestedValue[keyToFind] === valToFind) {\n                foundObj = nestedValue;\n            }\n            return nestedValue;\n        });\n        return foundObj;\n    } catch (error) {\n        throw error;\n    };\n};",
+        "func": "try {\n    let { obj, key, val } = msg.sub;\n    let nest = findNestedObj(obj, key, val);\n    msg.sub = nest;\n} catch (error) {\n    msg.sub = null;\n    msg.error = error.message;\n}\nreturn msg;\n\nfunction findNestedObj(entireObj, keyToFind, valToFind) {\n    let foundObj;\n    JSON.stringify(entireObj, (_, nestedValue) => {\n        if (nestedValue && nestedValue[keyToFind] === valToFind) {\n            foundObj = nestedValue;\n        }\n        return nestedValue;\n    });\n    return foundObj;\n}",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
