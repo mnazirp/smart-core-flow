@@ -1805,7 +1805,7 @@
         "statusCode": "400",
         "headers": {},
         "x": 1220,
-        "y": 340,
+        "y": 320,
         "wires": []
     },
     {
@@ -1828,7 +1828,7 @@
         "to": "",
         "reg": false,
         "x": 1240,
-        "y": 300,
+        "y": 280,
         "wires": [
             [
                 "11fc9ef3ad64cf3c"
@@ -1932,7 +1932,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1430,
+        "x": 1450,
         "y": 140,
         "wires": [
             [
@@ -1964,7 +1964,7 @@
         "type": "subflow:44e549ae5408d3d3",
         "z": "3a3a41a0d95d74c4",
         "name": "",
-        "x": 1440,
+        "x": 1460,
         "y": 180,
         "wires": [
             [
@@ -2039,7 +2039,7 @@
         "name": "",
         "statusCode": "200",
         "headers": {},
-        "x": 1660,
+        "x": 1680,
         "y": 220,
         "wires": []
     },
@@ -2048,7 +2048,7 @@
         "type": "subflow:dbbf76b23c84dc6a",
         "z": "3a3a41a0d95d74c4",
         "name": "",
-        "x": 1680,
+        "x": 1700,
         "y": 140,
         "wires": [
             [
@@ -2067,7 +2067,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1650,
+        "x": 1670,
         "y": 180,
         "wires": [
             [
@@ -2080,13 +2080,13 @@
         "type": "function",
         "z": "3a3a41a0d95d74c4",
         "name": "set system roles",
-        "func": "let user = { ...msg.user };\nuser.systemRoles = msg.sub;\nmsg.sub = msg.user.scopes;\nreturn msg;",
+        "func": "let user = { ...msg.user };\nuser.systemRoles[0] = msg.sub;\nmsg.sub = msg.user.scopes;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1440,
+        "x": 1460,
         "y": 220,
         "wires": [
             [
