@@ -483,7 +483,7 @@
         "type": "function",
         "z": "77002254b872fa8e",
         "name": "jwt sign",
-        "func": "let secret = env.get('JWTSECRET');\nlet options = { expiresIn: '2 days' };\nlet token = jwt.sign(msg.sub, secret, options);\nlet decoded = jwt.verify(token, secret);\nmsg.sub = token;\nreturn msg;",
+        "func": "try {\n    let secret = env.get('JWTSECRET');\n    let options = { expiresIn: '2 days' };\n    let token = jwt.sign(msg.sub, secret, options);\n    let decoded = jwt.verify(token, secret);\n    msg.sub = token;\n} catch (error) {\n    msg.sub = null;\n    msg.error = error.message;\n};\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -1709,7 +1709,7 @@
         "type": "function",
         "z": "3a3a41a0d95d74c4",
         "name": "prepare sub",
-        "func": "msg.user = msg.payload[0].value;\nlet pass = msg.user.authorizations.find(x => x.type === 'password').passwords\nmsg.sub = pass[pass.length - 1];\n\nreturn msg;",
+        "func": "let user= msg.payload[0].value;\ndelete user._id;\ndelete user._rev;\nlet pass = user.authorizations.find(x => x.type === 'password').passwords\nmsg.sub = pass[pass.length - 1];\nmsg.user = user\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -1945,7 +1945,7 @@
         "type": "function",
         "z": "3a3a41a0d95d74c4",
         "name": "set result",
-        "func": "msg.sign = msg.sub;\ndelete msg.sub;\nmsg.payload = {\n    key: [\"reference\", \"smart-system-role\"]\n}\nreturn msg;",
+        "func": "msg.user.token = msg.sub;\ndelete msg.sub;\nmsg.payload = {\n    key: [\"reference\", \"smart-system-role\"]\n}\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -2033,54 +2033,11 @@
         ]
     },
     {
-        "id": "9ed6e261b82dc55d",
-        "type": "http response",
-        "z": "3a3a41a0d95d74c4",
-        "name": "",
-        "statusCode": "200",
-        "headers": {},
-        "x": 1680,
-        "y": 220,
-        "wires": []
-    },
-    {
-        "id": "6de44606a029cc3e",
-        "type": "subflow:dbbf76b23c84dc6a",
-        "z": "3a3a41a0d95d74c4",
-        "name": "",
-        "x": 1700,
-        "y": 140,
-        "wires": [
-            [
-                "ade671b97e908ca5"
-            ]
-        ]
-    },
-    {
-        "id": "ade671b97e908ca5",
-        "type": "function",
-        "z": "3a3a41a0d95d74c4",
-        "name": "return",
-        "func": "msg.user.scopes = msg.sub;\nmsg.payload = msg.user;\ndelete msg.user;\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 1670,
-        "y": 180,
-        "wires": [
-            [
-                "9ed6e261b82dc55d"
-            ]
-        ]
-    },
-    {
         "id": "3b111b6afac1790d",
         "type": "function",
         "z": "3a3a41a0d95d74c4",
         "name": "set system roles",
-        "func": "let user = { ...msg.user };\nuser.systemRoles[0] = msg.sub;\nmsg.sub = msg.user.scopes;\nreturn msg;",
+        "func": "try {\n    let user = { ...msg.user };\n    user.systemRoles[0] = msg.sub;\n    msg.statusCode = 200;\n    msg.payload = user;\n    delete msg.user;\n} catch (error) {\n    msg.statusCode = 500;\n    msg.payload = { error: error.message }\n}\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -2090,9 +2047,57 @@
         "y": 220,
         "wires": [
             [
-                "6de44606a029cc3e"
+                "c41d95634343de45"
             ]
         ]
+    },
+    {
+        "id": "a9a1177ca114eaea",
+        "type": "function",
+        "z": "3a3a41a0d95d74c4",
+        "name": "function 19",
+        "func": "msg.payload = [`login:${msg.payload.nik}`, JSON.stringify(msg.payload), 'EX', 5 * 60];\nmsg.topic = null;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1730,
+        "y": 180,
+        "wires": [
+            [
+                "a4f226361cad87f5"
+            ]
+        ]
+    },
+    {
+        "id": "a4f226361cad87f5",
+        "type": "redis-command",
+        "z": "3a3a41a0d95d74c4",
+        "server": "0fb96b870afb5c15",
+        "command": "set",
+        "name": "",
+        "topic": "",
+        "params": "[]",
+        "paramsType": "json",
+        "payloadType": "json",
+        "block": false,
+        "x": 1720,
+        "y": 220,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "c41d95634343de45",
+        "type": "http response",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 1670,
+        "y": 140,
+        "wires": []
     },
     {
         "id": "d2f18a6f7f6e0afd",
