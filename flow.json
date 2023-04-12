@@ -74,7 +74,7 @@
     {
         "id": "77002254b872fa8e",
         "type": "subflow",
-        "name": "algo:jwt-sign",
+        "name": "algo: jwt-sign",
         "info": "## input:\r\non msg.sub assign an object like this:\r\n\r\n\r\n    {        \r\n        nik: '', \r\n        fullName: '',\r\n        email: '',\r\n        occupation: '',\r\n        roles: ['']\r\n    }\r\n\r\n\r\n\r\n## output:\r\ninside msg.sub:\r\n\r\n\r\n\r\n    {\r\n        token: 'eyJhbGciOiJIUzI1NiI...',\r\n        decoded: {}  \r\n    }\r\n\r\n// nrlint function-eslint:off\r\n",
         "category": "",
         "in": [
@@ -107,7 +107,7 @@
     {
         "id": "32e9ed8660fb2fde",
         "type": "subflow",
-        "name": "algo:jwt-verify",
+        "name": "algo: jwt-verify",
         "info": "## input:\non msg.sub assign an a token string like this:\n\n\n    'eyJhbGciOiJIUzI1NiI...'\n\n\n## output:\ninside msg.sub:\n\n\n\n    {\n        token: 'eyJhbGciOiJIUzI1NiI...',\n        decoded: {},\n        error: {\n            message: 'jwt expired',\n            stack: '',\n            arguments: null,\n            name: 'TokenExpiredError',\n            expiredAt: '2023-02-19T07:49:01.000Z'\n        }  \n    }\n\n// nrlint function-eslint:off\n",
         "category": "",
         "in": [
@@ -140,7 +140,7 @@
     {
         "id": "0f802e687dcc9e4a",
         "type": "subflow",
-        "name": "algo:hashing",
+        "name": "algo: hashing",
         "info": "## Input\r\nset msg.sub with the password string that neet to be hashing\r\n\r\n    `MyPassword`\r\n\r\n## Output\r\nit will produce msg.sub a hasing string\r\n\r\n    ``\r\n\r\n// nrlint function-eslint:off\r\n",
         "category": "",
         "in": [
@@ -173,7 +173,7 @@
     {
         "id": "c9c1579a9da27745",
         "type": "subflow",
-        "name": "algo:hashing-compare",
+        "name": "algo: hashing-compare",
         "info": "## Input\r\nassign msg.sub with an object:\r\n\r\n    {\r\n        password: 'MyPassword',\r\n        hash: '$2b$10$...'\r\n    }\r\n\r\n## Output\r\nit will produce msg.sub with object:\r\n\r\n    {\r\n        isValid: true //or false\r\n    }\r\n\r\n// nrlint function-eslint:off\r\n",
         "category": "",
         "in": [
@@ -206,7 +206,7 @@
     {
         "id": "cfa2e326ca547b07",
         "type": "subflow",
-        "name": "algo:crypto-encrypt",
+        "name": "algo: crypto-encrypt",
         "info": "## Input\r\nset msg.sub into a string that want to encrypt\r\n\r\n    msg.sub = \"some random text\"\r\n\r\n## output\r\nit will produce encrypted text in msg.sub\r\n\r\n// nrlint function-eslint:off\r\n",
         "category": "",
         "in": [
@@ -239,7 +239,7 @@
     {
         "id": "c2f437acbbab02bd",
         "type": "subflow",
-        "name": "algo:crypto-dencrypt",
+        "name": "algo: crypto-dencrypt",
         "info": "## Input\r\nassign msg.sub with encrypted text like:\r\n\r\n    msg.sub = \"d15cac3ea87e3fca0b51b\"\r\n\r\n## output\r\nit will produce dencrypted text in msg.sub\r\n\r\n// nrlint function-eslint:off\r\n",
         "category": "",
         "in": [
@@ -272,7 +272,7 @@
     {
         "id": "f804f4dc33b60992",
         "type": "subflow",
-        "name": "sub:search-on-hierarchy",
+        "name": "sub: search-on-hierarchy",
         "info": "## Input on msg.sub\r\n\r\n    msg.sub = {\r\n        topic: 'area',\r\n        root: 5001,\r\n        pointer: 5068,\r\n        crit: [\r\n            {\r\n                key: 'category',\r\n                val: 'BLOCK'\r\n            }\r\n        ]\r\n    }\r\n\r\n`topic` is a topic for hierarchy in couchdb \r\n\r\n`root` is an id as starting point of all hierarchy tree \r\n\r\n`pointer` is starting point to search by id inside tree\r\n\r\n`crit` as a filter to define the final result\r\n\r\n## Output on msg.sub\r\n\r\n    msg.sub = {\r\n        result,\r\n        parents,\r\n        flatten\r\n    }\r\n\r\n`result` is the result after filter by criteria\r\n\r\n`parents` contains all superior node starting from pointer id\r\n\r\n`flatten` contains all flatten objects starting at pointer ",
         "category": "",
         "in": [
@@ -305,7 +305,7 @@
     {
         "id": "44e549ae5408d3d3",
         "type": "subflow",
-        "name": "algo:find-nested",
+        "name": "algo: find-nested",
         "info": "",
         "category": "",
         "in": [
@@ -338,7 +338,7 @@
     {
         "id": "63baa18a398cf25b",
         "type": "subflow",
-        "name": "algo:find-scope",
+        "name": "algo: find-scope",
         "info": "",
         "category": "",
         "in": [
@@ -371,7 +371,7 @@
     {
         "id": "25a729f30c43b341",
         "type": "subflow",
-        "name": "sub:get-scope-by-code",
+        "name": "sub: get-scope-by-code",
         "info": "## Input\r\nassign msg.sub with string scope code like this:\r\n\r\n    \"SC-SAW-SIAK-00001\"\r\n\r\n## output\r\nit will an array of scopes in msg.sub\r\n\r\n    [\r\n        {\r\n            \"name\": \"UPSTREAM\",\r\n            \"desc\": \"UPSTREAM\",\r\n            \"category\": \"US\",\r\n            \"id\": 5001,\r\n            \"level\": 0,\r\n            \"parentId\": null\r\n        },\r\n        {\r\n            \"name\": \"DIRSERVICE\",\r\n            \"desc\": \"Directorate Service\",\r\n            \"category\": \"DIRECTORATE\",\r\n            \"id\": 5005,\r\n            \"level\": 1,\r\n            \"parentId\": 5001\r\n        },\r\n    ]\r\n\r\n",
         "category": "",
         "in": [
@@ -501,7 +501,7 @@
         "type": "function",
         "z": "32e9ed8660fb2fde",
         "name": "jwt verify",
-        "func": "let secret = env.get('JWTSECRET');\nlet error = null;\nlet decoded = null;\njwt.verify(msg.sub, secret, (err, dec) => {\n    if(err) error = err;\n    decoded = dec;\n});\nmsg.sub = {\n    token: msg.sub,\n    decoded: decoded,\n    error: error\n}\nreturn msg;",
+        "func": "try {\n    let secret = env.get('JWTSECRET');\n    let error = null;\n    let decoded = null;\n    jwt.verify(msg.sub, secret, (err, dec) => {\n        if (err) error = err;\n        decoded = dec;\n    });\n    msg.sub = {\n        token: msg.sub,\n        decoded: decoded,\n        error: error\n    }\n} catch (error) {\n    msg.sub = null;\n    msg.error = {\n        hint: '',\n        error: error.message\n    }\n}\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -523,7 +523,7 @@
         "type": "function",
         "z": "0f802e687dcc9e4a",
         "name": "hashing",
-        "func": "let pass = bcrypt.hashSync(msg.sub, 10);\nmsg.sub = pass;\nreturn msg;",
+        "func": "try {\n    let pass = bcrypt.hashSync(msg.sub, 10);\n    msg.sub = pass;\n} catch (error) {\n    msg.sub = null;\n    msg.error = {\n        hint: '',\n        error: error.message\n    }\n}\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -545,7 +545,7 @@
         "type": "function",
         "z": "c9c1579a9da27745",
         "name": "compare",
-        "func": "let {password, hash} = msg.sub;\nlet rs = '';\nrs = bcrypt.compareSync(password, hash);\nmsg.sub = {\n    isValid: rs\n};\nreturn msg;",
+        "func": "try {\n    let { password, hash } = msg.sub;\n    let rs = '';\n    rs = bcrypt.compareSync(password, hash);\n    msg.sub = {\n        isValid: rs\n    };\n} catch (error) {\n    msg.sub = null;\n    msg.error = {\n        hint: '',\n        error: error.message\n    }\n}\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -567,7 +567,7 @@
         "type": "function",
         "z": "cfa2e326ca547b07",
         "name": "crypto-encrypt",
-        "func": "let algorithm = 'aes256';\nlet key = env.get('CRYPTO_KEY');\nlet iv = env.get('CRYPTO_IV');\nlet cipher = crypto.createCipheriv(algorithm, key, iv);\nlet encrypted = cipher.update(msg.sub, 'utf8', 'hex') + cipher.final('hex');\nmsg.sub = encrypted;\nreturn msg;",
+        "func": "try {\n    let algorithm = 'aes256';\n    let key = env.get('CRYPTO_KEY');\n    let iv = env.get('CRYPTO_IV');\n    let cipher = crypto.createCipheriv(algorithm, key, iv);\n    let encrypted = cipher.update(msg.sub, 'utf8', 'hex') + cipher.final('hex');\n    msg.sub = encrypted;\n} catch (error) {\n    msg.sub = null;\n    msg.error = {\n        hint: '',\n        error: error.message\n    }\n}\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -589,7 +589,7 @@
         "type": "function",
         "z": "c2f437acbbab02bd",
         "name": "crypto-dencrypt",
-        "func": "try {\n    let algorithm = 'aes256';\n    let key = env.get('CRYPTO_KEY');\n    let iv = env.get('CRYPTO_IV');\n    let decipher = crypto.createDecipheriv(algorithm, key, iv);\n    let decrypted = decipher.update(msg.sub, 'hex', 'utf8') + decipher.final('utf8');\n    msg.sub = decrypted;\n} catch (error) {\n    msg.sub = null;\n    msg.error = error.message;\n};\nreturn msg;",
+        "func": "try {\n    let algorithm = 'aes256';\n    let key = env.get('CRYPTO_KEY');\n    let iv = env.get('CRYPTO_IV');\n    let decipher = crypto.createDecipheriv(algorithm, key, iv);\n    let decrypted = decipher.update(msg.sub, 'hex', 'utf8') + decipher.final('utf8');\n    msg.sub = decrypted;\n} catch (error) {\n    msg.sub = null;\n    msg.error = {\n        hint: '',\n        error: error.message\n    }\n}\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -611,7 +611,7 @@
         "type": "function",
         "z": "f804f4dc33b60992",
         "name": "mapping sub result",
-        "func": "let { root, pointer, crit } = msg.sub;\nlet { value } = msg.payload[0];\nlet obj = value.data;\n\nlet rootObj = findNestedObj(obj, 'id', root);\nlet pointerObj = (rootObj) ? findNestedObj(rootObj, 'id', pointer) : undefined;\nlet rootFlat = (rootObj) ? flatten([rootObj]) : [];\nlet pointerFlat = (pointerObj) ? flatten([pointerObj]) : [];\nlet parents = getParents(rootFlat, pointer);\nlet result = filterFlat(pointerFlat, crit);\nmsg.sub = {\n    result,\n    parents,\n    flatten: pointerFlat\n}\n\nreturn msg;\n\nfunction findNestedObj(entireObj, keyToFind, valToFind) {\n    let foundObj;\n    JSON.stringify(entireObj, (_, nestedValue) => {\n        if (nestedValue && nestedValue[keyToFind] === valToFind) {\n            foundObj = nestedValue;\n        }\n        return nestedValue;\n    });\n    return foundObj;\n}\n\nfunction flatten(arr, level = 0, filter = {}, parentId = null) {\n    const filterKeys = Object.keys(filter);\n    return arr.reduce((acc, { id, children, ...rest }) => {\n        const flattenedChildren = children ? flatten(children, level + 1, filter, id) : [];\n        const flattenedObject = { ...rest, id, level, parentId };\n        if (filterKeys.every(key => flattenedObject[key] === filter[key])) {\n            return [...acc, flattenedObject, ...flattenedChildren];\n        }\n        return acc.concat(flattenedChildren);\n    }, []);\n}\n\nfunction filterFlat(flatObj, crit) {\n    return flatObj.filter(x => {\n        let params = [];\n        crit.forEach(c => {\n            let rs = false;\n            if (Array.isArray(c.val)) {\n                rs = c.val.some(s => x[c.key] === s)\n            } else {\n                rs = x[c.key] === c.val\n            }\n            params.push(rs);\n        });\n        return params.reduce((acc, val) => acc && val, true);\n    });\n}\n\nfunction getParents(flatObj, childId) {\n    let parents = [];\n    let child = flatObj.find(x => x.id === childId);\n    if(child){\n        parents.push(child);\n        do {\n            let parent = (child) ? flatObj.find(x => x.id === child.parentId) : [];\n            parents.push(parent);\n            child = parent;\n        }\n        while (child && child.parentId != null);\n    }\n    return parents;\n}",
+        "func": "try {\n    let { root, pointer, crit } = msg.sub;\n    let { value } = msg.payload[0];\n    let obj = value.data;\n\n    let rootObj = findNestedObj(obj, 'id', root);\n    let pointerObj = (rootObj) ? findNestedObj(rootObj, 'id', pointer) : undefined;\n    let rootFlat = (rootObj) ? flatten([rootObj]) : [];\n    let pointerFlat = (pointerObj) ? flatten([pointerObj]) : [];\n    let parents = getParents(rootFlat, pointer);\n    let result = filterFlat(pointerFlat, crit);\n    msg.sub = {\n        result,\n        parents,\n        flatten: pointerFlat\n    }\n} catch (error) {\n    msg.sub = null;\n    msg.error = {\n        hint: '',\n        error: error.message\n    }\n}\n\nreturn msg;\n\nfunction findNestedObj(entireObj, keyToFind, valToFind) {\n    let foundObj;\n    JSON.stringify(entireObj, (_, nestedValue) => {\n        if (nestedValue && nestedValue[keyToFind] === valToFind) {\n            foundObj = nestedValue;\n        }\n        return nestedValue;\n    });\n    return foundObj;\n}\n\nfunction flatten(arr, level = 0, filter = {}, parentId = null) {\n    const filterKeys = Object.keys(filter);\n    return arr.reduce((acc, { id, children, ...rest }) => {\n        const flattenedChildren = children ? flatten(children, level + 1, filter, id) : [];\n        const flattenedObject = { ...rest, id, level, parentId };\n        if (filterKeys.every(key => flattenedObject[key] === filter[key])) {\n            return [...acc, flattenedObject, ...flattenedChildren];\n        }\n        return acc.concat(flattenedChildren);\n    }, []);\n}\n\nfunction filterFlat(flatObj, crit) {\n    return flatObj.filter(x => {\n        let params = [];\n        crit.forEach(c => {\n            let rs = false;\n            if (Array.isArray(c.val)) {\n                rs = c.val.some(s => x[c.key] === s)\n            } else {\n                rs = x[c.key] === c.val\n            }\n            params.push(rs);\n        });\n        return params.reduce((acc, val) => acc && val, true);\n    });\n}\n\nfunction getParents(flatObj, childId) {\n    let parents = [];\n    let child = flatObj.find(x => x.id === childId);\n    if(child){\n        parents.push(child);\n        do {\n            let parent = (child) ? flatObj.find(x => x.id === child.parentId) : [];\n            parents.push(parent);\n            child = parent;\n        }\n        while (child && child.parentId != null);\n    }\n    return parents;\n}",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -665,14 +665,14 @@
         "id": "f6e36d93f7d62631",
         "type": "function",
         "z": "44e549ae5408d3d3",
-        "name": "function 12",
+        "name": "find",
         "func": "try {\n    let { obj, key, val } = msg.sub;\n    let nest = findNestedObj(obj, key, val);\n    msg.sub = nest;\n} catch (error) {\n    msg.sub = null;\n    msg.error = error.message;\n}\nreturn msg;\n\nfunction findNestedObj(entireObj, keyToFind, valToFind) {\n    let foundObj;\n    JSON.stringify(entireObj, (_, nestedValue) => {\n        if (nestedValue && nestedValue[keyToFind] === valToFind) {\n            foundObj = nestedValue;\n        }\n        return nestedValue;\n    });\n    return foundObj;\n}",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 190,
+        "x": 170,
         "y": 100,
         "wires": [
             []
@@ -683,7 +683,7 @@
         "type": "function",
         "z": "63baa18a398cf25b",
         "name": "mapping sub result",
-        "func": "let { obj, scopes } = msg.sub;\nlet rs = [];\nlet combineObj = [];\nif (Array.isArray(scopes)) {\n    scopes.forEach(id => {\n        let items = findNestedObj(obj, 'id', id);\n        let flat = flatten(items);\n        let fullFLat = flatten(obj);\n        let parents = getParents(fullFLat, id);\n        flat[0].parentId = parents[0].parentId;\n        parents.shift();\n        rs.push(parents.sort().reverse().concat(flat));\n    });\n}\ncombineObj = combineArrays(...rs);\n\nmsg.sub = combineObj;\n\nreturn msg;\n\nfunction findNestedObj(entireObj, keyToFind, valToFind) {\n    let foundObj = [];\n    JSON.stringify(entireObj, (_, nestedValue) => {\n        if (nestedValue && nestedValue[keyToFind] === valToFind) {\n            foundObj = nestedValue;\n        }\n        return nestedValue;\n    });\n    return [foundObj];\n}\n\nfunction flatten(arr, level = 0, filter = {}, parentId = null) {\n    const filterKeys = Object.keys(filter);\n    return arr.reduce((acc, { id, children, ...rest }) => {\n        const flattenedChildren = children ? flatten(children, level + 1, filter, id) : [];\n        const flattenedObject = { ...rest, id, level, parentId };\n        if (filterKeys.every(key => flattenedObject[key] === filter[key])) {\n            return [...acc, flattenedObject, ...flattenedChildren];\n        }\n        return acc.concat(flattenedChildren);\n    }, []);\n}\n\nfunction getParents(flatObj, childId) {\n    let parents = [];\n    let child = flatObj.find(x => x.id === childId);\n    if (child) {\n        parents.push(child);\n        do {\n            let parent = (child) ? flatObj.find(x => x.id === child.parentId) : [];\n            if (parent) parents.push(parent);\n            child = parent;\n        }\n        while (child && child.parentId != null);\n    }\n    return parents;\n}\n\nfunction combineArrays(...arrays) {\n    const combinedArray = [].concat(...arrays);\n    const uniqueObject = {};\n    const uniqueArray = [];\n\n    for (let obj of combinedArray) {\n        const objString = JSON.stringify(obj);\n        if (!uniqueObject[objString]) {\n            uniqueObject[objString] = true;\n            uniqueArray.push(obj);\n        }\n    }\n\n    return uniqueArray;\n}\n",
+        "func": "try {\n    let { obj, scopes } = msg.sub;\n    let rs = [];\n    let combineObj = [];\n    if (Array.isArray(scopes)) {\n        scopes.forEach(id => {\n            let items = findNestedObj(obj, 'id', id);\n            let flat = flatten(items);\n            let fullFLat = flatten(obj);\n            let parents = getParents(fullFLat, id);\n            flat[0].parentId = parents[0].parentId;\n            parents.shift();\n            rs.push(parents.sort().reverse().concat(flat));\n        });\n    }\n    combineObj = combineArrays(...rs);\n    msg.sub = combineObj;\n} catch (error) {\n    msg.sub = null;\n    msg.error = {\n        hint: '',\n        error: error.message\n    }\n}\nreturn msg;\n\nfunction findNestedObj(entireObj, keyToFind, valToFind) {\n    let foundObj = [];\n    JSON.stringify(entireObj, (_, nestedValue) => {\n        if (nestedValue && nestedValue[keyToFind] === valToFind) {\n            foundObj = nestedValue;\n        }\n        return nestedValue;\n    });\n    return [foundObj];\n}\n\nfunction flatten(arr, level = 0, filter = {}, parentId = null) {\n    const filterKeys = Object.keys(filter);\n    return arr.reduce((acc, { id, children, ...rest }) => {\n        const flattenedChildren = children ? flatten(children, level + 1, filter, id) : [];\n        const flattenedObject = { ...rest, id, level, parentId };\n        if (filterKeys.every(key => flattenedObject[key] === filter[key])) {\n            return [...acc, flattenedObject, ...flattenedChildren];\n        }\n        return acc.concat(flattenedChildren);\n    }, []);\n}\n\nfunction getParents(flatObj, childId) {\n    let parents = [];\n    let child = flatObj.find(x => x.id === childId);\n    if (child) {\n        parents.push(child);\n        do {\n            let parent = (child) ? flatObj.find(x => x.id === child.parentId) : [];\n            if (parent) parents.push(parent);\n            child = parent;\n        }\n        while (child && child.parentId != null);\n    }\n    return parents;\n}\n\nfunction combineArrays(...arrays) {\n    const combinedArray = [].concat(...arrays);\n    const uniqueObject = {};\n    const uniqueArray = [];\n\n    for (let obj of combinedArray) {\n        const objString = JSON.stringify(obj);\n        if (!uniqueObject[objString]) {\n            uniqueObject[objString] = true;\n            uniqueArray.push(obj);\n        }\n    }\n\n    return uniqueArray;\n}\n",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -1229,7 +1229,7 @@
         "type": "subflow:25a729f30c43b341",
         "z": "dbbf76b23c84dc6a",
         "name": "",
-        "x": 1180,
+        "x": 1190,
         "y": 120,
         "wires": [
             [
