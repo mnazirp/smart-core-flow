@@ -72,6 +72,14 @@
         "env": []
     },
     {
+        "id": "d0ef491d8730ea48",
+        "type": "tab",
+        "label": "Smart: Blueprint",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
         "id": "77002254b872fa8e",
         "type": "subflow",
         "name": "algo: jwt-sign",
@@ -3357,6 +3365,90 @@
         ]
     },
     {
+        "id": "23b9198797a52319",
+        "type": "inject",
+        "z": "bf22cd3c7ed55a35",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 100,
+        "y": 840,
+        "wires": [
+            [
+                "0ebe8540543b7d8c"
+            ]
+        ]
+    },
+    {
+        "id": "700da8c33ddfbfb7",
+        "type": "cloudantplus in",
+        "z": "bf22cd3c7ed55a35",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-blueprint",
+        "service": "_ext_",
+        "search": "_all_",
+        "design": "",
+        "index": "",
+        "x": 300,
+        "y": 880,
+        "wires": [
+            [
+                "5ae606c4e4cb301c"
+            ]
+        ]
+    },
+    {
+        "id": "0ebe8540543b7d8c",
+        "type": "function",
+        "z": "bf22cd3c7ed55a35",
+        "name": "function 20",
+        "func": "msg.payload = {\n    keys: [\n        \"53d89bcba9e2c7202f43c9edcc0604c0\",\n        \"8bc73c31c8ebe86e7078a3ff480058d9\"\n    ]\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 290,
+        "y": 840,
+        "wires": [
+            [
+                "700da8c33ddfbfb7"
+            ]
+        ]
+    },
+    {
+        "id": "5ae606c4e4cb301c",
+        "type": "debug",
+        "z": "bf22cd3c7ed55a35",
+        "name": "debug 21",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 500,
+        "y": 880,
+        "wires": []
+    },
+    {
         "id": "f23842780cb1d49b",
         "type": "http in",
         "z": "c13d19c3dfb652c9",
@@ -4465,6 +4557,72 @@
         "headers": {},
         "x": 980,
         "y": 560,
+        "wires": []
+    },
+    {
+        "id": "a9e10fe5cca4e39f",
+        "type": "http in",
+        "z": "d0ef491d8730ea48",
+        "name": "",
+        "url": "/api/blueprint/page/:id",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 150,
+        "y": 100,
+        "wires": [
+            [
+                "5b79b297f83f24c7"
+            ]
+        ]
+    },
+    {
+        "id": "5b79b297f83f24c7",
+        "type": "function",
+        "z": "d0ef491d8730ea48",
+        "name": "function 19",
+        "func": "msg.payload = msg.req.params.id\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 450,
+        "y": 100,
+        "wires": [
+            [
+                "96a4afc30c20b571"
+            ]
+        ]
+    },
+    {
+        "id": "96a4afc30c20b571",
+        "type": "cloudantplus in",
+        "z": "d0ef491d8730ea48",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-blueprint",
+        "service": "_ext_",
+        "search": "_id_",
+        "design": "",
+        "index": "",
+        "x": 460,
+        "y": 140,
+        "wires": [
+            [
+                "c46864b04d26159f"
+            ]
+        ]
+    },
+    {
+        "id": "c46864b04d26159f",
+        "type": "http response",
+        "z": "d0ef491d8730ea48",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 680,
+        "y": 140,
         "wires": []
     }
 ]
