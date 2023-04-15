@@ -459,6 +459,43 @@
         "color": "#DDAA99"
     },
     {
+        "id": "9e1a5ed360837111",
+        "type": "subflow",
+        "name": "sub: get-page-by-id",
+        "info": "",
+        "category": "",
+        "in": [
+            {
+                "x": 60,
+                "y": 120,
+                "wires": [
+                    {
+                        "id": "de59eeb7a3e9990b"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 860,
+                "y": 220,
+                "wires": [
+                    {
+                        "id": "bc03ea4c02e4f058",
+                        "port": 0
+                    },
+                    {
+                        "id": "e2804e8e36bdb441",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [],
+        "meta": {},
+        "color": "#DDAA99"
+    },
+    {
         "id": "784d89e62dfb5070",
         "type": "cloudantplus",
         "host": "${DIGA_COUCHDB}",
@@ -919,7 +956,7 @@
         "type": "function",
         "z": "25a729f30c43b341",
         "name": "save to redis",
-        "func": "/**to set expire set topic into null\n * and set payload to an Array with EX on it [topic, value, EX, ex-value]\n */\nmsg.payload = [`scope:${msg.ori}`, JSON.stringify(msg.sub), 'EX', 5 * 60];\nmsg.topic = null;\nreturn msg;",
+        "func": "/**to set expire set topic into null\n * and set payload to an Array with EX on it [topic, value, EX, ex-value]\n */\nmsg.payload = [`scope:${msg.ori}`, JSON.stringify(msg.sub), 'EX', Number(env.get('NODERED_TTL')) * 60];\nmsg.topic = null;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -1287,6 +1324,207 @@
                 "07d3733446a87fc2"
             ],
             []
+        ]
+    },
+    {
+        "id": "96a4afc30c20b571",
+        "type": "cloudantplus in",
+        "z": "9e1a5ed360837111",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-blueprint",
+        "service": "_ext_",
+        "search": "_id_",
+        "design": "",
+        "index": "",
+        "x": 520,
+        "y": 160,
+        "wires": [
+            [
+                "bc03ea4c02e4f058",
+                "815ad5d520f95317"
+            ]
+        ]
+    },
+    {
+        "id": "bc03ea4c02e4f058",
+        "type": "function",
+        "z": "9e1a5ed360837111",
+        "name": "result",
+        "func": "try {\n    if(msg.payload){\n        msg.sub = msg.payload.data;\n    }else{\n        msg.sub = null;\n    }\n} catch (error) {\n    msg.sub = null;\n    msg.error = error.message;\n}\nmsg.payload = msg.backup;\ndelete msg.backup;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 730,
+        "y": 200,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b4e15d4c0180190f",
+        "type": "redis-command",
+        "z": "9e1a5ed360837111",
+        "server": "0fb96b870afb5c15",
+        "command": "set",
+        "name": "",
+        "topic": "",
+        "params": "[]",
+        "paramsType": "json",
+        "payloadType": "json",
+        "block": false,
+        "x": 900,
+        "y": 160,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "c61741a6131b4649",
+        "type": "function",
+        "z": "9e1a5ed360837111",
+        "name": "prepare payload",
+        "func": "msg.payload = [`page:${msg.payload._id}`, JSON.stringify(msg.payload.data), 'EX', Number(env.get('NODERED_TTL')) * 60];\nmsg.topic = null;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 920,
+        "y": 120,
+        "wires": [
+            [
+                "b4e15d4c0180190f"
+            ]
+        ]
+    },
+    {
+        "id": "de59eeb7a3e9990b",
+        "type": "function",
+        "z": "9e1a5ed360837111",
+        "name": "set key",
+        "func": "msg.backup = msg.payload;\nmsg.payload = `page:${msg.sub}`;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 180,
+        "y": 120,
+        "wires": [
+            [
+                "fd52843d369dca35"
+            ]
+        ]
+    },
+    {
+        "id": "fd52843d369dca35",
+        "type": "redis-command",
+        "z": "9e1a5ed360837111",
+        "server": "0fb96b870afb5c15",
+        "command": "GET",
+        "name": "",
+        "topic": "",
+        "params": "[]",
+        "paramsType": "json",
+        "payloadType": "json",
+        "block": false,
+        "x": 180,
+        "y": 160,
+        "wires": [
+            [
+                "a6d128ad3b00e4a2"
+            ]
+        ]
+    },
+    {
+        "id": "a6d128ad3b00e4a2",
+        "type": "switch",
+        "z": "9e1a5ed360837111",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "null"
+            },
+            {
+                "t": "nnull"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 330,
+        "y": 160,
+        "wires": [
+            [
+                "b5c71771edac53a8"
+            ],
+            [
+                "e2804e8e36bdb441"
+            ]
+        ]
+    },
+    {
+        "id": "b5c71771edac53a8",
+        "type": "function",
+        "z": "9e1a5ed360837111",
+        "name": "set key",
+        "func": "msg.payload = msg.sub;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 500,
+        "y": 120,
+        "wires": [
+            [
+                "96a4afc30c20b571"
+            ]
+        ]
+    },
+    {
+        "id": "e2804e8e36bdb441",
+        "type": "function",
+        "z": "9e1a5ed360837111",
+        "name": "JSON parse",
+        "func": "msg.sub = JSON.parse(msg.payload);\nmsg.payload = msg.backup;\ndelete msg.backup;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 510,
+        "y": 220,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "815ad5d520f95317",
+        "type": "switch",
+        "z": "9e1a5ed360837111",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "nnull"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 730,
+        "y": 120,
+        "wires": [
+            [
+                "c61741a6131b4649"
+            ]
         ]
     },
     {
@@ -1995,7 +2233,7 @@
         "type": "subflow:44e549ae5408d3d3",
         "z": "3a3a41a0d95d74c4",
         "name": "",
-        "x": 1920,
+        "x": 1930,
         "y": 240,
         "wires": [
             [
@@ -3320,7 +3558,7 @@
         "type": "subflow:25a729f30c43b341",
         "z": "bf22cd3c7ed55a35",
         "name": "",
-        "x": 1000,
+        "x": 1010,
         "y": 340,
         "wires": [
             [
@@ -3481,7 +3719,7 @@
         "type": "subflow:25a729f30c43b341",
         "z": "c13d19c3dfb652c9",
         "name": "",
-        "x": 540,
+        "x": 550,
         "y": 100,
         "wires": [
             [
@@ -3530,7 +3768,7 @@
         "type": "subflow:25a729f30c43b341",
         "z": "c13d19c3dfb652c9",
         "name": "",
-        "x": 540,
+        "x": 550,
         "y": 260,
         "wires": [
             [
@@ -4580,37 +4818,18 @@
         "id": "5b79b297f83f24c7",
         "type": "function",
         "z": "d0ef491d8730ea48",
-        "name": "function 19",
-        "func": "msg.payload = msg.req.params.id\nreturn msg;",
+        "name": "set key",
+        "func": "msg.sub = msg.req.params.id\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 450,
+        "x": 440,
         "y": 100,
         "wires": [
             [
-                "96a4afc30c20b571"
-            ]
-        ]
-    },
-    {
-        "id": "96a4afc30c20b571",
-        "type": "cloudantplus in",
-        "z": "d0ef491d8730ea48",
-        "name": "",
-        "cloudant": "784d89e62dfb5070",
-        "database": "smart-blueprint",
-        "service": "_ext_",
-        "search": "_id_",
-        "design": "",
-        "index": "",
-        "x": 460,
-        "y": 140,
-        "wires": [
-            [
-                "c46864b04d26159f"
+                "e4d5c393c14d37a3"
             ]
         ]
     },
@@ -4621,8 +4840,40 @@
         "name": "",
         "statusCode": "",
         "headers": {},
-        "x": 680,
-        "y": 140,
+        "x": 610,
+        "y": 180,
         "wires": []
+    },
+    {
+        "id": "e4d5c393c14d37a3",
+        "type": "subflow:9e1a5ed360837111",
+        "z": "d0ef491d8730ea48",
+        "name": "",
+        "x": 470,
+        "y": 140,
+        "wires": [
+            [
+                "4646c353cd3c1140"
+            ]
+        ]
+    },
+    {
+        "id": "4646c353cd3c1140",
+        "type": "function",
+        "z": "d0ef491d8730ea48",
+        "name": "result",
+        "func": "if (msg.sub != null) {\n    msg.statusCode = 200;\n    msg.payload = msg.sub;\n} else {\n    msg.statusCode = 400;\n    msg.payload = {\n        hint: 'page not found'\n    }\n\n    if (msg.error) {\n        msg.statusCode = 500;\n        msg.payload = msg.error;\n    }\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 180,
+        "wires": [
+            [
+                "c46864b04d26159f"
+            ]
+        ]
     }
 ]
