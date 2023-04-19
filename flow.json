@@ -80,6 +80,14 @@
         "env": []
     },
     {
+        "id": "2e56a74c132aeaaf",
+        "type": "tab",
+        "label": "Hino",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
         "id": "77002254b872fa8e",
         "type": "subflow",
         "name": "algo: jwt-sign",
@@ -516,6 +524,14 @@
         "type": "redis-config",
         "name": "Local",
         "options": "REDIS_URL",
+        "cluster": false,
+        "optionsType": "env"
+    },
+    {
+        "id": "3cc67d60c90e6c5d",
+        "type": "redis-config",
+        "name": "redis_ts",
+        "options": "REDIS_TS_URL",
         "cluster": false,
         "optionsType": "env"
     },
@@ -4874,6 +4890,312 @@
             [
                 "c46864b04d26159f"
             ]
+        ]
+    },
+    {
+        "id": "3653f1b59ac43d23",
+        "type": "function",
+        "z": "2e56a74c132aeaaf",
+        "name": "Set query ",
+        "func": "let payload = JSON.parse(msg.payload);\nlet query = null;\nlet counter = 0;\nif (payload.data) {\n    query = `insert into am_hinototracking \n              (szVin, szVehicleStatus, iOdometer, iEngineHours, decLongitude, decLatitude, decHeading, decSpeed\n              , decAltitude, dtmPositionDateTime, dtmCreatedDateTime, szCreatedBy, dtmCreatedDate, szModifiedBy\n              , dtmModifiedDate)\n             values `;\n    let d = new Date();\n    payload.data.forEach(x => {\n        let position = (x.positionDateTime) ? `STR_TO_DATE('${x.positionDateTime}', '%Y-%m-%dT%H:%i:%sZ')` : null;\n        let created = (x.createdDateTime) ? `STR_TO_DATE('${x.createdDateTime}', '%Y-%m-%dT%H:%i:%sZ')` : null;\n        let serverDate = `STR_TO_DATE('${d.toISOString().slice(0, -5)}Z', '%Y-%m-%dT%H:%i:%sZ')`;\n        query += `('${x.vin}', '${x.vehicleStatus}', ${x.odometer}, ${x.engineHours}, ${x.longitude}, ${x.latitude}\n                    , ${x.heading}, ${x.speed}, ${x.altitude}, ${position}, ${created}\n                    , 'smart-red', ${serverDate}, 'smart-red', ${serverDate}),`;\n    });\n    query = query.slice(0, -1);\n}\n\nmsg.topic = query;\nmsg.payload = null;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 480,
+        "y": 240,
+        "wires": [
+            [
+                "e73378a283ba5005"
+            ]
+        ]
+    },
+    {
+        "id": "ce895a4cf9597e04",
+        "type": "http request",
+        "z": "2e56a74c132aeaaf",
+        "name": "Hino get vehiclepositions",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "https://api-sandbox.hino.co.id/hmsi/hmsi-std-api/vehiclepositions?size=1000",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "bearer",
+        "senderr": false,
+        "headers": [
+            {
+                "keyType": "other",
+                "keyValue": "X-IBM-Client-Id",
+                "valueType": "other",
+                "valueValue": "6823e121-a1ec-4fff-8711-b5c18486b57b"
+            },
+            {
+                "keyType": "other",
+                "keyValue": "accept",
+                "valueType": "other",
+                "valueValue": "application/json"
+            }
+        ],
+        "x": 430,
+        "y": 200,
+        "wires": [
+            [
+                "3653f1b59ac43d23"
+            ]
+        ]
+    },
+    {
+        "id": "e73378a283ba5005",
+        "type": "switch",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "property": "topic",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "nnull"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 670,
+        "y": 200,
+        "wires": [
+            [
+                "fc336030101cb162"
+            ]
+        ]
+    },
+    {
+        "id": "e1509d66ddce4f68",
+        "type": "function",
+        "z": "2e56a74c132aeaaf",
+        "name": "function 12",
+        "func": "msg.payload = {\n    grant_type: 'client_credentials'\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 390,
+        "y": 160,
+        "wires": [
+            [
+                "ce895a4cf9597e04"
+            ]
+        ]
+    },
+    {
+        "id": "b54662cce8df2b14",
+        "type": "debug",
+        "z": "2e56a74c132aeaaf",
+        "name": "debug 17",
+        "active": true,
+        "tosidebar": false,
+        "console": true,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 930,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "64aa3dd0a5ed610e",
+        "type": "catch",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "scope": [
+            "3653f1b59ac43d23",
+            "29457a467dba8868",
+            "ce895a4cf9597e04",
+            "e1509d66ddce4f68"
+        ],
+        "uncaught": false,
+        "x": 490,
+        "y": 280,
+        "wires": [
+            [
+                "487d914b50905d37"
+            ]
+        ]
+    },
+    {
+        "id": "19481a6806271a88",
+        "type": "cronplus",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "outputField": "payload",
+        "timeZone": "",
+        "persistDynamic": false,
+        "commandResponseMsgOutput": "output1",
+        "outputs": 1,
+        "options": [
+            {
+                "name": "schedule1",
+                "topic": "topic1",
+                "payloadType": "default",
+                "payload": "",
+                "expressionType": "cron",
+                "expression": "0 */5 * * * * *",
+                "location": "",
+                "offset": "0",
+                "solarType": "all",
+                "solarEvents": "sunrise,sunset"
+            }
+        ],
+        "x": 140,
+        "y": 160,
+        "wires": [
+            [
+                "e1509d66ddce4f68"
+            ]
+        ]
+    },
+    {
+        "id": "487d914b50905d37",
+        "type": "function",
+        "z": "2e56a74c132aeaaf",
+        "name": "function 15",
+        "func": "msg.payload = msg.error;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 690,
+        "y": 280,
+        "wires": [
+            [
+                "b54662cce8df2b14"
+            ]
+        ]
+    },
+    {
+        "id": "fc336030101cb162",
+        "type": "redis-command",
+        "z": "2e56a74c132aeaaf",
+        "server": "0fb96b870afb5c15",
+        "command": "TS.CREATE",
+        "name": "",
+        "topic": "",
+        "params": "[]",
+        "paramsType": "json",
+        "payloadType": "json",
+        "block": false,
+        "x": 710,
+        "y": 240,
+        "wires": [
+            [
+                "b54662cce8df2b14"
+            ]
+        ]
+    },
+    {
+        "id": "3fc9d222d32aeda1",
+        "type": "debug",
+        "z": "2e56a74c132aeaaf",
+        "name": "debug 22",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 580,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "054fbcb0d2cbd6bb",
+        "type": "inject",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[\"MULTI\",[\"TS.CREATE\",\"temperature\"],[\"TS.CREATE\",\"humidity\"],\"EXEC\"]",
+        "payloadType": "json",
+        "x": 150,
+        "y": 420,
+        "wires": [
+            [
+                "e161fea79f5f0287"
+            ]
+        ]
+    },
+    {
+        "id": "e161fea79f5f0287",
+        "type": "function",
+        "z": "2e56a74c132aeaaf",
+        "name": "function 21",
+        "func": "let redis = context.flow.get('redis');\n\nlet commands = [\n    {\n        \"command\": \"TS.CREATE\",\n        \"args\": [\n            \"temperature\"\n        ]\n    },\n    {\n        \"command\": \"TS.CREATE\",\n        \"args\": [\n            \"humidity\"\n        ]\n    }\n]\n\ncommands.forEach((cmd) => {\n    node.warn(cmd);\n    redis.call(`KEYS`).then(res => {\n        node.warn(res);\n    })\n})\n\n// redis.info().then((data) => {\n//     msg.payload = data\n//     node.send(msg);\n// })\n/*\nredis.call(\"anycmd\").then((data)=>{\n    msg.payload = data\n    node.send(msg);\n})*/\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 420,
+        "wires": [
+            [
+                "3fc9d222d32aeda1"
+            ]
+        ]
+    },
+    {
+        "id": "d44fe1b96a5e893e",
+        "type": "redis-instance",
+        "z": "2e56a74c132aeaaf",
+        "server": "3cc67d60c90e6c5d",
+        "name": "",
+        "topic": "redis",
+        "location": "flow",
+        "x": 350,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "ab35966be28558a7",
+        "type": "inject",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[{\"command\":\"TS.CREATE\",\"args\":[\"temperature\"]},{\"command\":\"TS.CREATE\",\"args\":[\"humidity\"]}]",
+        "payloadType": "json",
+        "x": 150,
+        "y": 500,
+        "wires": [
+            []
         ]
     }
 ]
