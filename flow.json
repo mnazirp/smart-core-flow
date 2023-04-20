@@ -4897,17 +4897,17 @@
         "type": "function",
         "z": "2e56a74c132aeaaf",
         "name": "Set query ",
-        "func": "let payload = JSON.parse(msg.payload);\nlet query = null;\nlet counter = 0;\nif (payload.data) {\n    query = `insert into am_hinototracking \n              (szVin, szVehicleStatus, iOdometer, iEngineHours, decLongitude, decLatitude, decHeading, decSpeed\n              , decAltitude, dtmPositionDateTime, dtmCreatedDateTime, szCreatedBy, dtmCreatedDate, szModifiedBy\n              , dtmModifiedDate)\n             values `;\n    let d = new Date();\n    payload.data.forEach(x => {\n        let position = (x.positionDateTime) ? `STR_TO_DATE('${x.positionDateTime}', '%Y-%m-%dT%H:%i:%sZ')` : null;\n        let created = (x.createdDateTime) ? `STR_TO_DATE('${x.createdDateTime}', '%Y-%m-%dT%H:%i:%sZ')` : null;\n        let serverDate = `STR_TO_DATE('${d.toISOString().slice(0, -5)}Z', '%Y-%m-%dT%H:%i:%sZ')`;\n        query += `('${x.vin}', '${x.vehicleStatus}', ${x.odometer}, ${x.engineHours}, ${x.longitude}, ${x.latitude}\n                    , ${x.heading}, ${x.speed}, ${x.altitude}, ${position}, ${created}\n                    , 'smart-red', ${serverDate}, 'smart-red', ${serverDate}),`;\n    });\n    query = query.slice(0, -1);\n}\n\nmsg.topic = query;\nmsg.payload = null;\nreturn msg;",
+        "func": "let payload = JSON.parse(msg.payload);\nmsg.isValid = false;\nif (payload.data) {\n    msg.isValid = true;\n}\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
         "x": 480,
-        "y": 240,
+        "y": 180,
         "wires": [
             [
-                "e73378a283ba5005"
+                "7510047f37bdee05"
             ]
         ]
     },
@@ -4941,33 +4941,10 @@
             }
         ],
         "x": 430,
-        "y": 200,
+        "y": 140,
         "wires": [
             [
                 "3653f1b59ac43d23"
-            ]
-        ]
-    },
-    {
-        "id": "e73378a283ba5005",
-        "type": "switch",
-        "z": "2e56a74c132aeaaf",
-        "name": "",
-        "property": "topic",
-        "propertyType": "msg",
-        "rules": [
-            {
-                "t": "nnull"
-            }
-        ],
-        "checkall": "true",
-        "repair": false,
-        "outputs": 1,
-        "x": 670,
-        "y": 200,
-        "wires": [
-            [
-                "fc336030101cb162"
             ]
         ]
     },
@@ -4983,7 +4960,7 @@
         "finalize": "",
         "libs": [],
         "x": 390,
-        "y": 160,
+        "y": 100,
         "wires": [
             [
                 "ce895a4cf9597e04"
@@ -4996,15 +4973,15 @@
         "z": "2e56a74c132aeaaf",
         "name": "debug 17",
         "active": true,
-        "tosidebar": false,
-        "console": true,
+        "tosidebar": true,
+        "console": false,
         "tostatus": false,
-        "complete": "payload",
-        "targetType": "msg",
+        "complete": "true",
+        "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 930,
-        "y": 240,
+        "x": 1140,
+        "y": 260,
         "wires": []
     },
     {
@@ -5014,48 +4991,16 @@
         "name": "",
         "scope": [
             "3653f1b59ac43d23",
-            "29457a467dba8868",
             "ce895a4cf9597e04",
-            "e1509d66ddce4f68"
+            "e1509d66ddce4f68",
+            "29fcbcf1031024cb"
         ],
         "uncaught": false,
-        "x": 490,
-        "y": 280,
+        "x": 130,
+        "y": 40,
         "wires": [
             [
                 "487d914b50905d37"
-            ]
-        ]
-    },
-    {
-        "id": "19481a6806271a88",
-        "type": "cronplus",
-        "z": "2e56a74c132aeaaf",
-        "name": "",
-        "outputField": "payload",
-        "timeZone": "",
-        "persistDynamic": false,
-        "commandResponseMsgOutput": "output1",
-        "outputs": 1,
-        "options": [
-            {
-                "name": "schedule1",
-                "topic": "topic1",
-                "payloadType": "default",
-                "payload": "",
-                "expressionType": "cron",
-                "expression": "0 */5 * * * * *",
-                "location": "",
-                "offset": "0",
-                "solarType": "all",
-                "solarEvents": "sunrise,sunset"
-            }
-        ],
-        "x": 140,
-        "y": 160,
-        "wires": [
-            [
-                "e1509d66ddce4f68"
             ]
         ]
     },
@@ -5070,53 +5015,16 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 690,
-        "y": 280,
+        "x": 370,
+        "y": 40,
         "wires": [
             [
-                "b54662cce8df2b14"
+                "6640ae2f60f53b0c"
             ]
         ]
     },
     {
-        "id": "fc336030101cb162",
-        "type": "redis-command",
-        "z": "2e56a74c132aeaaf",
-        "server": "0fb96b870afb5c15",
-        "command": "TS.CREATE",
-        "name": "",
-        "topic": "",
-        "params": "[]",
-        "paramsType": "json",
-        "payloadType": "json",
-        "block": false,
-        "x": 710,
-        "y": 240,
-        "wires": [
-            [
-                "b54662cce8df2b14"
-            ]
-        ]
-    },
-    {
-        "id": "3fc9d222d32aeda1",
-        "type": "debug",
-        "z": "2e56a74c132aeaaf",
-        "name": "debug 22",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 580,
-        "y": 420,
-        "wires": []
-    },
-    {
-        "id": "054fbcb0d2cbd6bb",
+        "id": "5752655b2f043898",
         "type": "inject",
         "z": "2e56a74c132aeaaf",
         "name": "",
@@ -5134,55 +5042,76 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "payload": "[\"MULTI\",[\"TS.CREATE\",\"temperature\"],[\"TS.CREATE\",\"humidity\"],\"EXEC\"]",
-        "payloadType": "json",
-        "x": 150,
-        "y": 420,
+        "payload": "",
+        "payloadType": "date",
+        "x": 140,
+        "y": 100,
         "wires": [
             [
-                "e161fea79f5f0287"
+                "e1509d66ddce4f68"
             ]
         ]
     },
     {
-        "id": "e161fea79f5f0287",
+        "id": "7510047f37bdee05",
+        "type": "switch",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "property": "isValid",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 490,
+        "y": 220,
+        "wires": [
+            [
+                "b7ad417b24957447"
+            ],
+            [
+                "666488dda2f67f77"
+            ]
+        ]
+    },
+    {
+        "id": "666488dda2f67f77",
         "type": "function",
         "z": "2e56a74c132aeaaf",
-        "name": "function 21",
-        "func": "let redis = context.flow.get('redis');\n\nlet commands = [\n    {\n        \"command\": \"TS.CREATE\",\n        \"args\": [\n            \"temperature\"\n        ]\n    },\n    {\n        \"command\": \"TS.CREATE\",\n        \"args\": [\n            \"humidity\"\n        ]\n    }\n]\n\ncommands.forEach((cmd) => {\n    node.warn(cmd);\n    redis.call(`KEYS`).then(res => {\n        node.warn(res);\n    })\n})\n\n// redis.info().then((data) => {\n//     msg.payload = data\n//     node.send(msg);\n// })\n/*\nredis.call(\"anycmd\").then((data)=>{\n    msg.payload = data\n    node.send(msg);\n})*/\nreturn msg;",
+        "name": "function 23",
+        "func": "msg.payload = JSON.parse(msg.payload);\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 370,
-        "y": 420,
+        "x": 710,
+        "y": 580,
         "wires": [
             [
-                "3fc9d222d32aeda1"
+                "b54662cce8df2b14"
             ]
         ]
     },
     {
-        "id": "d44fe1b96a5e893e",
-        "type": "redis-instance",
-        "z": "2e56a74c132aeaaf",
-        "server": "3cc67d60c90e6c5d",
-        "name": "",
-        "topic": "redis",
-        "location": "flow",
-        "x": 350,
-        "y": 380,
-        "wires": []
-    },
-    {
-        "id": "ab35966be28558a7",
+        "id": "a4b12276bbdddc5e",
         "type": "inject",
         "z": "2e56a74c132aeaaf",
         "name": "",
         "props": [
             {
                 "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
             }
         ],
         "repeat": "",
@@ -5190,12 +5119,281 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "payload": "[{\"command\":\"TS.CREATE\",\"args\":[\"temperature\"]},{\"command\":\"TS.CREATE\",\"args\":[\"humidity\"]}]",
-        "payloadType": "json",
-        "x": 150,
-        "y": 500,
+        "payload": "",
+        "payloadType": "date",
+        "x": 100,
+        "y": 760,
         "wires": [
-            []
+            [
+                "21b07d215dbdd4fe"
+            ]
+        ]
+    },
+    {
+        "id": "3fd4fae1e0a969d5",
+        "type": "debug",
+        "z": "2e56a74c132aeaaf",
+        "name": "debug 23",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 640,
+        "y": 800,
+        "wires": []
+    },
+    {
+        "id": "21b07d215dbdd4fe",
+        "type": "function",
+        "z": "2e56a74c132aeaaf",
+        "name": "function 24",
+        "func": "msg.payload = [\"hino:speed\", \n    1681903255000, 31,\n    \"LABELS\", \"vim\", \"MJEC1JG43N5201104\",\n    \"vehicleStatus\", \"OFF\"\n]\nmsg.topic = null\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 310,
+        "y": 760,
+        "wires": [
+            [
+                "ecd11c5d24bfe791"
+            ]
+        ]
+    },
+    {
+        "id": "ecd11c5d24bfe791",
+        "type": "redis-command",
+        "z": "2e56a74c132aeaaf",
+        "server": "3cc67d60c90e6c5d",
+        "command": "TS.ADD",
+        "name": "",
+        "topic": "",
+        "params": "[]",
+        "paramsType": "json",
+        "payloadType": "json",
+        "block": false,
+        "x": 320,
+        "y": 800,
+        "wires": [
+            [
+                "3fd4fae1e0a969d5"
+            ]
+        ]
+    },
+    {
+        "id": "29fcbcf1031024cb",
+        "type": "redis-command",
+        "z": "2e56a74c132aeaaf",
+        "server": "3cc67d60c90e6c5d",
+        "command": "TS.ADD",
+        "name": "",
+        "topic": "",
+        "params": "[]",
+        "paramsType": "json",
+        "payloadType": "json",
+        "block": false,
+        "x": 900,
+        "y": 120,
+        "wires": [
+            [
+                "4bade8d3bb8a63aa"
+            ]
+        ]
+    },
+    {
+        "id": "0252672c8a320eef",
+        "type": "change",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "null",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 890,
+        "y": 80,
+        "wires": [
+            [
+                "29fcbcf1031024cb"
+            ]
+        ]
+    },
+    {
+        "id": "a5dbf084af25a58b",
+        "type": "split",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "splt": "\\n",
+        "spltType": "str",
+        "arraySplt": 1,
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "x": 690,
+        "y": 120,
+        "wires": [
+            [
+                "0252672c8a320eef"
+            ]
+        ]
+    },
+    {
+        "id": "6640ae2f60f53b0c",
+        "type": "debug",
+        "z": "2e56a74c132aeaaf",
+        "name": "debug 24",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 620,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "4bade8d3bb8a63aa",
+        "type": "join",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "mode": "auto",
+        "build": "object",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "accumulate": "false",
+        "timeout": "",
+        "count": "",
+        "reduceRight": false,
+        "x": 930,
+        "y": 160,
+        "wires": [
+            [
+                "b54662cce8df2b14"
+            ]
+        ]
+    },
+    {
+        "id": "a02a5998c93e9f87",
+        "type": "function",
+        "z": "2e56a74c132aeaaf",
+        "name": "function 25",
+        "func": "msg.payload = [\"gps_tracking_data\", 1647150000, 1647160000]\nmsg.topic = null;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 310,
+        "y": 840,
+        "wires": [
+            [
+                "82dabd8ab6cdd216"
+            ]
+        ]
+    },
+    {
+        "id": "82dabd8ab6cdd216",
+        "type": "redis-command",
+        "z": "2e56a74c132aeaaf",
+        "server": "0fb96b870afb5c15",
+        "command": "ZRANGEBYSCORE",
+        "name": "",
+        "topic": "",
+        "params": "[]",
+        "paramsType": "json",
+        "payloadType": "json",
+        "block": false,
+        "x": 350,
+        "y": 880,
+        "wires": [
+            [
+                "7e1da47f1b4f2f55"
+            ]
+        ]
+    },
+    {
+        "id": "19c16317cdfbf697",
+        "type": "inject",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 100,
+        "y": 840,
+        "wires": [
+            [
+                "a02a5998c93e9f87"
+            ]
+        ]
+    },
+    {
+        "id": "7e1da47f1b4f2f55",
+        "type": "debug",
+        "z": "2e56a74c132aeaaf",
+        "name": "debug 25",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 640,
+        "y": 840,
+        "wires": []
+    },
+    {
+        "id": "b7ad417b24957447",
+        "type": "function",
+        "z": "2e56a74c132aeaaf",
+        "name": "Set query ",
+        "func": "let payload = msg.payload;\nlet params = [];\npayload.data.forEach(x => {\n    let time = new Date(x.positionDateTime).getTime();\n    params.push([`vehicleStatus:${x.vin}`, time, x.vehicleStatus,\n        \"RETENTION\", 0, \"DUPLICATE_POLICY\", \"LAST\", \"CHUNK_SIZE\", 1048576,\n        \"LABELS\", \"vin\", x.vin]);\n    params.push([`altitude:${x.vin}`, time, x.altitude,\n        \"RETENTION\", 0, \"DUPLICATE_POLICY\", \"LAST\", \"CHUNK_SIZE\", 1048576,\n        \"LABELS\", \"vin\", x.vin]);\n    params.push([`odometer:${x.vin}`, time, x.odometer,\n        \"RETENTION\", 0, \"DUPLICATE_POLICY\", \"LAST\", \"CHUNK_SIZE\", 1048576,\n        \"LABELS\", \"vin\", x.vin]);\n    params.push([`engineHours:${x.vin}`, time, x.engineHours,\n        \"RETENTION\", 0, \"DUPLICATE_POLICY\", \"LAST\", \"CHUNK_SIZE\", 1048576,\n        \"LABELS\", \"vin\", x.vin]);\n    params.push([`latitude:${x.vin}`, time, x.latitude,\n        \"RETENTION\", 0, \"DUPLICATE_POLICY\", \"LAST\", \"CHUNK_SIZE\", 1048576,\n        \"LABELS\", \"vin\", x.vin]);\n    params.push([`longitude:${x.vin}`, time, x.longitude,\n        \"RETENTION\", 0, \"DUPLICATE_POLICY\", \"LAST\", \"CHUNK_SIZE\", 1048576,\n        \"LABELS\", \"vin\", x.vin]);\n    params.push([`heading:${x.vin}`, time, x.heading,\n        \"RETENTION\", 0, \"DUPLICATE_POLICY\", \"LAST\", \"CHUNK_SIZE\", 1048576,\n        \"LABELS\", \"vin\", x.vin]);\n    params.push([`speed:${x.vin}`, time, x.speed,\n        \"RETENTION\", 0, \"DUPLICATE_POLICY\", \"LAST\", \"CHUNK_SIZE\", 1048576,\n        \"LABELS\", \"vin\", x.vin]);\n});\nmsg.payload = params;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 700,
+        "y": 80,
+        "wires": [
+            [
+                "a5dbf084af25a58b"
+            ]
         ]
     }
 ]
