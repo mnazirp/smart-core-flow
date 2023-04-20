@@ -4897,14 +4897,14 @@
         "type": "function",
         "z": "2e56a74c132aeaaf",
         "name": "Set query ",
-        "func": "let payload = JSON.parse(msg.payload);\nmsg.isValid = false;\nif (payload.data) {\n    msg.isValid = true;\n}\nreturn msg;",
+        "func": "let payload = JSON.parse(msg.payload);\nmsg.isValid = false;\nif (payload.data) {\n    msg.isValid = true;\n    msg.payload = payload;\n}\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 480,
-        "y": 180,
+        "x": 440,
+        "y": 280,
         "wires": [
             [
                 "7510047f37bdee05"
@@ -4940,8 +4940,8 @@
                 "valueValue": "application/json"
             }
         ],
-        "x": 430,
-        "y": 140,
+        "x": 390,
+        "y": 240,
         "wires": [
             [
                 "3653f1b59ac43d23"
@@ -4959,8 +4959,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 390,
-        "y": 100,
+        "x": 350,
+        "y": 200,
         "wires": [
             [
                 "ce895a4cf9597e04"
@@ -4980,8 +4980,8 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1140,
-        "y": 260,
+        "x": 1060,
+        "y": 400,
         "wires": []
     },
     {
@@ -4996,26 +4996,7 @@
             "29fcbcf1031024cb"
         ],
         "uncaught": false,
-        "x": 130,
-        "y": 40,
-        "wires": [
-            [
-                "487d914b50905d37"
-            ]
-        ]
-    },
-    {
-        "id": "487d914b50905d37",
-        "type": "function",
-        "z": "2e56a74c132aeaaf",
-        "name": "function 15",
-        "func": "msg.payload = msg.error;\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 370,
+        "x": 150,
         "y": 40,
         "wires": [
             [
@@ -5044,8 +5025,8 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 140,
-        "y": 100,
+        "x": 100,
+        "y": 200,
         "wires": [
             [
                 "e1509d66ddce4f68"
@@ -5070,8 +5051,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 490,
-        "y": 220,
+        "x": 450,
+        "y": 320,
         "wires": [
             [
                 "b7ad417b24957447"
@@ -5092,8 +5073,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 710,
-        "y": 580,
+        "x": 650,
+        "y": 400,
         "wires": [
             [
                 "b54662cce8df2b14"
@@ -5197,8 +5178,8 @@
         "paramsType": "json",
         "payloadType": "json",
         "block": false,
-        "x": 900,
-        "y": 120,
+        "x": 840,
+        "y": 280,
         "wires": [
             [
                 "4bade8d3bb8a63aa"
@@ -5224,8 +5205,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 890,
-        "y": 80,
+        "x": 830,
+        "y": 240,
         "wires": [
             [
                 "29fcbcf1031024cb"
@@ -5243,8 +5224,8 @@
         "arraySpltType": "len",
         "stream": false,
         "addname": "",
-        "x": 690,
-        "y": 120,
+        "x": 630,
+        "y": 280,
         "wires": [
             [
                 "0252672c8a320eef"
@@ -5284,8 +5265,8 @@
         "timeout": "",
         "count": "",
         "reduceRight": false,
-        "x": 930,
-        "y": 160,
+        "x": 870,
+        "y": 320,
         "wires": [
             [
                 "b54662cce8df2b14"
@@ -5382,14 +5363,14 @@
         "type": "function",
         "z": "2e56a74c132aeaaf",
         "name": "Set query ",
-        "func": "let payload = msg.payload;\nlet params = [];\npayload.data.forEach(x => {\n    let time = new Date(x.positionDateTime).getTime();\n    params.push([`vehicleStatus:${x.vin}`, time, x.vehicleStatus,\n        \"RETENTION\", 0, \"DUPLICATE_POLICY\", \"LAST\", \"CHUNK_SIZE\", 1048576,\n        \"LABELS\", \"vin\", x.vin]);\n    params.push([`altitude:${x.vin}`, time, x.altitude,\n        \"RETENTION\", 0, \"DUPLICATE_POLICY\", \"LAST\", \"CHUNK_SIZE\", 1048576,\n        \"LABELS\", \"vin\", x.vin]);\n    params.push([`odometer:${x.vin}`, time, x.odometer,\n        \"RETENTION\", 0, \"DUPLICATE_POLICY\", \"LAST\", \"CHUNK_SIZE\", 1048576,\n        \"LABELS\", \"vin\", x.vin]);\n    params.push([`engineHours:${x.vin}`, time, x.engineHours,\n        \"RETENTION\", 0, \"DUPLICATE_POLICY\", \"LAST\", \"CHUNK_SIZE\", 1048576,\n        \"LABELS\", \"vin\", x.vin]);\n    params.push([`latitude:${x.vin}`, time, x.latitude,\n        \"RETENTION\", 0, \"DUPLICATE_POLICY\", \"LAST\", \"CHUNK_SIZE\", 1048576,\n        \"LABELS\", \"vin\", x.vin]);\n    params.push([`longitude:${x.vin}`, time, x.longitude,\n        \"RETENTION\", 0, \"DUPLICATE_POLICY\", \"LAST\", \"CHUNK_SIZE\", 1048576,\n        \"LABELS\", \"vin\", x.vin]);\n    params.push([`heading:${x.vin}`, time, x.heading,\n        \"RETENTION\", 0, \"DUPLICATE_POLICY\", \"LAST\", \"CHUNK_SIZE\", 1048576,\n        \"LABELS\", \"vin\", x.vin]);\n    params.push([`speed:${x.vin}`, time, x.speed,\n        \"RETENTION\", 0, \"DUPLICATE_POLICY\", \"LAST\", \"CHUNK_SIZE\", 1048576,\n        \"LABELS\", \"vin\", x.vin]);\n});\nmsg.payload = params;\nreturn msg;",
+        "func": "let payload = msg.payload;\nlet params = [];\npayload.data.forEach(x => {\n    if (x.vin && x.positionDateTime) {\n        let time = new Date(x.positionDateTime).getTime();\n        params.push([`${x.vin}:altitude`, time, (x.altitude) ? x.altitude : 0,\n            \"DUPLICATE_POLICY\", \"LAST\",\"LABELS\", \"vin\", x.vin]);\n        params.push([`${x.vin}:odometer`, time, (x.odometer) ? x.odometer : 0,\n            \"DUPLICATE_POLICY\", \"LAST\",\"LABELS\", \"vin\", x.vin]);\n        params.push([`${x.vin}:engineHours`, time, (x.engineHours) ? x.engineHours : 0,\n            \"DUPLICATE_POLICY\", \"LAST\",\"LABELS\", \"vin\", x.vin]);\n        params.push([`${x.vin}:latitude`, time, (x.latitude) ? x.latitude : 0,\n            \"DUPLICATE_POLICY\", \"LAST\",\"LABELS\", \"vin\", x.vin]);\n        params.push([`${x.vin}:longitude`, time, (x.longitude) ? x.longitude : 0,\n            \"DUPLICATE_POLICY\", \"LAST\",\"LABELS\", \"vin\", x.vin]);\n        params.push([`${x.vin}:heading`, time, (x.heading) ? x.heading : 0,\n            \"DUPLICATE_POLICY\", \"LAST\",\"LABELS\", \"vin\", x.vin]);\n        params.push([`${x.vin}:speed`, time, (x.speed) ? x.speed : 0,\n            \"DUPLICATE_POLICY\", \"LAST\",\"LABELS\", \"vin\", x.vin]);\n    }\n});\nmsg.payload = params;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 700,
-        "y": 80,
+        "x": 640,
+        "y": 240,
         "wires": [
             [
                 "a5dbf084af25a58b"
