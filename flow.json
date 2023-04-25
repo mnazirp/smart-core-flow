@@ -4972,7 +4972,7 @@
         "type": "debug",
         "z": "2e56a74c132aeaaf",
         "name": "debug 17",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -5026,7 +5026,7 @@
         "payload": "",
         "payloadType": "date",
         "x": 100,
-        "y": 200,
+        "y": 240,
         "wires": [
             [
                 "e1509d66ddce4f68"
@@ -5363,7 +5363,7 @@
         "type": "function",
         "z": "2e56a74c132aeaaf",
         "name": "Set query ",
-        "func": "let payload = msg.payload;\nlet params = [];\npayload.data.forEach(x => {\n    if (x.vin && x.positionDateTime) {\n        let time = new Date(x.positionDateTime).getTime();\n        params.push([`${x.vin}:altitude`, time, (x.altitude) ? x.altitude : 0,\n            \"DUPLICATE_POLICY\", \"LAST\",\"LABELS\", \"vin\", x.vin]);\n        params.push([`${x.vin}:odometer`, time, (x.odometer) ? x.odometer : 0,\n            \"DUPLICATE_POLICY\", \"LAST\",\"LABELS\", \"vin\", x.vin]);\n        params.push([`${x.vin}:engineHours`, time, (x.engineHours) ? x.engineHours : 0,\n            \"DUPLICATE_POLICY\", \"LAST\",\"LABELS\", \"vin\", x.vin]);\n        params.push([`${x.vin}:latitude`, time, (x.latitude) ? x.latitude : 0,\n            \"DUPLICATE_POLICY\", \"LAST\",\"LABELS\", \"vin\", x.vin]);\n        params.push([`${x.vin}:longitude`, time, (x.longitude) ? x.longitude : 0,\n            \"DUPLICATE_POLICY\", \"LAST\",\"LABELS\", \"vin\", x.vin]);\n        params.push([`${x.vin}:heading`, time, (x.heading) ? x.heading : 0,\n            \"DUPLICATE_POLICY\", \"LAST\",\"LABELS\", \"vin\", x.vin]);\n        params.push([`${x.vin}:speed`, time, (x.speed) ? x.speed : 0,\n            \"DUPLICATE_POLICY\", \"LAST\",\"LABELS\", \"vin\", x.vin]);\n    }\n});\nmsg.payload = params;\nreturn msg;",
+        "func": "let payload = msg.payload;\nlet params = [];\npayload.data.forEach(x => {\n    if (x.vin && x.positionDateTime) {\n        let time = new Date(x.positionDateTime).getTime();\n        let status = -1;\n        if(x.vehicleStatus === 'OFF') status = 0;\n        else if(x.vehicleStatus === 'MOVING') status = 1;\n        else if(x.vehicleStatus === 'IDLE') status = 2;\n\n        params.push([`${x.vin}:vehicleStatus`, time, status,\n            \"DUPLICATE_POLICY\", \"LAST\", \"LABELS\", \"vin\", x.vin]);\n        params.push([`${x.vin}:altitude`, time, (x.altitude) ? x.altitude : 0,\n            \"DUPLICATE_POLICY\", \"LAST\",\"LABELS\", \"vin\", x.vin]);\n        params.push([`${x.vin}:odometer`, time, (x.odometer) ? x.odometer : 0,\n            \"DUPLICATE_POLICY\", \"LAST\",\"LABELS\", \"vin\", x.vin]);\n        params.push([`${x.vin}:engineHours`, time, (x.engineHours) ? x.engineHours : 0,\n            \"DUPLICATE_POLICY\", \"LAST\",\"LABELS\", \"vin\", x.vin]);\n        params.push([`${x.vin}:latitude`, time, (x.latitude) ? x.latitude : 0,\n            \"DUPLICATE_POLICY\", \"LAST\",\"LABELS\", \"vin\", x.vin]);\n        params.push([`${x.vin}:longitude`, time, (x.longitude) ? x.longitude : 0,\n            \"DUPLICATE_POLICY\", \"LAST\",\"LABELS\", \"vin\", x.vin]);\n        params.push([`${x.vin}:heading`, time, (x.heading) ? x.heading : 0,\n            \"DUPLICATE_POLICY\", \"LAST\",\"LABELS\", \"vin\", x.vin]);\n        params.push([`${x.vin}:speed`, time, (x.speed) ? x.speed : 0,\n            \"DUPLICATE_POLICY\", \"LAST\",\"LABELS\", \"vin\", x.vin]);\n    }\n});\nmsg.payload = params;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -5374,6 +5374,38 @@
         "wires": [
             [
                 "a5dbf084af25a58b"
+            ]
+        ]
+    },
+    {
+        "id": "f3462a98979cea3f",
+        "type": "cronplus",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "outputField": "payload",
+        "timeZone": "",
+        "persistDynamic": false,
+        "commandResponseMsgOutput": "output1",
+        "outputs": 1,
+        "options": [
+            {
+                "name": "schedule1",
+                "topic": "topic1",
+                "payloadType": "default",
+                "payload": "",
+                "expressionType": "cron",
+                "expression": "0 */1 * * * * *",
+                "location": "",
+                "offset": "0",
+                "solarType": "all",
+                "solarEvents": "sunrise,sunset"
+            }
+        ],
+        "x": 100,
+        "y": 200,
+        "wires": [
+            [
+                "e1509d66ddce4f68"
             ]
         ]
     }
