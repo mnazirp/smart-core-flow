@@ -4667,7 +4667,8 @@
         "y": 360,
         "wires": [
             [
-                "88c031c5f4967e47"
+                "88c031c5f4967e47",
+                "48c14bf3688ce5c8"
             ]
         ]
     },
@@ -4835,6 +4836,62 @@
         "x": 980,
         "y": 560,
         "wires": []
+    },
+    {
+        "id": "aa4e6a56f1201151",
+        "type": "redis-command",
+        "z": "50baf2723fb4853b",
+        "server": "0fb96b870afb5c15",
+        "command": "DEL",
+        "name": "",
+        "topic": "",
+        "params": "[]",
+        "paramsType": "json",
+        "payloadType": "json",
+        "block": false,
+        "x": 1140,
+        "y": 400,
+        "wires": [
+            [
+                "e85b39fe16903cdb"
+            ]
+        ]
+    },
+    {
+        "id": "e85b39fe16903cdb",
+        "type": "debug",
+        "z": "50baf2723fb4853b",
+        "name": "debug 26",
+        "active": true,
+        "tosidebar": false,
+        "console": true,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1330,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "48c14bf3688ce5c8",
+        "type": "function",
+        "z": "50baf2723fb4853b",
+        "name": "function 26",
+        "func": "msg.topic = `scope:${msg.ori.code}`;\nmsg.payload = null;\ndelete msg.ori;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 950,
+        "y": 400,
+        "wires": [
+            [
+                "aa4e6a56f1201151"
+            ]
+        ]
     },
     {
         "id": "a9e10fe5cca4e39f",
