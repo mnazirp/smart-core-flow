@@ -50,7 +50,7 @@
     {
         "id": "0ee186eb42c82e4f",
         "type": "tab",
-        "label": "Smart: User",
+        "label": "Admin: User",
         "disabled": false,
         "info": "",
         "env": []
@@ -58,7 +58,7 @@
     {
         "id": "bef67a5c91d12113",
         "type": "tab",
-        "label": "Smart: Hierarchy",
+        "label": "Admin: Hierarchy",
         "disabled": false,
         "info": "",
         "env": []
@@ -66,7 +66,7 @@
     {
         "id": "50baf2723fb4853b",
         "type": "tab",
-        "label": "Smart: Libs",
+        "label": "Admin: Libs",
         "disabled": false,
         "info": "// nrlint function-eslint:off\n",
         "env": []
@@ -3975,11 +3975,11 @@
         "type": "http in",
         "z": "0ee186eb42c82e4f",
         "name": "",
-        "url": "/api/user/by-nik/:nik",
+        "url": "/admin/user/by-nik/:nik",
         "method": "get",
         "upload": false,
         "swaggerDoc": "",
-        "x": 170,
+        "x": 180,
         "y": 80,
         "wires": [
             [
@@ -4068,11 +4068,11 @@
         "type": "http in",
         "z": "0ee186eb42c82e4f",
         "name": "",
-        "url": "/api/user",
+        "url": "/admin/user",
         "method": "put",
         "upload": false,
         "swaggerDoc": "",
-        "x": 130,
+        "x": 140,
         "y": 360,
         "wires": [
             [
@@ -4460,11 +4460,11 @@
         "type": "http in",
         "z": "bef67a5c91d12113",
         "name": "",
-        "url": "/api/hierarchy/by-topic/:topic",
+        "url": "/admin/hierarchy/by-topic/:topic",
         "method": "get",
         "upload": false,
         "swaggerDoc": "",
-        "x": 170,
+        "x": 180,
         "y": 60,
         "wires": [
             [
@@ -4488,11 +4488,11 @@
         "type": "http in",
         "z": "50baf2723fb4853b",
         "name": "",
-        "url": "/api/libs/by-code/:code",
+        "url": "/admin/libs/by-code/:code",
         "method": "get",
         "upload": false,
         "swaggerDoc": "",
-        "x": 150,
+        "x": 160,
         "y": 80,
         "wires": [
             [
@@ -4573,11 +4573,11 @@
         "type": "http in",
         "z": "50baf2723fb4853b",
         "name": "",
-        "url": "/api/libs/by-id",
+        "url": "/admin/libs/by-id",
         "method": "put",
         "upload": false,
         "swaggerDoc": "",
-        "x": 130,
+        "x": 140,
         "y": 280,
         "wires": [
             [
@@ -4717,11 +4717,11 @@
         "type": "http in",
         "z": "50baf2723fb4853b",
         "name": "",
-        "url": "/api/ref/select-options",
+        "url": "/admin/ref/select-options",
         "method": "post",
         "upload": false,
         "swaggerDoc": "",
-        "x": 160,
+        "x": 170,
         "y": 520,
         "wires": [
             [
