@@ -4085,7 +4085,7 @@
         "type": "function",
         "z": "0ee186eb42c82e4f",
         "name": "payload validation",
-        "func": "msg.ori = msg.payload;\nlet { nik, loginType, fullName, corpRole, scopes } = msg.ori;\nlet valid = (nik && loginType && fullName && corpRole && scopes) ? true : false;\nmsg.payload = {\n    \"key\": msg.payload.nik\n}\nmsg.isValid = valid;\nreturn msg;",
+        "func": "msg.ori = msg.payload;\nlet { nik, loginType, fullName, corpRole, systemRoles, scopes } = msg.ori;\nlet valid = (nik && loginType && fullName && corpRole && systemRoles && scopes) ? true : false;\nmsg.payload = {\n    \"key\": msg.payload.nik\n}\nmsg.isValid = valid;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -4243,7 +4243,7 @@
         "type": "function",
         "z": "0ee186eb42c82e4f",
         "name": "function 18",
-        "func": "let user = msg.payload;\nlet { loginType, fullName, email, corpRole, combo, scopes} = msg.ori;\nuser['loginType'] = loginType;\nuser['fullName'] = fullName;\nuser['email'] = email;\nuser['corpRole'] = corpRole;\nuser['combo'] = combo;\nuser['scopes'] = scopes;\n// delete user._rev;\nmsg.payload = user;\nreturn msg;",
+        "func": "let user = msg.payload;\nlet { loginType, fullName, email, corpRole, systemRoles, combo, scopes} = msg.ori;\nuser['loginType'] = loginType;\nuser['fullName'] = fullName;\nuser['email'] = email;\nuser['corpRole'] = corpRole;\nuser['systemRoles'] = systemRoles;\nuser['combo'] = combo;\nuser['scopes'] = scopes;\n// delete user._rev;\nmsg.payload = user;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -4397,6 +4397,99 @@
                 "4ced71eba12ca1fc"
             ]
         ]
+    },
+    {
+        "id": "82122e00922085ab",
+        "type": "http in",
+        "z": "0ee186eb42c82e4f",
+        "name": "",
+        "url": "/admin/user/system-roles",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 180,
+        "y": 660,
+        "wires": [
+            [
+                "4b94c2d9123ae31b"
+            ]
+        ]
+    },
+    {
+        "id": "4b94c2d9123ae31b",
+        "type": "function",
+        "z": "0ee186eb42c82e4f",
+        "name": "function 27",
+        "func": "msg.payload = 'smart-system-roles'\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 510,
+        "y": 660,
+        "wires": [
+            [
+                "f584481a9b03bb93"
+            ]
+        ]
+    },
+    {
+        "id": "f584481a9b03bb93",
+        "type": "cloudantplus in",
+        "z": "0ee186eb42c82e4f",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-configs",
+        "service": "_ext_",
+        "search": "_id_",
+        "design": "",
+        "index": "",
+        "x": 520,
+        "y": 700,
+        "wires": [
+            [
+                "884b93a38e6258da"
+            ]
+        ]
+    },
+    {
+        "id": "884b93a38e6258da",
+        "type": "change",
+        "z": "0ee186eb42c82e4f",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.data",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 520,
+        "y": 740,
+        "wires": [
+            [
+                "482a0f53f9b4f9c6"
+            ]
+        ]
+    },
+    {
+        "id": "482a0f53f9b4f9c6",
+        "type": "http response",
+        "z": "0ee186eb42c82e4f",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 780,
+        "y": 740,
+        "wires": []
     },
     {
         "id": "c86674137cc829c6",
