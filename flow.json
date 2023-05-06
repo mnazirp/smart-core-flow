@@ -5998,7 +5998,7 @@
         "search": "_id_",
         "design": "",
         "index": "",
-        "x": 440,
+        "x": 580,
         "y": 100,
         "wires": [
             [
@@ -6025,7 +6025,7 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 440,
+        "x": 580,
         "y": 60,
         "wires": [
             [
@@ -6038,13 +6038,13 @@
         "type": "function",
         "z": "20bd6215ce29ada7",
         "name": "return",
-        "func": "if (msg.payload && msg.payload.data && Array.isArray(msg.payload.data)) {\n    msg.payload = msg.payload.data;\n    msg.responseCode = 200;\n}else{\n    msg.responseCode = 400;\n    msg.payload = 'applications not found'\n}\nreturn msg;",
+        "func": "if (msg.payload && msg.payload.data && Array.isArray(msg.payload.data)) {\n    msg.payload = msg.payload.data.map(x => {\n        return{\n            label: x.label,\n            value: x.code\n        }\n    });\n    msg.responseCode = 200;\n}else{\n    msg.responseCode = 400;\n    msg.payload = 'applications not found'\n}\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 410,
+        "x": 550,
         "y": 140,
         "wires": [
             [
@@ -6059,7 +6059,7 @@
         "name": "",
         "statusCode": "",
         "headers": {},
-        "x": 570,
+        "x": 710,
         "y": 140,
         "wires": []
     }
