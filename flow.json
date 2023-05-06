@@ -88,6 +88,22 @@
         "env": []
     },
     {
+        "id": "06108b8ace191ff7",
+        "type": "tab",
+        "label": "Admin: Scope",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "20bd6215ce29ada7",
+        "type": "tab",
+        "label": "Smart: Select Options",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
         "id": "77002254b872fa8e",
         "type": "subflow",
         "name": "algo: jwt-sign",
@@ -5581,5 +5597,470 @@
                 "e1509d66ddce4f68"
             ]
         ]
+    },
+    {
+        "id": "ac083b48bc2518ab",
+        "type": "http in",
+        "z": "06108b8ace191ff7",
+        "name": "",
+        "url": "/admin/scope/by-code/:code",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 170,
+        "y": 80,
+        "wires": [
+            [
+                "5ae79c73a59c90db"
+            ]
+        ]
+    },
+    {
+        "id": "5ae79c73a59c90db",
+        "type": "function",
+        "z": "06108b8ace191ff7",
+        "name": "prepare",
+        "func": "msg.payload = {\n    key: msg.req.params.code\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 500,
+        "y": 80,
+        "wires": [
+            [
+                "80ca9a9ddc05d78f"
+            ]
+        ]
+    },
+    {
+        "id": "80ca9a9ddc05d78f",
+        "type": "cloudantplus in",
+        "z": "06108b8ace191ff7",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-libs",
+        "service": "_ext_",
+        "search": "_view_",
+        "design": "type",
+        "index": "by-code",
+        "x": 500,
+        "y": 120,
+        "wires": [
+            [
+                "edf16ce67482975a"
+            ]
+        ]
+    },
+    {
+        "id": "edf16ce67482975a",
+        "type": "function",
+        "z": "06108b8ace191ff7",
+        "name": "prepare payload",
+        "func": "let rs = [];\nif(msg.payload.length > 0){\n    rs = msg.payload[0].value;\n    msg.payload = rs;\n    msg.statusCode = 200;\n}else{\n    msg.statusCode = 400;\n    msg.payload = 'document not found'\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 520,
+        "y": 160,
+        "wires": [
+            [
+                "08f0af4b7f580661"
+            ]
+        ]
+    },
+    {
+        "id": "08f0af4b7f580661",
+        "type": "http response",
+        "z": "06108b8ace191ff7",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 730,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "50e3512e4f3d0e48",
+        "type": "http in",
+        "z": "06108b8ace191ff7",
+        "name": "",
+        "url": "/admin/scope",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 210,
+        "y": 320,
+        "wires": [
+            [
+                "6fec0a691f75b8a4"
+            ]
+        ]
+    },
+    {
+        "id": "eaa075dc2ad56acd",
+        "type": "http in",
+        "z": "06108b8ace191ff7",
+        "name": "",
+        "url": "/admin/scope",
+        "method": "put",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 210,
+        "y": 500,
+        "wires": [
+            [
+                "af89cef923076c0a"
+            ]
+        ]
+    },
+    {
+        "id": "e70a801c6515e91f",
+        "type": "http response",
+        "z": "06108b8ace191ff7",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 900,
+        "y": 580,
+        "wires": []
+    },
+    {
+        "id": "906188adbf6aa812",
+        "type": "cloudantplus in",
+        "z": "06108b8ace191ff7",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-libs",
+        "service": "_ext_",
+        "search": "_id_",
+        "design": "type",
+        "index": "by-type-topic-code",
+        "x": 500,
+        "y": 540,
+        "wires": [
+            [
+                "b7ec432a2b3fbbbf"
+            ]
+        ]
+    },
+    {
+        "id": "af89cef923076c0a",
+        "type": "function",
+        "z": "06108b8ace191ff7",
+        "name": "_id, _rev",
+        "func": "delete msg.payload._rev;\nlet { _id, ...rest } = msg.payload;\nmsg.ori = rest;\nmsg.payload = _id;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 500,
+        "y": 500,
+        "wires": [
+            [
+                "906188adbf6aa812"
+            ]
+        ]
+    },
+    {
+        "id": "7bcfd8915b8b20c5",
+        "type": "function",
+        "z": "06108b8ace191ff7",
+        "name": "prepare doc",
+        "func": "let {_id, _rev} = msg.payload;\nmsg.payload = {\n    _id,\n    _rev,\n    ...msg.ori\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 730,
+        "y": 540,
+        "wires": [
+            [
+                "7a2c326736bab4c6"
+            ]
+        ]
+    },
+    {
+        "id": "7a2c326736bab4c6",
+        "type": "cloudantplus out",
+        "z": "06108b8ace191ff7",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-libs",
+        "service": "_ext_",
+        "payonly": true,
+        "operation": "insert",
+        "x": 720,
+        "y": 580,
+        "wires": [
+            [
+                "e70a801c6515e91f",
+                "af413a65eab3f555"
+            ]
+        ]
+    },
+    {
+        "id": "b7ec432a2b3fbbbf",
+        "type": "switch",
+        "z": "06108b8ace191ff7",
+        "name": "payload not null",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "nnull"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 520,
+        "y": 580,
+        "wires": [
+            [
+                "7bcfd8915b8b20c5"
+            ],
+            [
+                "0ed15aab45c260b6"
+            ]
+        ]
+    },
+    {
+        "id": "0ed15aab45c260b6",
+        "type": "http response",
+        "z": "06108b8ace191ff7",
+        "name": "",
+        "statusCode": "400",
+        "headers": {},
+        "x": 720,
+        "y": 640,
+        "wires": []
+    },
+    {
+        "id": "997a37d4af85b3b4",
+        "type": "redis-command",
+        "z": "06108b8ace191ff7",
+        "server": "0fb96b870afb5c15",
+        "command": "DEL",
+        "name": "",
+        "topic": "",
+        "params": "[]",
+        "paramsType": "json",
+        "payloadType": "json",
+        "block": false,
+        "x": 1080,
+        "y": 620,
+        "wires": [
+            [
+                "8dca4cfcfd2d7c3e"
+            ]
+        ]
+    },
+    {
+        "id": "8dca4cfcfd2d7c3e",
+        "type": "debug",
+        "z": "06108b8ace191ff7",
+        "name": "debug 27",
+        "active": true,
+        "tosidebar": false,
+        "console": true,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1250,
+        "y": 620,
+        "wires": []
+    },
+    {
+        "id": "af413a65eab3f555",
+        "type": "function",
+        "z": "06108b8ace191ff7",
+        "name": "function 28",
+        "func": "msg.topic = `scope:${msg.ori.code}`;\nmsg.payload = null;\ndelete msg.ori;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 910,
+        "y": 620,
+        "wires": [
+            [
+                "997a37d4af85b3b4"
+            ]
+        ]
+    },
+    {
+        "id": "6fec0a691f75b8a4",
+        "type": "function",
+        "z": "06108b8ace191ff7",
+        "name": "check payload",
+        "func": "msg.isValid = false;\nlet {\n    topic,\n    code,\n    applicationCode,\n    hierarchyCode,\n    data\n} = msg.payload;\n\nif(\n    topic && code && applicationCode && hierarchyCode\n    && data && Array.isArray(data)\n){\n    msg.isValid = true;\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 520,
+        "y": 320,
+        "wires": [
+            [
+                "225f9c8309144e87"
+            ]
+        ]
+    },
+    {
+        "id": "225f9c8309144e87",
+        "type": "switch",
+        "z": "06108b8ace191ff7",
+        "name": "isValid",
+        "property": "isValid",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 550,
+        "y": 360,
+        "wires": [
+            [
+                "30d8cd201e982b78"
+            ],
+            [
+                "63d7de0a1d2cb9d2"
+            ]
+        ]
+    },
+    {
+        "id": "63d7de0a1d2cb9d2",
+        "type": "http response",
+        "z": "06108b8ace191ff7",
+        "name": "",
+        "statusCode": "400",
+        "headers": {},
+        "x": 720,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "30d8cd201e982b78",
+        "type": "http response",
+        "z": "06108b8ace191ff7",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 710,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "f69613269c94bb04",
+        "type": "http in",
+        "z": "20bd6215ce29ada7",
+        "name": "",
+        "url": "/api/select-options/apps",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 160,
+        "y": 60,
+        "wires": [
+            [
+                "781abb6c1cb25494"
+            ]
+        ]
+    },
+    {
+        "id": "772f28707b2b1925",
+        "type": "cloudantplus in",
+        "z": "20bd6215ce29ada7",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-configs",
+        "service": "_ext_",
+        "search": "_id_",
+        "design": "",
+        "index": "",
+        "x": 440,
+        "y": 100,
+        "wires": [
+            [
+                "a5fb91c789d992ab"
+            ]
+        ]
+    },
+    {
+        "id": "781abb6c1cb25494",
+        "type": "change",
+        "z": "20bd6215ce29ada7",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "smart-apps",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 440,
+        "y": 60,
+        "wires": [
+            [
+                "772f28707b2b1925"
+            ]
+        ]
+    },
+    {
+        "id": "a5fb91c789d992ab",
+        "type": "function",
+        "z": "20bd6215ce29ada7",
+        "name": "return",
+        "func": "if (msg.payload && msg.payload.data && Array.isArray(msg.payload.data)) {\n    msg.payload = msg.payload.data;\n    msg.responseCode = 200;\n}else{\n    msg.responseCode = 400;\n    msg.payload = 'applications not found'\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 410,
+        "y": 140,
+        "wires": [
+            [
+                "b3acb1d424c3d418"
+            ]
+        ]
+    },
+    {
+        "id": "b3acb1d424c3d418",
+        "type": "http response",
+        "z": "20bd6215ce29ada7",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 570,
+        "y": 140,
+        "wires": []
     }
 ]
