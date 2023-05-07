@@ -6062,5 +6062,98 @@
         "x": 710,
         "y": 140,
         "wires": []
+    },
+    {
+        "id": "493610ade07095d5",
+        "type": "http in",
+        "z": "20bd6215ce29ada7",
+        "name": "",
+        "url": "/api/select-options/hierarchy",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 170,
+        "y": 260,
+        "wires": [
+            [
+                "d6e7f6b18815c8bb"
+            ]
+        ]
+    },
+    {
+        "id": "aba86789e538f3c5",
+        "type": "cloudantplus in",
+        "z": "20bd6215ce29ada7",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-libs",
+        "service": "_ext_",
+        "search": "_view_",
+        "design": "hierarchy",
+        "index": "code",
+        "x": 560,
+        "y": 300,
+        "wires": [
+            [
+                "c8a20441520e9faf"
+            ]
+        ]
+    },
+    {
+        "id": "d6e7f6b18815c8bb",
+        "type": "change",
+        "z": "20bd6215ce29ada7",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "smart-apps",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 580,
+        "y": 260,
+        "wires": [
+            [
+                "aba86789e538f3c5"
+            ]
+        ]
+    },
+    {
+        "id": "c8a20441520e9faf",
+        "type": "function",
+        "z": "20bd6215ce29ada7",
+        "name": "return",
+        "func": "if (msg.payload && msg.payload && Array.isArray(msg.payload)) {\n    msg.payload = msg.payload.map(x => {\n        return{\n            label: x.key,\n            value: x.key\n        }\n    });\n    msg.responseCode = 200;\n}else{\n    msg.responseCode = 400;\n    msg.payload = 'applications not found'\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 550,
+        "y": 340,
+        "wires": [
+            [
+                "d774bd72f3c39253"
+            ]
+        ]
+    },
+    {
+        "id": "d774bd72f3c39253",
+        "type": "http response",
+        "z": "20bd6215ce29ada7",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 710,
+        "y": 340,
+        "wires": []
     }
 ]
