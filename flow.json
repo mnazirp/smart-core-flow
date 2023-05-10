@@ -5182,7 +5182,11 @@
             "3653f1b59ac43d23",
             "ce895a4cf9597e04",
             "e1509d66ddce4f68",
-            "29fcbcf1031024cb"
+            "29fcbcf1031024cb",
+            "2d1679d174ec0ca8",
+            "4d4789372c0b02b2",
+            "a3cf852138203866",
+            "7e902022fa305aeb"
         ],
         "uncaught": false,
         "x": 150,
@@ -5840,7 +5844,7 @@
         "type": "function",
         "z": "2e56a74c132aeaaf",
         "name": "Insert query ",
-        "func": "let payload = msg.payload;\nmsg.data = payload;\nlet query = `INSERT INTO smart.hino_vehicles (vin, plate, name, imei, brand, type, model) VALUES`;\nlet params = [];\npayload.data.forEach(x => {\n    let item = `('${x.vin}', '${x.plate}', ${x.name}, ${x.imei}, ${x.brand}, \n                ${x.type}, ${x.model})`;\n    params.push(item.replace(/\\n/gm, \" \"));\n});\nquery = query.replace(/\\n/gm, \" \");\nquery = query + ' ' + params.join(', ');\nmsg.params = params;\nmsg.payload = null;\nmsg.topic = query;\nreturn msg;",
+        "func": "let payload = msg.payload;\nmsg.data = payload;\nlet query = `INSERT INTO smart.hino_vehicles (vin, plate, name, imei, brand, type, model) VALUES`;\nlet params = [];\npayload.data.forEach(x => {\n    let item = `('${x.vin}', '${x.plate}', '${x.name}', '${x.imei}', '${x.brand}', \n                '${x.type}', '${x.model}')`;\n    params.push(item.replace(/\\n/gm, \" \"));\n});\nquery = query.replace(/\\n/gm, \" \");\nquery = query + ' ' + params.join(', ');\nmsg.params = params;\nmsg.payload = null;\nmsg.topic = query;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
