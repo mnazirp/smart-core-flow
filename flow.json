@@ -5093,7 +5093,7 @@
         "finalize": "",
         "libs": [],
         "x": 440,
-        "y": 280,
+        "y": 340,
         "wires": [
             [
                 "7510047f37bdee05"
@@ -5130,7 +5130,7 @@
             }
         ],
         "x": 390,
-        "y": 240,
+        "y": 300,
         "wires": [
             [
                 "3653f1b59ac43d23"
@@ -5149,7 +5149,7 @@
         "finalize": "",
         "libs": [],
         "x": 350,
-        "y": 200,
+        "y": 260,
         "wires": [
             [
                 "ce895a4cf9597e04"
@@ -5169,8 +5169,8 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1060,
-        "y": 400,
+        "x": 1220,
+        "y": 340,
         "wires": []
     },
     {
@@ -5215,7 +5215,7 @@
         "payload": "",
         "payloadType": "date",
         "x": 100,
-        "y": 240,
+        "y": 300,
         "wires": [
             [
                 "e1509d66ddce4f68"
@@ -5241,9 +5241,10 @@
         "repair": false,
         "outputs": 2,
         "x": 450,
-        "y": 320,
+        "y": 380,
         "wires": [
             [
+                "b4f97edae7789e18",
                 "b7ad417b24957447"
             ],
             [
@@ -5262,8 +5263,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 650,
-        "y": 400,
+        "x": 670,
+        "y": 500,
         "wires": [
             [
                 "b54662cce8df2b14"
@@ -5292,7 +5293,7 @@
         "payload": "",
         "payloadType": "date",
         "x": 100,
-        "y": 760,
+        "y": 1180,
         "wires": [
             [
                 "21b07d215dbdd4fe"
@@ -5313,7 +5314,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 640,
-        "y": 800,
+        "y": 1220,
         "wires": []
     },
     {
@@ -5328,7 +5329,7 @@
         "finalize": "",
         "libs": [],
         "x": 310,
-        "y": 760,
+        "y": 1180,
         "wires": [
             [
                 "ecd11c5d24bfe791"
@@ -5348,7 +5349,7 @@
         "payloadType": "json",
         "block": false,
         "x": 320,
-        "y": 800,
+        "y": 1220,
         "wires": [
             [
                 "3fd4fae1e0a969d5"
@@ -5367,8 +5368,8 @@
         "paramsType": "json",
         "payloadType": "json",
         "block": false,
-        "x": 840,
-        "y": 280,
+        "x": 860,
+        "y": 440,
         "wires": [
             [
                 "4bade8d3bb8a63aa"
@@ -5394,8 +5395,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 830,
-        "y": 240,
+        "x": 850,
+        "y": 400,
         "wires": [
             [
                 "29fcbcf1031024cb"
@@ -5413,8 +5414,8 @@
         "arraySpltType": "len",
         "stream": false,
         "addname": "",
-        "x": 630,
-        "y": 280,
+        "x": 650,
+        "y": 440,
         "wires": [
             [
                 "0252672c8a320eef"
@@ -5454,8 +5455,8 @@
         "timeout": "",
         "count": "",
         "reduceRight": false,
-        "x": 870,
-        "y": 320,
+        "x": 1030,
+        "y": 440,
         "wires": [
             [
                 "b54662cce8df2b14"
@@ -5474,7 +5475,7 @@
         "finalize": "",
         "libs": [],
         "x": 310,
-        "y": 840,
+        "y": 1260,
         "wires": [
             [
                 "82dabd8ab6cdd216"
@@ -5494,7 +5495,7 @@
         "payloadType": "json",
         "block": false,
         "x": 350,
-        "y": 880,
+        "y": 1300,
         "wires": [
             [
                 "7e1da47f1b4f2f55"
@@ -5523,7 +5524,7 @@
         "payload": "",
         "payloadType": "date",
         "x": 100,
-        "y": 840,
+        "y": 1260,
         "wires": [
             [
                 "a02a5998c93e9f87"
@@ -5544,7 +5545,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 640,
-        "y": 840,
+        "y": 1260,
         "wires": []
     },
     {
@@ -5558,8 +5559,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 640,
-        "y": 240,
+        "x": 660,
+        "y": 400,
         "wires": [
             [
                 "a5dbf084af25a58b"
@@ -5591,10 +5592,281 @@
             }
         ],
         "x": 100,
-        "y": 200,
+        "y": 260,
         "wires": [
             [
                 "e1509d66ddce4f68"
+            ]
+        ]
+    },
+    {
+        "id": "b4f97edae7789e18",
+        "type": "function",
+        "z": "2e56a74c132aeaaf",
+        "name": "Insert query ",
+        "func": "let payload = msg.payload;\nmsg.data = payload;\nlet query = `INSERT INTO smart.hino_vehicle_position \n        (vin, vehicleStatus, odometer, engineHours, longitude, heading, speed, \n        positionDateTime, createdDateTime, latitude, altitude) VALUES`;\nlet params = [];\npayload.data.forEach(x => {\n    let datePosition = (x.positionDateTime) ? `STR_TO_DATE('${x.positionDateTime}','%Y-%m-%dT%H:%i:%sZ')` : null;\n    let dateCreated = (x.createdDateTime) ? `STR_TO_DATE('${x.createdDateTime}','%Y-%m-%dT%H:%i:%sZ')` : null;\n    let item = `('${x.vin}', '${x.vehicleStatus}', ${x.odometer}, ${x.engineHours}, ${x.longitude}, \n                ${x.heading}, ${x.speed}, ${datePosition}, ${dateCreated}, ${x.latitude}, \n                ${x.altitude})`;\n    params.push(item.replace(/\\n/gm, \" \"));\n});\nquery = query.replace(/\\n/gm, \" \");\nquery = query + ' ' + params.join(', ');\nmsg.params = params;\nmsg.payload = null;\nmsg.topic = query;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 670,
+        "y": 300,
+        "wires": [
+            [
+                "2e42cb81b2dd6771"
+            ]
+        ]
+    },
+    {
+        "id": "2e42cb81b2dd6771",
+        "type": "mysql2",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "server": "9dc2644ec5b51cb2",
+        "bind": "",
+        "topic": "",
+        "x": 660,
+        "y": 340,
+        "wires": [
+            [
+                "b54662cce8df2b14"
+            ]
+        ]
+    },
+    {
+        "id": "9be52a1337887cb9",
+        "type": "cronplus",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "outputField": "payload",
+        "timeZone": "",
+        "persistDynamic": false,
+        "commandResponseMsgOutput": "output1",
+        "outputs": 1,
+        "options": [
+            {
+                "name": "schedule1",
+                "topic": "topic1",
+                "payloadType": "default",
+                "payload": "",
+                "expressionType": "cron",
+                "expression": "0 0 */1 * * * *",
+                "location": "",
+                "offset": "0",
+                "solarType": "all",
+                "solarEvents": "sunrise,sunset"
+            }
+        ],
+        "x": 100,
+        "y": 600,
+        "wires": [
+            [
+                "58d1c513d8d29371"
+            ]
+        ]
+    },
+    {
+        "id": "b9dacb1caeda7b7a",
+        "type": "inject",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 100,
+        "y": 640,
+        "wires": [
+            [
+                "58d1c513d8d29371"
+            ]
+        ]
+    },
+    {
+        "id": "58d1c513d8d29371",
+        "type": "function",
+        "z": "2e56a74c132aeaaf",
+        "name": "function 30",
+        "func": "msg.payload = {\n    grant_type: 'client_credentials'\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 600,
+        "wires": [
+            [
+                "a3cf852138203866"
+            ]
+        ]
+    },
+    {
+        "id": "a3cf852138203866",
+        "type": "http request",
+        "z": "2e56a74c132aeaaf",
+        "name": "Hino get vehicles",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "https://api-sandbox.hino.co.id/hmsi/hmsi-std-api/vehicles",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "bearer",
+        "senderr": false,
+        "headers": [
+            {
+                "keyType": "other",
+                "keyValue": "X-IBM-Client-Id",
+                "valueType": "other",
+                "valueValue": "6823e121-a1ec-4fff-8711-b5c18486b57b"
+            },
+            {
+                "keyType": "other",
+                "keyValue": "accept",
+                "valueType": "other",
+                "valueValue": "application/json"
+            }
+        ],
+        "x": 370,
+        "y": 640,
+        "wires": [
+            [
+                "7e902022fa305aeb"
+            ]
+        ]
+    },
+    {
+        "id": "ece565574deb460b",
+        "type": "debug",
+        "z": "2e56a74c132aeaaf",
+        "name": "debug 28",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 820,
+        "y": 720,
+        "wires": []
+    },
+    {
+        "id": "7e902022fa305aeb",
+        "type": "function",
+        "z": "2e56a74c132aeaaf",
+        "name": "Set query ",
+        "func": "let payload = JSON.parse(msg.payload);\nmsg.isValid = false;\nif (payload.data) {\n    msg.isValid = true;\n    msg.payload = payload;\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 680,
+        "wires": [
+            [
+                "6d20e612113dd4ac"
+            ]
+        ]
+    },
+    {
+        "id": "6d20e612113dd4ac",
+        "type": "switch",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "property": "isValid",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 410,
+        "y": 720,
+        "wires": [
+            [
+                "2d1679d174ec0ca8"
+            ],
+            [
+                "4dfc392dbc71f985"
+            ]
+        ]
+    },
+    {
+        "id": "4dfc392dbc71f985",
+        "type": "function",
+        "z": "2e56a74c132aeaaf",
+        "name": "function 31",
+        "func": "msg.payload = JSON.parse(msg.payload);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 610,
+        "y": 780,
+        "wires": [
+            [
+                "ece565574deb460b"
+            ]
+        ]
+    },
+    {
+        "id": "2d1679d174ec0ca8",
+        "type": "function",
+        "z": "2e56a74c132aeaaf",
+        "name": "Insert query ",
+        "func": "let payload = msg.payload;\nmsg.data = payload;\nlet query = `INSERT INTO smart.hino_vehicles (vin, plate, name, imei, brand, type, model) VALUES`;\nlet params = [];\npayload.data.forEach(x => {\n    let item = `('${x.vin}', '${x.plate}', ${x.name}, ${x.imei}, ${x.brand}, \n                ${x.type}, ${x.model})`;\n    params.push(item.replace(/\\n/gm, \" \"));\n});\nquery = query.replace(/\\n/gm, \" \");\nquery = query + ' ' + params.join(', ');\nmsg.params = params;\nmsg.payload = null;\nmsg.topic = query;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 610,
+        "y": 680,
+        "wires": [
+            [
+                "4d4789372c0b02b2"
+            ]
+        ]
+    },
+    {
+        "id": "4d4789372c0b02b2",
+        "type": "mysql2",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "server": "9dc2644ec5b51cb2",
+        "bind": "",
+        "topic": "",
+        "x": 600,
+        "y": 720,
+        "wires": [
+            [
+                "ece565574deb460b"
             ]
         ]
     },
@@ -6073,7 +6345,7 @@
         "upload": false,
         "swaggerDoc": "",
         "x": 170,
-        "y": 260,
+        "y": 220,
         "wires": [
             [
                 "d6e7f6b18815c8bb"
@@ -6092,7 +6364,7 @@
         "design": "hierarchy",
         "index": "code",
         "x": 560,
-        "y": 300,
+        "y": 260,
         "wires": [
             [
                 "c8a20441520e9faf"
@@ -6119,7 +6391,7 @@
         "to": "",
         "reg": false,
         "x": 580,
-        "y": 260,
+        "y": 220,
         "wires": [
             [
                 "aba86789e538f3c5"
@@ -6138,7 +6410,7 @@
         "finalize": "",
         "libs": [],
         "x": 550,
-        "y": 340,
+        "y": 300,
         "wires": [
             [
                 "d774bd72f3c39253"
@@ -6153,7 +6425,92 @@
         "statusCode": "",
         "headers": {},
         "x": 710,
-        "y": 340,
+        "y": 300,
         "wires": []
+    },
+    {
+        "id": "601d8e8a0535f47e",
+        "type": "http in",
+        "z": "20bd6215ce29ada7",
+        "name": "",
+        "url": "/api/select-options/scope/:code",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 180,
+        "y": 380,
+        "wires": [
+            [
+                "696263a6a8bc18c0"
+            ]
+        ]
+    },
+    {
+        "id": "d2ee7c5ec305182d",
+        "type": "http response",
+        "z": "20bd6215ce29ada7",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 710,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "696263a6a8bc18c0",
+        "type": "function",
+        "z": "20bd6215ce29ada7",
+        "name": "function 29",
+        "func": "msg.payload = {\n    key: msg.req.params.code\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 570,
+        "y": 380,
+        "wires": [
+            [
+                "b851ec9be5c26d6b"
+            ]
+        ]
+    },
+    {
+        "id": "957ca631b5f2e10a",
+        "type": "function",
+        "z": "20bd6215ce29ada7",
+        "name": "return",
+        "func": "if (msg.payload && Array.isArray(msg.payload)) {\n    msg.responseCode = 200;\n    msg.payload = flatten(msg.payload[0].value).map(x => {\n        return{\n            label: `${x.category} - ${x.id} - ${x.name}`,\n            value: x.id\n        }\n    });\n}else{\n    msg.responseCode = 400;\n    msg.payload = 'applications not found'\n}\nreturn msg;\n\nfunction flatten(arr, level = 0, filter = {}, parentId = null) {\n    const filterKeys = Object.keys(filter);\n    return arr.reduce((acc, { id, children, ...rest }) => {\n        const flattenedChildren = children ? flatten(children, level + 1, filter, id) : [];\n        const flattenedObject = { ...rest, id, level, parentId };\n        if (filterKeys.every(key => flattenedObject[key] === filter[key])) {\n            return [...acc, flattenedObject, ...flattenedChildren];\n        }\n        return acc.concat(flattenedChildren);\n    }, []);\n}",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 550,
+        "y": 460,
+        "wires": [
+            [
+                "d2ee7c5ec305182d"
+            ]
+        ]
+    },
+    {
+        "id": "b851ec9be5c26d6b",
+        "type": "cloudantplus in",
+        "z": "20bd6215ce29ada7",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-libs",
+        "service": "_ext_",
+        "search": "_view_",
+        "design": "hierarchy",
+        "index": "code-data",
+        "x": 560,
+        "y": 420,
+        "wires": [
+            [
+                "957ca631b5f2e10a"
+            ]
+        ]
     }
 ]
