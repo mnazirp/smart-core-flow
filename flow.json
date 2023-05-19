@@ -104,6 +104,14 @@
         "env": []
     },
     {
+        "id": "4a4022757bfcb244",
+        "type": "tab",
+        "label": "Sawber: Estimation",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
         "id": "77002254b872fa8e",
         "type": "subflow",
         "name": "algo: jwt-sign",
@@ -5108,7 +5116,7 @@
         "method": "GET",
         "ret": "txt",
         "paytoqs": "ignore",
-        "url": "https://api-sandbox.hino.co.id/hmsi/hmsi-std-api/vehiclepositions?size=1000",
+        "url": "https://api-sandbox.hino.co.id/hmsi/hmsi-std-api/vehiclepositions?size=2000",
         "tls": "",
         "persist": false,
         "proxy": "",
@@ -5589,7 +5597,7 @@
                 "payloadType": "default",
                 "payload": "",
                 "expressionType": "cron",
-                "expression": "0 */1 * * * * *",
+                "expression": "0 */5 * * * * *",
                 "location": "",
                 "offset": "0",
                 "solarType": "all",
@@ -5728,7 +5736,7 @@
         "method": "GET",
         "ret": "txt",
         "paytoqs": "ignore",
-        "url": "https://api-sandbox.hino.co.id/hmsi/hmsi-std-api/vehicles",
+        "url": "https://api-sandbox.hino.co.id/hmsi/hmsi-std-api/vehicles?size=2000",
         "tls": "",
         "persist": false,
         "proxy": "",
@@ -6518,5 +6526,51 @@
                 "957ca631b5f2e10a"
             ]
         ]
+    },
+    {
+        "id": "211ec60f96eb81f7",
+        "type": "http in",
+        "z": "4a4022757bfcb244",
+        "name": "",
+        "url": "/api/sawber/estimation",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 180,
+        "y": 80,
+        "wires": [
+            [
+                "c9431e4eae8c989c"
+            ]
+        ]
+    },
+    {
+        "id": "c9431e4eae8c989c",
+        "type": "cloudantplus out",
+        "z": "4a4022757bfcb244",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-transactions",
+        "service": "_ext_",
+        "payonly": true,
+        "operation": "insert",
+        "x": 490,
+        "y": 80,
+        "wires": [
+            [
+                "9ea3dccdb9e8c393"
+            ]
+        ]
+    },
+    {
+        "id": "9ea3dccdb9e8c393",
+        "type": "http response",
+        "z": "4a4022757bfcb244",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 450,
+        "y": 140,
+        "wires": []
     }
 ]
