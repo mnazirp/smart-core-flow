@@ -24,5 +24,23 @@
     "7f9d98d6c341571a": {
         "user": "root",
         "password": "password"
+    },
+    "7b87edb20a5df6d5": {
+        "password": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHAiOiJydW5uZXIiLCJleHAiOjE2OTY5NjA4ODQsImlkIjoiNjdmYTZjY2EtMzU5Yy00MzA3LTgxNDktZjE4ODQ0NGUyYTNiIiwiaXNhY3RpdmUiOjEsImlzb3JnYWRtaW4iOjIsIm9yZ2FuaXphdGlvbmlkIjoiNTEzMDFiYzAtMGRlNi00ZmNjLThhZDgtZGE2NDNhZDJhNmM3IiwidXNlcm5hbWUiOiJkZW1vY2FyIn0.Wl3_-d1QyZQj83vXo8CHeXt9StgJx69cBh3Vw5LcEbs"
+    },
+    "136f16525d8f27f2": {
+        "password": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHAiOiJydW5uZXIiLCJleHAiOjE2OTY5NjA4ODQsImlkIjoiNjdmYTZjY2EtMzU5Yy00MzA3LTgxNDktZjE4ODQ0NGUyYTNiIiwiaXNhY3RpdmUiOjEsImlzb3JnYWRtaW4iOjIsIm9yZ2FuaXphdGlvbmlkIjoiNTEzMDFiYzAtMGRlNi00ZmNjLThhZDgtZGE2NDNhZDJhNmM3IiwidXNlcm5hbWUiOiJkZW1vY2FyIn0.Wl3_-d1QyZQj83vXo8CHeXt9StgJx69cBh3Vw5LcEbs"
+    },
+    "860c452556bcc207": {
+        "user": "diga",
+        "password": "password"
+    },
+    "f1adc5badfd32d68": {
+        "user": "diga",
+        "password": "password"
+    },
+    "c1d535d1ca3a2a0b": {
+        "user": "diga",
+        "password": "password"
     }
 }
