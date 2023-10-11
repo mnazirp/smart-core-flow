@@ -563,7 +563,7 @@
         "out": [
             {
                 "x": 1120,
-                "y": 340,
+                "y": 420,
                 "wires": [
                     {
                         "id": "b5780a4c4612bc87",
@@ -1678,7 +1678,7 @@
         "type": "function",
         "z": "34c9e2e17c31980a",
         "name": "mapping data & set filter by props",
-        "func": "let payload = JSON.parse(msg.payload);\nlet docs;\nlet keys;\nmsg.type = msg.sub.scopeType;\nswitch (msg.sub.scopeType) {\n    case 'psm':\n        docs = payload.data.geojson.features.map(x => {\n            return {\n                psm: x.properties.psm,\n                pt: x.properties.pt,\n                geometry: x.geometry\n            }\n        });\n        keys = payload.data.geojson.features.map(x => {\n            return [\n                x.properties.psm,\n                x.properties.pt\n            ];\n        });\n        break;\n    case 'estate':\n        docs = payload.data.geojson.features.map(x => {\n            return {\n                psm: x.properties.psm,\n                pt: x.properties.pt,\n                estate: x.properties.estate,\n                geometry: x.geometry\n            }\n        });\n        keys = payload.data.geojson.features.map(x => {\n            return [\n                x.properties.psm,\n                x.properties.pt,\n                x.properties.estate,\n            ];\n        });\n        break;\n    case 'division':\n        docs = payload.data.geojson.features.map(x => {\n            return {\n                psm: x.properties.psm,\n                pt: x.properties.pt,\n                estate: x.properties.estate,\n                division: x.properties.divisi,\n                geometry: x.geometry\n            }\n        });\n        keys = payload.data.geojson.features.map(x => {\n            return [\n                x.properties.psm,\n                x.properties.pt,\n                x.properties.estate,\n                x.properties.divisi,\n            ];\n        });\n        break;\n    case 'block':\n        docs = payload.data.geojson.features.map(x => {\n            return {\n                psm: x.properties.psm,\n                pt: x.properties.pt,\n                estate: x.properties.estate,\n                division: x.properties.divisi,\n                block: x.properties.blok,\n                geometry: x.geometry\n            }\n        });\n        keys = payload.data.geojson.features.map(x => {\n            return [\n                x.properties.psm,\n                x.properties.pt,\n                x.properties.estate,\n                x.properties.divisi,\n                x.properties.blok,\n            ];\n        });\n        break;\n    case 'road':\n        docs = payload.data.geojson.features.map(x => {\n            return {\n                psm: x.properties.psm,\n                pt: x.properties.pt,\n                estate: x.properties.estate,\n                division: x.properties.divisi,\n                roadID: x.properties.id_jalan,\n                type: x.properties.kls_jalan,\n                geometry: x.geometry\n            }\n        });\n        keys = payload.data.geojson.features.map(x => {\n            return [\n                x.properties.psm,\n                x.properties.pt,\n                x.properties.estate,\n                x.properties.divisi,\n                x.properties.id_jalan\n            ];\n        });\n        break;\n}\nmsg.payload = {\n    keys: keys\n}\nmsg.documents = {\n    docs: docs\n}\nreturn msg;",
+        "func": "let payload = JSON.parse(msg.payload);\nlet docs;\nlet keys;\nmsg.type = msg.sub.scopeType;\nswitch (msg.sub.scopeType) {\n    case 'psm':\n        docs = payload.data.geojson.features.map(x => {\n            return {\n                psm: x.properties.psm,\n                pt: x.properties.pt,\n                geometry: x.geometry\n            }\n        });\n        keys = payload.data.geojson.features.map(x => {\n            return [\n                x.properties.psm,\n                x.properties.pt\n            ];\n        });\n        break;\n    case 'estate':\n        docs = payload.data.geojson.features.map(x => {\n            return {\n                psm: x.properties.psm,\n                pt: x.properties.pt,\n                estate: x.properties.estate,\n                geometry: x.geometry\n            }\n        });\n        keys = payload.data.geojson.features.map(x => {\n            return [\n                x.properties.psm,\n                x.properties.pt,\n                x.properties.estate,\n            ];\n        });\n        break;\n    case 'division':\n        docs = payload.data.geojson.features.map(x => {\n            return {\n                psm: x.properties.psm,\n                pt: x.properties.pt,\n                estate: x.properties.estate,\n                division: x.properties.divisi,\n                geometry: x.geometry\n            }\n        });\n        keys = payload.data.geojson.features.map(x => {\n            return [\n                x.properties.psm,\n                x.properties.pt,\n                x.properties.estate,\n                x.properties.divisi,\n            ];\n        });\n        break;\n    case 'block':\n        docs = payload.data.geojson.features.map(x => {\n            return {\n                psm: x.properties.psm,\n                pt: x.properties.pt,\n                estate: x.properties.estate,\n                division: x.properties.divisi,\n                block: x.properties.blok,\n                geometry: x.geometry\n            }\n        });\n        keys = payload.data.geojson.features.map(x => {\n            return [\n                x.properties.psm,\n                x.properties.pt,\n                x.properties.estate,\n                x.properties.divisi,\n                x.properties.blok,\n            ];\n        });\n        break;\n    case 'road':\n        docs = payload.data.geojson.features.map(x => {\n            return {\n                psm: x.properties.psm,\n                pt: x.properties.pt,\n                estate: x.properties.estate_code,\n                division: x.properties.divisi,\n                roadID: x.properties.id_jalan,\n                type: x.properties.kls_jalan,\n                geometry: x.geometry\n            }\n        });\n        keys = payload.data.geojson.features.map(x => {\n            return [\n                x.properties.psm,\n                x.properties.pt,\n                x.properties.estate_code,\n                x.properties.divisi,\n                x.properties.id_jalan\n            ];\n        });\n        break;\n}\nmsg.payload = {\n    keys: keys\n}\nmsg.documents = {\n    docs: docs\n}\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -1767,7 +1767,7 @@
         "design": "filter",
         "index": "division",
         "x": 830,
-        "y": 100,
+        "y": 140,
         "wires": [
             [
                 "07d33039ce8d5767"
@@ -1794,7 +1794,7 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 1010,
+        "x": 1030,
         "y": 140,
         "wires": [
             [
@@ -1892,7 +1892,7 @@
         "senderr": false,
         "headers": [],
         "x": 490,
-        "y": 260,
+        "y": 340,
         "wires": [
             [
                 "33b79b1911f801a7"
@@ -1920,7 +1920,7 @@
         "repair": false,
         "outputs": 2,
         "x": 530,
-        "y": 300,
+        "y": 380,
         "wires": [
             [
                 "6dfd2d0d5832ee58"
@@ -1950,7 +1950,7 @@
         "to": "",
         "reg": false,
         "x": 720,
-        "y": 260,
+        "y": 340,
         "wires": [
             [
                 "fccbeff34d3395f5"
@@ -1975,7 +1975,7 @@
         "repair": false,
         "outputs": 1,
         "x": 470,
-        "y": 220,
+        "y": 300,
         "wires": [
             [
                 "b2e4fa5bb4ce4106"
@@ -2032,7 +2032,7 @@
         "finalize": "",
         "libs": [],
         "x": 990,
-        "y": 340,
+        "y": 420,
         "wires": [
             []
         ]
@@ -2057,7 +2057,7 @@
         "to": "",
         "reg": false,
         "x": 480,
-        "y": 340,
+        "y": 420,
         "wires": [
             [
                 "b5780a4c4612bc87"
@@ -2084,7 +2084,7 @@
         "to": "",
         "reg": false,
         "x": 720,
-        "y": 320,
+        "y": 400,
         "wires": [
             [
                 "b5780a4c4612bc87"
@@ -2099,6 +2099,16 @@
         "property": "type",
         "propertyType": "msg",
         "rules": [
+            {
+                "t": "eq",
+                "v": "psm",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "estate",
+                "vt": "str"
+            },
             {
                 "t": "eq",
                 "v": "division",
@@ -2117,10 +2127,16 @@
         ],
         "checkall": "true",
         "repair": false,
-        "outputs": 3,
+        "outputs": 5,
         "x": 630,
         "y": 140,
         "wires": [
+            [
+                "f359b622fc0e21bd"
+            ],
+            [
+                "67a0948dd3d44270"
+            ],
             [
                 "942cd95c71f1be05"
             ],
@@ -2144,7 +2160,7 @@
         "design": "filter",
         "index": "block",
         "x": 820,
-        "y": 140,
+        "y": 180,
         "wires": [
             [
                 "07d33039ce8d5767"
@@ -2163,7 +2179,45 @@
         "design": "filter",
         "index": "road",
         "x": 820,
-        "y": 180,
+        "y": 220,
+        "wires": [
+            [
+                "07d33039ce8d5767"
+            ]
+        ]
+    },
+    {
+        "id": "67a0948dd3d44270",
+        "type": "cloudantplus in",
+        "z": "34c9e2e17c31980a",
+        "name": "filter/estate",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-geojson",
+        "service": "_ext_",
+        "search": "_view_",
+        "design": "filter",
+        "index": "estate",
+        "x": 830,
+        "y": 100,
+        "wires": [
+            [
+                "07d33039ce8d5767"
+            ]
+        ]
+    },
+    {
+        "id": "f359b622fc0e21bd",
+        "type": "cloudantplus in",
+        "z": "34c9e2e17c31980a",
+        "name": "filter/psm",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-geojson",
+        "service": "_ext_",
+        "search": "_view_",
+        "design": "filter",
+        "index": "psm",
+        "x": 820,
+        "y": 60,
         "wires": [
             [
                 "07d33039ce8d5767"
@@ -8392,7 +8446,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 390,
+        "x": 350,
         "y": 60,
         "wires": [
             [
@@ -8408,7 +8462,7 @@
         "server": "9dc2644ec5b51cb2",
         "bind": "",
         "topic": "",
-        "x": 360,
+        "x": 320,
         "y": 100,
         "wires": [
             [
@@ -8429,7 +8483,7 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 620,
+        "x": 580,
         "y": 140,
         "wires": []
     },
@@ -8473,7 +8527,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 370,
+        "x": 330,
         "y": 140,
         "wires": [
             [
@@ -8502,8 +8556,8 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 940,
-        "y": 40,
+        "x": 120,
+        "y": 700,
         "wires": [
             [
                 "9dc622e2b160af4f"
@@ -8521,8 +8575,8 @@
         "search": "_view_",
         "design": "filter",
         "index": "divisi",
-        "x": 1160,
-        "y": 40,
+        "x": 340,
+        "y": 700,
         "wires": [
             [
                 "6cb053bde18f145b"
@@ -8542,8 +8596,8 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1380,
-        "y": 40,
+        "x": 560,
+        "y": 700,
         "wires": []
     },
     {
@@ -8557,8 +8611,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 930,
-        "y": 80,
+        "x": 110,
+        "y": 740,
         "wires": [
             [
                 "6c3c51da7ecfada3"
@@ -8579,7 +8633,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 600,
-        "y": 340,
+        "y": 260,
         "wires": []
     },
     {
@@ -8588,118 +8642,10 @@
         "z": "c5b9039a5fc48f97",
         "name": "",
         "x": 360,
-        "y": 380,
+        "y": 260,
         "wires": [
             [
                 "4d11e3541c97639d"
-            ]
-        ]
-    },
-    {
-        "id": "7de87463c9032344",
-        "type": "cloudantplus in",
-        "z": "c5b9039a5fc48f97",
-        "name": "filter/road",
-        "cloudant": "784d89e62dfb5070",
-        "database": "smart-geojson",
-        "service": "_ext_",
-        "search": "_view_",
-        "design": "filter",
-        "index": "road",
-        "x": 360,
-        "y": 560,
-        "wires": [
-            [
-                "18254b92f59ad6a8"
-            ]
-        ]
-    },
-    {
-        "id": "2e8f50d7bc54f69e",
-        "type": "inject",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 140,
-        "y": 560,
-        "wires": [
-            [
-                "7de87463c9032344"
-            ]
-        ]
-    },
-    {
-        "id": "7bfb821d8f543a68",
-        "type": "debug",
-        "z": "c5b9039a5fc48f97",
-        "name": "debug 48",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 600,
-        "y": 680,
-        "wires": []
-    },
-    {
-        "id": "18254b92f59ad6a8",
-        "type": "function",
-        "z": "c5b9039a5fc48f97",
-        "name": "prepare docs id for delete",
-        "func": "msg.payload = {\n    docs: msg.payload.map(x => {\n        return { ...x.value, _deleted: true }\n    })\n};\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 450,
-        "y": 640,
-        "wires": [
-            [
-                "c1d535d1ca3a2a0b"
-            ]
-        ]
-    },
-    {
-        "id": "c1d535d1ca3a2a0b",
-        "type": "http request",
-        "z": "c5b9039a5fc48f97",
-        "name": "bulk delete",
-        "method": "POST",
-        "ret": "txt",
-        "paytoqs": "ignore",
-        "url": "http://localhost:5930/smart-geojson/_bulk_docs",
-        "tls": "",
-        "persist": false,
-        "proxy": "",
-        "insecureHTTPParser": false,
-        "authType": "basic",
-        "senderr": false,
-        "headers": [],
-        "x": 410,
-        "y": 680,
-        "wires": [
-            [
-                "7bfb821d8f543a68"
             ]
         ]
     },
@@ -8725,7 +8671,7 @@
         "payload": "",
         "payloadType": "date",
         "x": 120,
-        "y": 340,
+        "y": 220,
         "wires": [
             [
                 "591fedcb39ee0343"
@@ -8737,7 +8683,92 @@
         "type": "function",
         "z": "c5b9039a5fc48f97",
         "name": "function 43",
-        "func": "msg.sub = {\n    \"scopeType\": \"road\",\n    \"ref1\": \"LIBE\",\n    \"ref2\": null,\n    \"ref3\": null\n}\nreturn msg;",
+        "func": "msg.sub = {\n    \"scopeType\": \"estate\",\n    \"ref1\": \"PHLE\",\n    \"ref2\": null,\n    \"ref3\": null\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 330,
+        "y": 220,
+        "wires": [
+            [
+                "51375f655958253f"
+            ]
+        ]
+    },
+    {
+        "id": "5c1ab17d9b961b05",
+        "type": "inject",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 340,
+        "wires": [
+            [
+                "0876b73191fa5100"
+            ]
+        ]
+    },
+    {
+        "id": "905212f96eccf0ba",
+        "type": "cloudantplus in",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-geojson",
+        "service": "_ext_",
+        "search": "_view_",
+        "design": "block",
+        "index": "geo-by-estate",
+        "x": 340,
+        "y": 380,
+        "wires": [
+            [
+                "3eaff2c3f1c9d48d",
+                "8ae8252acbea1169"
+            ]
+        ]
+    },
+    {
+        "id": "3eaff2c3f1c9d48d",
+        "type": "debug",
+        "z": "c5b9039a5fc48f97",
+        "name": "debug 48",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 540,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "0876b73191fa5100",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "function 44",
+        "func": "msg.payload = {\n    // key: ['PSM 5', 'LIBE', 'DIVISI 2']\n    key: ['PSM 2', 'SMSE']\n}\nmsg.key = ['PSM 2', 'SMSE']\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -8747,7 +8778,167 @@
         "y": 340,
         "wires": [
             [
-                "51375f655958253f"
+                "905212f96eccf0ba"
+            ]
+        ]
+    },
+    {
+        "id": "8ae8252acbea1169",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "save to redis",
+        "func": "/**to set expire set topic into null\n * and set payload to an Array with EX on it [topic, value, EX, ex-value]\n */\nmsg.payload = [`geo:block:by-estate:${msg.key.join(':')}`, JSON.stringify(msg.payload.map(x => {\n    return {...x.value}\n})), 'EX', Number(env.get('NODERED_TTL')) * 60];\nmsg.topic = null;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 330,
+        "y": 420,
+        "wires": [
+            [
+                "bafbc4a609dc25ce"
+            ]
+        ]
+    },
+    {
+        "id": "bafbc4a609dc25ce",
+        "type": "redis-command",
+        "z": "c5b9039a5fc48f97",
+        "server": "0fb96b870afb5c15",
+        "command": "set",
+        "name": "",
+        "topic": "",
+        "params": "[]",
+        "paramsType": "json",
+        "payloadType": "json",
+        "block": false,
+        "x": 320,
+        "y": 460,
+        "wires": [
+            [
+                "933c7a3db7c6c761"
+            ]
+        ]
+    },
+    {
+        "id": "933c7a3db7c6c761",
+        "type": "debug",
+        "z": "c5b9039a5fc48f97",
+        "name": "debug 49",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 520,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "622cf54d7c620f65",
+        "type": "inject",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 540,
+        "wires": [
+            [
+                "d0790ce895126769"
+            ]
+        ]
+    },
+    {
+        "id": "d0790ce895126769",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "get scope by code",
+        "func": "msg.backup = msg.payload;\nmsg.ori = msg.sub;\nmsg.payload = `geo:block:by-estate:PSM 2:SMSE`;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 540,
+        "wires": [
+            [
+                "9b8229086a7f4736"
+            ]
+        ]
+    },
+    {
+        "id": "9b8229086a7f4736",
+        "type": "redis-command",
+        "z": "c5b9039a5fc48f97",
+        "server": "0fb96b870afb5c15",
+        "command": "GET",
+        "name": "",
+        "topic": "",
+        "params": "[]",
+        "paramsType": "json",
+        "payloadType": "json",
+        "block": false,
+        "x": 320,
+        "y": 580,
+        "wires": [
+            [
+                "6f0d16abae370cce"
+            ]
+        ]
+    },
+    {
+        "id": "c6b4b8b36d3cba79",
+        "type": "debug",
+        "z": "c5b9039a5fc48f97",
+        "name": "debug 50",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 520,
+        "y": 620,
+        "wires": []
+    },
+    {
+        "id": "6f0d16abae370cce",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "function 45",
+        "func": "msg.payload = JSON.parse(msg.payload)\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 330,
+        "y": 620,
+        "wires": [
+            [
+                "c6b4b8b36d3cba79"
             ]
         ]
     }
