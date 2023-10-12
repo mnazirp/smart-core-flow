@@ -577,6 +577,39 @@
         "color": "#DDAA99"
     },
     {
+        "id": "d7ccf53b2b9fe097",
+        "type": "subflow",
+        "name": "sub: couch-view-get",
+        "info": "## input\r\n\r\nmsg.sub\r\n\r\n    {\r\n        database: 'smart-geojson',\r\n        design: 'division',\r\n        view: 'geo-by-estate',\r\n        key: ['PSM 5', 'LIBE']\r\n    }\r\n",
+        "category": "",
+        "in": [
+            {
+                "x": 60,
+                "y": 80,
+                "wires": [
+                    {
+                        "id": "09ce6f4f9faad7e1"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 320,
+                "y": 160,
+                "wires": [
+                    {
+                        "id": "7af2625f0ad3a7a3",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [],
+        "meta": {},
+        "color": "#DDAA99"
+    },
+    {
         "id": "784d89e62dfb5070",
         "type": "cloudantplus",
         "host": "${DIGA_COUCHDB}",
@@ -2222,6 +2255,66 @@
             [
                 "07d33039ce8d5767"
             ]
+        ]
+    },
+    {
+        "id": "09ce6f4f9faad7e1",
+        "type": "function",
+        "z": "d7ccf53b2b9fe097",
+        "name": "read sub",
+        "func": "msg.backup = msg.payload;\n\nlet { database, design, view, key } = msg.sub;\nlet keyStr = (Array.isArray(key)) ? `[${key.map(x => `\"${x}\"`).join(',')}]` : key;\nmsg.url = `http://localhost:5930/${database}/_design/${design}/_view/${view}?key=${keyStr}`;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 200,
+        "y": 80,
+        "wires": [
+            [
+                "fa9c1abe42043f29"
+            ]
+        ]
+    },
+    {
+        "id": "fa9c1abe42043f29",
+        "type": "http request",
+        "z": "d7ccf53b2b9fe097",
+        "name": "",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "basic",
+        "senderr": false,
+        "headers": [],
+        "x": 210,
+        "y": 120,
+        "wires": [
+            [
+                "7af2625f0ad3a7a3"
+            ]
+        ]
+    },
+    {
+        "id": "7af2625f0ad3a7a3",
+        "type": "function",
+        "z": "d7ccf53b2b9fe097",
+        "name": "result",
+        "func": "msg.sub = JSON.parse(msg.payload);\nmsg.payload = msg.backup;\ndelete msg.url;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 190,
+        "y": 160,
+        "wires": [
+            []
         ]
     },
     {
@@ -8446,7 +8539,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 350,
+        "x": 1670,
         "y": 60,
         "wires": [
             [
@@ -8462,7 +8555,7 @@
         "server": "9dc2644ec5b51cb2",
         "bind": "",
         "topic": "",
-        "x": 320,
+        "x": 1640,
         "y": 100,
         "wires": [
             [
@@ -8483,8 +8576,8 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 580,
-        "y": 140,
+        "x": 1900,
+        "y": 100,
         "wires": []
     },
     {
@@ -8508,7 +8601,7 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 120,
+        "x": 1440,
         "y": 60,
         "wires": [
             [
@@ -8527,8 +8620,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 330,
-        "y": 140,
+        "x": 1910,
+        "y": 60,
         "wires": [
             [
                 "8dba743fb188db79"
@@ -8556,8 +8649,8 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 120,
-        "y": 700,
+        "x": 1440,
+        "y": 500,
         "wires": [
             [
                 "9dc622e2b160af4f"
@@ -8575,8 +8668,8 @@
         "search": "_view_",
         "design": "filter",
         "index": "divisi",
-        "x": 340,
-        "y": 700,
+        "x": 1660,
+        "y": 540,
         "wires": [
             [
                 "6cb053bde18f145b"
@@ -8596,8 +8689,8 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 560,
-        "y": 700,
+        "x": 1840,
+        "y": 540,
         "wires": []
     },
     {
@@ -8611,8 +8704,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 110,
-        "y": 740,
+        "x": 1650,
+        "y": 500,
         "wires": [
             [
                 "6c3c51da7ecfada3"
@@ -8632,8 +8725,8 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 600,
-        "y": 260,
+        "x": 1920,
+        "y": 200,
         "wires": []
     },
     {
@@ -8641,8 +8734,8 @@
         "type": "subflow:34c9e2e17c31980a",
         "z": "c5b9039a5fc48f97",
         "name": "",
-        "x": 360,
-        "y": 260,
+        "x": 1680,
+        "y": 200,
         "wires": [
             [
                 "4d11e3541c97639d"
@@ -8670,8 +8763,8 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 120,
-        "y": 220,
+        "x": 1440,
+        "y": 160,
         "wires": [
             [
                 "591fedcb39ee0343"
@@ -8689,8 +8782,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 330,
-        "y": 220,
+        "x": 1650,
+        "y": 160,
         "wires": [
             [
                 "51375f655958253f"
@@ -8718,8 +8811,8 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 120,
-        "y": 340,
+        "x": 1440,
+        "y": 260,
         "wires": [
             [
                 "0876b73191fa5100"
@@ -8736,9 +8829,9 @@
         "service": "_ext_",
         "search": "_view_",
         "design": "block",
-        "index": "geo-by-estate",
-        "x": 340,
-        "y": 380,
+        "index": "geo-by-psm",
+        "x": 1660,
+        "y": 300,
         "wires": [
             [
                 "3eaff2c3f1c9d48d",
@@ -8759,8 +8852,8 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 540,
-        "y": 380,
+        "x": 1880,
+        "y": 260,
         "wires": []
     },
     {
@@ -8768,14 +8861,14 @@
         "type": "function",
         "z": "c5b9039a5fc48f97",
         "name": "function 44",
-        "func": "msg.payload = {\n    // key: ['PSM 5', 'LIBE', 'DIVISI 2']\n    key: ['PSM 2', 'SMSE']\n}\nmsg.key = ['PSM 2', 'SMSE']\nreturn msg;",
+        "func": "msg.payload = {\n    // key: ['PSM 5', 'LIBE', 'DIVISI 2']\n    // key: ['PSM 2', 'SMSE']\n    key: 'PSM 5'\n}\nmsg.key = ['PSM 2']\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 330,
-        "y": 340,
+        "x": 1650,
+        "y": 260,
         "wires": [
             [
                 "905212f96eccf0ba"
@@ -8787,14 +8880,14 @@
         "type": "function",
         "z": "c5b9039a5fc48f97",
         "name": "save to redis",
-        "func": "/**to set expire set topic into null\n * and set payload to an Array with EX on it [topic, value, EX, ex-value]\n */\nmsg.payload = [`geo:block:by-estate:${msg.key.join(':')}`, JSON.stringify(msg.payload.map(x => {\n    return {...x.value}\n})), 'EX', Number(env.get('NODERED_TTL')) * 60];\nmsg.topic = null;\nreturn msg;",
+        "func": "/**to set expire set topic into null\n * and set payload to an Array with EX on it [topic, value, EX, ex-value]\n */\nmsg.payload = [`geo:block:by-psm:${msg.key.join(':')}`, JSON.stringify(msg.payload.map(x => {\n    return {...x.value}\n})), 'EX', Number(env.get('NODERED_TTL')) * 60];\nmsg.topic = null;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 330,
-        "y": 420,
+        "x": 1890,
+        "y": 300,
         "wires": [
             [
                 "bafbc4a609dc25ce"
@@ -8813,8 +8906,8 @@
         "paramsType": "json",
         "payloadType": "json",
         "block": false,
-        "x": 320,
-        "y": 460,
+        "x": 1880,
+        "y": 340,
         "wires": [
             [
                 "933c7a3db7c6c761"
@@ -8834,8 +8927,8 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 520,
-        "y": 460,
+        "x": 2080,
+        "y": 340,
         "wires": []
     },
     {
@@ -8859,8 +8952,8 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 120,
-        "y": 540,
+        "x": 1440,
+        "y": 400,
         "wires": [
             [
                 "d0790ce895126769"
@@ -8878,8 +8971,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 350,
-        "y": 540,
+        "x": 1670,
+        "y": 400,
         "wires": [
             [
                 "9b8229086a7f4736"
@@ -8898,8 +8991,8 @@
         "paramsType": "json",
         "payloadType": "json",
         "block": false,
-        "x": 320,
-        "y": 580,
+        "x": 1700,
+        "y": 440,
         "wires": [
             [
                 "6f0d16abae370cce"
@@ -8919,8 +9012,8 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 520,
-        "y": 620,
+        "x": 2100,
+        "y": 400,
         "wires": []
     },
     {
@@ -8934,11 +9027,273 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 330,
-        "y": 620,
+        "x": 1910,
+        "y": 400,
         "wires": [
             [
                 "c6b4b8b36d3cba79"
+            ]
+        ]
+    },
+    {
+        "id": "5b97d92a9bb49e05",
+        "type": "http in",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "url": "/geo",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 100,
+        "y": 60,
+        "wires": [
+            [
+                "3cdc106f1f3ace69"
+            ]
+        ]
+    },
+    {
+        "id": "0da17778942f9139",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "function 46",
+        "func": "msg.payload = {\n    // key: ['PSM 5', 'LIBE', 'DIVISI 2']\n    // key: ['PSM 2', 'SMSE']\n    key: 'PSM 2'\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 190,
+        "y": 580,
+        "wires": [
+            [
+                "1beea91613b7cee6"
+            ]
+        ]
+    },
+    {
+        "id": "1beea91613b7cee6",
+        "type": "cloudantplus in",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-geojson",
+        "service": "_ext_",
+        "search": "_view_",
+        "design": "block",
+        "index": "geo-by-psm",
+        "x": 200,
+        "y": 620,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "6491137a78308fda",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "get scope by code",
+        "func": "msg.backup = msg.payload;\nmsg.ori = msg.sub;\nmsg.payload = `geo:block:by-psm:PSM 2`;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 210,
+        "y": 680,
+        "wires": [
+            [
+                "e7d0b75876531ed3"
+            ]
+        ]
+    },
+    {
+        "id": "e7d0b75876531ed3",
+        "type": "redis-command",
+        "z": "c5b9039a5fc48f97",
+        "server": "0fb96b870afb5c15",
+        "command": "GET",
+        "name": "",
+        "topic": "",
+        "params": "[]",
+        "paramsType": "json",
+        "payloadType": "json",
+        "block": false,
+        "x": 180,
+        "y": 720,
+        "wires": [
+            [
+                "55177f852ecb4f71"
+            ]
+        ]
+    },
+    {
+        "id": "55177f852ecb4f71",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "function 48",
+        "func": "msg.payload = JSON.parse(msg.payload)\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 190,
+        "y": 760,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b44d1f07ad63f74b",
+        "type": "http response",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 1080,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "3cdc106f1f3ace69",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "prepare query",
+        "func": "msg.ori = msg.payload;\nlet { geoType, groupBy, keys } = msg.payload;\nmsg.payload = `geo:${geoType}:by-${groupBy}:${keys.join(':')}`;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 320,
+        "y": 60,
+        "wires": [
+            [
+                "b30c98643fb6dc09"
+            ]
+        ]
+    },
+    {
+        "id": "b30c98643fb6dc09",
+        "type": "redis-command",
+        "z": "c5b9039a5fc48f97",
+        "server": "0fb96b870afb5c15",
+        "command": "GET",
+        "name": "",
+        "topic": "",
+        "params": "[]",
+        "paramsType": "json",
+        "payloadType": "json",
+        "block": false,
+        "x": 300,
+        "y": 100,
+        "wires": [
+            [
+                "1414e7875149cbbd"
+            ]
+        ]
+    },
+    {
+        "id": "3634ae1ea7c0cfba",
+        "type": "debug",
+        "z": "c5b9039a5fc48f97",
+        "name": "debug 51",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 840,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "1414e7875149cbbd",
+        "type": "switch",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "nnull"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 450,
+        "y": 100,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "0c65a86fcc10b84f",
+        "type": "inject",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 360,
+        "y": 240,
+        "wires": [
+            [
+                "2cb75819f08cf585"
+            ]
+        ]
+    },
+    {
+        "id": "2cb75819f08cf585",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "prepare sub",
+        "func": "msg.sub = {\n    database: 'smart-geojson',\n    design: 'division',\n    view: 'geo-by-estate',\n    key: ['PSM 5', 'LIBE']\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 590,
+        "y": 240,
+        "wires": [
+            [
+                "52320d1d8887657f"
+            ]
+        ]
+    },
+    {
+        "id": "52320d1d8887657f",
+        "type": "subflow:d7ccf53b2b9fe097",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "x": 620,
+        "y": 280,
+        "wires": [
+            [
+                "3634ae1ea7c0cfba"
             ]
         ]
     }
