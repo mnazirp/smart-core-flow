@@ -635,8 +635,8 @@
         "id": "92d8c02087d4e3d3",
         "type": "junction",
         "z": "c5b9039a5fc48f97",
-        "x": 1420,
-        "y": 520,
+        "x": 1720,
+        "y": 480,
         "wires": [
             [
                 "75ff0174239450e9"
@@ -647,8 +647,8 @@
         "id": "75ff0174239450e9",
         "type": "junction",
         "z": "c5b9039a5fc48f97",
-        "x": 360,
-        "y": 420,
+        "x": 660,
+        "y": 380,
         "wires": [
             [
                 "050293e83401bb46"
@@ -2102,7 +2102,7 @@
         "type": "function",
         "z": "34c9e2e17c31980a",
         "name": "result",
-        "func": "if (msg.tokenFailed) {\n    msg.sub = {\n        error: 'failed to renew PNMP token'\n    }\n    delete msg.tokenFailed;\n} else if (msg.pnmpFailed) {\n    msg.sub = {\n        error: msg.error\n    }\n    delete msg.pnmpFailed;\n    delete msg.error;\n} else {\n    msg.sub = JSON.parse(msg.payload);\n}\n\n/**restore payload */\nmsg.payload = msg.backup;\ndelete msg.backup;\n\nreturn msg;",
+        "func": "if (msg.tokenFailed) {\n    msg.sub = {\n        error: 'failed to renew PNMP token'\n    }\n    delete msg.tokenFailed;\n} else if (msg.pnmpFailed) {\n    msg.sub = {\n        error: msg.error\n    }\n    delete msg.pnmpFailed;\n    delete msg.error;\n}\nelse if (msg.catchError) {\n    msg.sub = msg.payload;\n    delete msg.catchError;\n} else {\n    msg.sub = JSON.parse(msg.payload);\n}\n\n/**restore payload */\nmsg.payload = msg.backup;\ndelete msg.backup;\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -2306,27 +2306,28 @@
         "y": 460,
         "wires": [
             [
-                "b5780a4c4612bc87",
-                "9222285ab967bcdd"
+                "1a06d66728456bcb"
             ]
         ]
     },
     {
-        "id": "9222285ab967bcdd",
-        "type": "debug",
+        "id": "1a06d66728456bcb",
+        "type": "function",
         "z": "34c9e2e17c31980a",
-        "name": "debug 53",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 1220,
-        "y": 480,
-        "wires": []
+        "name": "function 50",
+        "func": "msg.catchError = true;\nmsg.payload = msg.error;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1050,
+        "y": 500,
+        "wires": [
+            [
+                "b5780a4c4612bc87"
+            ]
+        ]
     },
     {
         "id": "09ce6f4f9faad7e1",
@@ -8757,26 +8758,26 @@
         "name": "",
         "statusCode": "200",
         "headers": {},
-        "x": 680,
-        "y": 100,
+        "x": 980,
+        "y": 60,
         "wires": []
     },
     {
         "id": "3cdc106f1f3ace69",
         "type": "function",
         "z": "c5b9039a5fc48f97",
-        "name": "prepare query",
-        "func": "msg.ori = msg.payload;\nlet { geoType, groupBy, key } = msg.payload;\nlet keyString = Array.isArray(key) ? key.join(':') : key;\nlet redisKey = `geo:${geoType}:${(Array.isArray(key) ? key.join(':') : key)}`;\nif (groupBy) redisKey = `geo:${geoType}:group-by-${groupBy}:${keyString}`;\nmsg.redisKey = redisKey;\nmsg.payload = redisKey;\nmsg.askPNMP = false;\nreturn msg;",
+        "name": "validate & prepare query",
+        "func": "msg.ori = msg.payload;\n\n/**validate */\nlet { geoType, groupBy, key } = msg.payload;\n\nlet { valid, message } = validate(geoType, groupBy, key);\nmsg.valid = valid;\nif (valid) {\n    let keyString = Array.isArray(key) ? key.join(':') : key;\n    let redisKey = `geo:${geoType}:${key.join(':')}`;\n    if (groupBy) redisKey = `geo:${geoType}:group-by-${groupBy}:${keyString}`;\n    msg.redisKey = redisKey;\n    msg.payload = redisKey;\n    msg.askPNMP = false;\n} else {\n    msg.payload = {\n        message: message\n    }\n}\n\nreturn msg;\n\nfunction validate(geoType, groupBy, key) {\n    if (geoType && Array.isArray(key) && key.length > 0) {\n        let psm = (key.length > 0) ? key[0] : null;\n        let estate = (key.length > 1) ? key[1] : null;\n        let division = (key.length > 2) ? key[2] : null;\n        let other = (key.length > 3) ? key[3] : null;\n\n        switch (geoType) {\n            case 'psm':\n                if (key.length > 1 && groupBy != null) {\n                    return {\n                        valid: false,\n                        message: 'key not valid for psm and groupBy must be null'\n                    }\n                }\n                return {\n                    valid: true\n                }\n            case 'estate':\n                if (groupBy === null) {\n                    if (!psm || !estate) {\n                        return {\n                            valid: false,\n                            message: 'provide psm & estate only in key'\n                        }\n                    }\n                } else {\n                    if (groupBy != 'psm') {\n                        return {\n                            valid: false,\n                            message: 'estate can be only group by psm'\n                        }\n                    }\n                    if (key.length > 1) {\n                        return {\n                            valid: false,\n                            message: 'provide only psm only in key'\n                        }\n                    }\n                }\n                return {\n                    valid: true\n                }\n            case 'division':\n                if (groupBy === null) {\n                    if (!psm || !estate || !division) {\n                        return {\n                            valid: false,\n                            message: 'provide psm, estate, and division only in key'\n                        }\n                    }\n                } else {\n                    if (groupBy != 'psm' && groupBy != 'estate') {\n                        return {\n                            valid: false,\n                            message: 'division can be only group by psm or estate'\n                        }\n                    }\n                    if (groupBy === 'psm' && key.length != 1) {\n                        return {\n                            valid: false,\n                            message: 'provide only psm only in key'\n                        }\n                    }\n                    if (groupBy === 'estate' && key.length != 2) {\n                        return {\n                            valid: false,\n                            message: 'provide psm & estate in key'\n                        }\n                    }\n                }\n                return {\n                    valid: true\n                }\n            case 'block':\n                if (groupBy === null) {\n                    if (!psm || !estate || !division || !other) {\n                        return {\n                            valid: false,\n                            message: 'provide psm, estate, division, block into key'\n                        }\n                    }\n                } else {\n                    if (groupBy != 'psm' && groupBy != 'estate' && groupBy != 'division') {\n                        return {\n                            valid: false,\n                            message: 'block can be only group by psm, estate, or division'\n                        }\n                    }\n                    if (groupBy === 'psm' && key.length != 1) {\n                        return {\n                            valid: false,\n                            message: 'provide only psm only in key'\n                        }\n                    }\n                    if (groupBy === 'estate' && key.length != 2) {\n                        return {\n                            valid: false,\n                            message: 'provide psm & estate only in key'\n                        }\n                    }\n                    if (groupBy === 'division' && key.length != 3) {\n                        return {\n                            valid: false,\n                            message: 'provide psm, estate, and division only in key'\n                        }\n                    }\n                }\n                return {\n                    valid: true\n                }\n            case 'road':\n                if (groupBy === null) {\n                    if (!psm && !estate && !division && !other) {\n                        return {\n                            valid: false,\n                            message: 'provide psm, estate, division, roadID into key'\n                        }\n                    }\n                } else {\n                    if (groupBy != 'psm' && groupBy != 'estate' && groupBy != 'division') {\n                        return {\n                            valid: false,\n                            message: 'road can be only group by psm, estate, or division'\n                        }\n                    }\n                    if (groupBy === 'psm' && key.length != 1) {\n                        return {\n                            valid: false,\n                            message: 'provide only psm only in key'\n                        }\n                    }\n                    if (groupBy === 'estate' && key.length != 2) {\n                        return {\n                            valid: false,\n                            message: 'provide psm & estate only in key'\n                        }\n                    }\n                    if (groupBy === 'division' && key.length != 3) {\n                        return {\n                            valid: false,\n                            message: 'provide psm, estate, and division only in key'\n                        }\n                    }\n                }\n                return {\n                    valid: true\n                }\n            default:\n                return {\n                    valid: false,\n                    message: 'your parameters is not suitable for this api'\n                }\n        }\n    }\n}",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 320,
+        "x": 350,
         "y": 60,
         "wires": [
             [
-                "b30c98643fb6dc09"
+                "851f7f85faba6429"
             ]
         ]
     },
@@ -8792,8 +8793,8 @@
         "paramsType": "json",
         "payloadType": "json",
         "block": false,
-        "x": 300,
-        "y": 100,
+        "x": 600,
+        "y": 60,
         "wires": [
             [
                 "1414e7875149cbbd"
@@ -8818,8 +8819,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 310,
-        "y": 140,
+        "x": 610,
+        "y": 100,
         "wires": [
             [
                 "37e7769403f58aaa"
@@ -8840,8 +8841,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 490,
-        "y": 180,
+        "x": 790,
+        "y": 140,
         "wires": [
             [
                 "9557bf780ba895b6"
@@ -8853,8 +8854,8 @@
         "type": "subflow:d7ccf53b2b9fe097",
         "z": "c5b9039a5fc48f97",
         "name": "",
-        "x": 520,
-        "y": 220,
+        "x": 820,
+        "y": 180,
         "wires": [
             [
                 "66ba522f6c15c4fc"
@@ -8872,8 +8873,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 490,
-        "y": 100,
+        "x": 790,
+        "y": 60,
         "wires": [
             [
                 "b44d1f07ad63f74b"
@@ -8891,8 +8892,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1000,
-        "y": 300,
+        "x": 1300,
+        "y": 260,
         "wires": [
             [
                 "52c38b07acdd2b44",
@@ -8907,8 +8908,8 @@
         "name": "",
         "statusCode": "200",
         "headers": {},
-        "x": 1220,
-        "y": 300,
+        "x": 1520,
+        "y": 260,
         "wires": []
     },
     {
@@ -8918,8 +8919,8 @@
         "name": "",
         "statusCode": "400",
         "headers": {},
-        "x": 1480,
-        "y": 600,
+        "x": 1780,
+        "y": 560,
         "wires": []
     },
     {
@@ -8927,8 +8928,8 @@
         "type": "subflow:183547d77875ed65",
         "z": "c5b9039a5fc48f97",
         "name": "",
-        "x": 1240,
-        "y": 340,
+        "x": 1540,
+        "y": 300,
         "wires": []
     },
     {
@@ -8942,8 +8943,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 560,
-        "y": 260,
+        "x": 860,
+        "y": 220,
         "wires": [
             [
                 "351c3d9473e73624"
@@ -8968,8 +8969,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 770,
-        "y": 400,
+        "x": 1070,
+        "y": 360,
         "wires": [
             [
                 "bc1ab5bdfd6e6010"
@@ -8984,8 +8985,8 @@
         "type": "subflow:34c9e2e17c31980a",
         "z": "c5b9039a5fc48f97",
         "name": "",
-        "x": 1260,
-        "y": 480,
+        "x": 1560,
+        "y": 440,
         "wires": [
             [
                 "9aa91097cda8fa4d"
@@ -9003,8 +9004,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1260,
-        "y": 440,
+        "x": 1560,
+        "y": 400,
         "wires": [
             [
                 "439f7293831d0618"
@@ -9016,14 +9017,14 @@
         "type": "function",
         "z": "c5b9039a5fc48f97",
         "name": "validate",
-        "func": "let valid = false;\nif (!msg.sub.error && msg.sub.length > 0) {\n    valid = true;\n} else {\n    msg.payload = {\n        message: 'check again your parameter',\n        error: msg.sub.error\n    }\n}\nmsg.valid = valid;\nreturn msg;",
+        "func": "let valid = false;\nif (!msg.sub.error && msg.sub.length > 0) {\n    valid = true;\n} else {\n    msg.payload = {\n        message: 'pnmp error check again your parameter',\n        error: msg.sub\n    }\n}\nmsg.valid = valid;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1300,
-        "y": 520,
+        "x": 1600,
+        "y": 480,
         "wires": [
             [
                 "ca03c8808883ea6c"
@@ -9048,8 +9049,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 1310,
-        "y": 560,
+        "x": 1610,
+        "y": 520,
         "wires": [
             [
                 "92d8c02087d4e3d3"
@@ -9077,8 +9078,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 570,
-        "y": 300,
+        "x": 870,
+        "y": 260,
         "wires": [
             [
                 "8b1a94a59e2923b4"
@@ -9107,8 +9108,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 780,
-        "y": 260,
+        "x": 1080,
+        "y": 220,
         "wires": [
             [
                 "918e0eb45089e3ff"
@@ -9122,8 +9123,8 @@
         "name": "",
         "statusCode": "400",
         "headers": {},
-        "x": 980,
-        "y": 260,
+        "x": 1280,
+        "y": 220,
         "wires": []
     },
     {
@@ -9574,8 +9575,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1250,
-        "y": 400,
+        "x": 1550,
+        "y": 360,
         "wires": [
             [
                 "87cbd51cea452447"
@@ -9600,8 +9601,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 990,
-        "y": 520,
+        "x": 1290,
+        "y": 480,
         "wires": [
             [
                 "e0cdd9416d39b75f"
@@ -9621,7 +9622,7 @@
                 "t": "set",
                 "p": "payload",
                 "pt": "msg",
-                "to": "{\"message\":\"check again your parameter\"}",
+                "to": "{\"message\":\"data not found on pnmp\"}",
                 "tot": "json"
             }
         ],
@@ -9630,8 +9631,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1240,
-        "y": 620,
+        "x": 1540,
+        "y": 580,
         "wires": [
             [
                 "d8c18798b2f32ff6"
@@ -9645,8 +9646,48 @@
         "name": "",
         "statusCode": "400",
         "headers": {},
-        "x": 1260,
-        "y": 660,
+        "x": 1560,
+        "y": 620,
+        "wires": []
+    },
+    {
+        "id": "851f7f85faba6429",
+        "type": "switch",
+        "z": "c5b9039a5fc48f97",
+        "name": "is param valid?",
+        "property": "valid",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 380,
+        "y": 100,
+        "wires": [
+            [
+                "b30c98643fb6dc09"
+            ],
+            [
+                "98437c080838f515"
+            ]
+        ]
+    },
+    {
+        "id": "98437c080838f515",
+        "type": "http response",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "statusCode": "400",
+        "headers": {},
+        "x": 600,
+        "y": 160,
         "wires": []
     }
 ]
