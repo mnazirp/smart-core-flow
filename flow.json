@@ -610,6 +610,28 @@
         "color": "#DDAA99"
     },
     {
+        "id": "183547d77875ed65",
+        "type": "subflow",
+        "name": "sub: redis-set",
+        "info": "## Input\r\n\r\nmsg.sub\r\n\r\n    {\r\n        key: msg.redisKey,\r\n        payload: JSON.stringify(payload),\r\n        ttl: Number(env.get('NODERED_TTL')) * 60\r\n    }\r\n",
+        "category": "",
+        "in": [
+            {
+                "x": 20,
+                "y": 80,
+                "wires": [
+                    {
+                        "id": "6ef494b5ccc166ea"
+                    }
+                ]
+            }
+        ],
+        "out": [],
+        "env": [],
+        "meta": {},
+        "color": "#DDAA99"
+    },
+    {
         "id": "784d89e62dfb5070",
         "type": "cloudantplus",
         "host": "${DIGA_COUCHDB}",
@@ -2262,7 +2284,7 @@
         "type": "function",
         "z": "d7ccf53b2b9fe097",
         "name": "read sub",
-        "func": "msg.backup = msg.payload;\n\nlet { database, design, view, key } = msg.sub;\nlet keyStr = (Array.isArray(key)) ? `[${key.map(x => `\"${x}\"`).join(',')}]` : key;\nmsg.url = `http://localhost:5930/${database}/_design/${design}/_view/${view}?key=${keyStr}`;\n\nreturn msg;",
+        "func": "msg.backup = msg.payload;\n\nlet { database, design, view, key } = msg.sub;\nlet keyStr = (Array.isArray(key)) ? `[${key.map(x => `\"${x}\"`).join(',')}]` : `\"${key}\"`;\nmsg.url = `http://localhost:5930/${database}/_design/${design}/_view/${view}?key=${keyStr}`;\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -2316,6 +2338,62 @@
         "wires": [
             []
         ]
+    },
+    {
+        "id": "4294ab4b0f30fa4d",
+        "type": "redis-command",
+        "z": "183547d77875ed65",
+        "server": "0fb96b870afb5c15",
+        "command": "set",
+        "name": "",
+        "topic": "",
+        "params": "[]",
+        "paramsType": "json",
+        "payloadType": "json",
+        "block": false,
+        "x": 220,
+        "y": 120,
+        "wires": [
+            [
+                "78ee1c8ee02c336c"
+            ]
+        ]
+    },
+    {
+        "id": "6ef494b5ccc166ea",
+        "type": "function",
+        "z": "183547d77875ed65",
+        "name": "read sub & prepare",
+        "func": "msg.backup = msg.payload;\nlet { key, payload, ttl } = msg.sub;\nmsg.payload = [key, payload, 'EX', ttl];\nmsg.topic = null;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 190,
+        "y": 80,
+        "wires": [
+            [
+                "4294ab4b0f30fa4d"
+            ]
+        ]
+    },
+    {
+        "id": "78ee1c8ee02c336c",
+        "type": "debug",
+        "z": "183547d77875ed65",
+        "name": "debug 52",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 220,
+        "y": 160,
+        "wires": []
     },
     {
         "id": "07090842a5b11d57",
@@ -8725,8 +8803,8 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1920,
-        "y": 200,
+        "x": 660,
+        "y": 540,
         "wires": []
     },
     {
@@ -8734,8 +8812,8 @@
         "type": "subflow:34c9e2e17c31980a",
         "z": "c5b9039a5fc48f97",
         "name": "",
-        "x": 1680,
-        "y": 200,
+        "x": 420,
+        "y": 540,
         "wires": [
             [
                 "4d11e3541c97639d"
@@ -8763,8 +8841,8 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 1440,
-        "y": 160,
+        "x": 180,
+        "y": 500,
         "wires": [
             [
                 "591fedcb39ee0343"
@@ -8782,8 +8860,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1650,
-        "y": 160,
+        "x": 390,
+        "y": 500,
         "wires": [
             [
                 "51375f655958253f"
@@ -9053,106 +9131,14 @@
         ]
     },
     {
-        "id": "0da17778942f9139",
-        "type": "function",
-        "z": "c5b9039a5fc48f97",
-        "name": "function 46",
-        "func": "msg.payload = {\n    // key: ['PSM 5', 'LIBE', 'DIVISI 2']\n    // key: ['PSM 2', 'SMSE']\n    key: 'PSM 2'\n}\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 190,
-        "y": 580,
-        "wires": [
-            [
-                "1beea91613b7cee6"
-            ]
-        ]
-    },
-    {
-        "id": "1beea91613b7cee6",
-        "type": "cloudantplus in",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "cloudant": "784d89e62dfb5070",
-        "database": "smart-geojson",
-        "service": "_ext_",
-        "search": "_view_",
-        "design": "block",
-        "index": "geo-by-psm",
-        "x": 200,
-        "y": 620,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "6491137a78308fda",
-        "type": "function",
-        "z": "c5b9039a5fc48f97",
-        "name": "get scope by code",
-        "func": "msg.backup = msg.payload;\nmsg.ori = msg.sub;\nmsg.payload = `geo:block:by-psm:PSM 2`;\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 210,
-        "y": 680,
-        "wires": [
-            [
-                "e7d0b75876531ed3"
-            ]
-        ]
-    },
-    {
-        "id": "e7d0b75876531ed3",
-        "type": "redis-command",
-        "z": "c5b9039a5fc48f97",
-        "server": "0fb96b870afb5c15",
-        "command": "GET",
-        "name": "",
-        "topic": "",
-        "params": "[]",
-        "paramsType": "json",
-        "payloadType": "json",
-        "block": false,
-        "x": 180,
-        "y": 720,
-        "wires": [
-            [
-                "55177f852ecb4f71"
-            ]
-        ]
-    },
-    {
-        "id": "55177f852ecb4f71",
-        "type": "function",
-        "z": "c5b9039a5fc48f97",
-        "name": "function 48",
-        "func": "msg.payload = JSON.parse(msg.payload)\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 190,
-        "y": 760,
-        "wires": [
-            []
-        ]
-    },
-    {
         "id": "b44d1f07ad63f74b",
         "type": "http response",
         "z": "c5b9039a5fc48f97",
         "name": "",
         "statusCode": "200",
         "headers": {},
-        "x": 1080,
-        "y": 80,
+        "x": 680,
+        "y": 120,
         "wires": []
     },
     {
@@ -9160,7 +9146,7 @@
         "type": "function",
         "z": "c5b9039a5fc48f97",
         "name": "prepare query",
-        "func": "msg.ori = msg.payload;\nlet { geoType, groupBy, keys } = msg.payload;\nmsg.payload = `geo:${geoType}:by-${groupBy}:${keys.join(':')}`;\n\nreturn msg;",
+        "func": "msg.ori = msg.payload;\nlet { geoType, groupBy, key } = msg.payload;\nlet keyString = Array.isArray(key) ? key.join(':') : key;\nlet redisKey = `geo:${geoType}:${(Array.isArray(key) ? key.join(':') : key)}`;\nif (groupBy) redisKey = `geo:${geoType}:group-by-${groupBy}:${keyString}`;\nmsg.redisKey = redisKey;\nmsg.payload = redisKey;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -9195,23 +9181,6 @@
         ]
     },
     {
-        "id": "3634ae1ea7c0cfba",
-        "type": "debug",
-        "z": "c5b9039a5fc48f97",
-        "name": "debug 51",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 840,
-        "y": 280,
-        "wires": []
-    },
-    {
         "id": "1414e7875149cbbd",
         "type": "switch",
         "z": "c5b9039a5fc48f97",
@@ -9229,71 +9198,183 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 450,
-        "y": 100,
-        "wires": [
-            [],
-            []
-        ]
-    },
-    {
-        "id": "0c65a86fcc10b84f",
-        "type": "inject",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 360,
-        "y": 240,
+        "x": 310,
+        "y": 140,
         "wires": [
             [
-                "2cb75819f08cf585"
+                "37e7769403f58aaa"
+            ],
+            [
+                "050293e83401bb46"
             ]
         ]
     },
     {
-        "id": "2cb75819f08cf585",
+        "id": "050293e83401bb46",
         "type": "function",
         "z": "c5b9039a5fc48f97",
         "name": "prepare sub",
-        "func": "msg.sub = {\n    database: 'smart-geojson',\n    design: 'division',\n    view: 'geo-by-estate',\n    key: ['PSM 5', 'LIBE']\n}\nreturn msg;",
+        "func": "let { geoType, groupBy, key } = msg.ori;\n\nmsg.sub = {\n    database: 'smart-geojson',\n    design: geoType,\n    view: (groupBy != null) ? `geo-by-${groupBy}` : 'geometry',\n    key: key\n}\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 590,
-        "y": 240,
+        "x": 490,
+        "y": 180,
         "wires": [
             [
-                "52320d1d8887657f"
+                "9557bf780ba895b6"
             ]
         ]
     },
     {
-        "id": "52320d1d8887657f",
+        "id": "9557bf780ba895b6",
         "type": "subflow:d7ccf53b2b9fe097",
         "z": "c5b9039a5fc48f97",
         "name": "",
-        "x": 620,
-        "y": 280,
+        "x": 520,
+        "y": 220,
         "wires": [
             [
-                "3634ae1ea7c0cfba"
+                "66ba522f6c15c4fc"
+            ]
+        ]
+    },
+    {
+        "id": "37e7769403f58aaa",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "function 49",
+        "func": "msg.payload = JSON.parse(msg.payload);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 490,
+        "y": 120,
+        "wires": [
+            [
+                "b44d1f07ad63f74b"
+            ]
+        ]
+    },
+    {
+        "id": "bc1ab5bdfd6e6010",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "prepare & result",
+        "func": "\nlet payload = msg.sub.rows.map(x => {\n    return { ...x.value }\n});\n\nmsg.sub = {\n    key: msg.redisKey,\n    payload: JSON.stringify(payload),\n    ttl: Number(env.get('NODERED_TTL')) * 60\n}\nmsg.payload = payload;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 760,
+        "y": 260,
+        "wires": [
+            [
+                "52c38b07acdd2b44",
+                "69d30779b2ab588f"
+            ]
+        ]
+    },
+    {
+        "id": "52c38b07acdd2b44",
+        "type": "http response",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 1000,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "bf084d0da5f01b31",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "data not found",
+        "func": "msg.payload = 'data not found';\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 760,
+        "y": 360,
+        "wires": [
+            [
+                "fab1bfa7b82e5a27"
+            ]
+        ]
+    },
+    {
+        "id": "fab1bfa7b82e5a27",
+        "type": "http response",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "statusCode": "400",
+        "headers": {},
+        "x": 1000,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "69d30779b2ab588f",
+        "type": "subflow:183547d77875ed65",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "x": 1020,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "66ba522f6c15c4fc",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "check sub",
+        "func": "let found = false;\n\nif (!msg.sub.error && msg.sub.rows.length > 0) found = true;\nmsg.found = found;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 560,
+        "y": 260,
+        "wires": [
+            [
+                "2391abfbae7258e2"
+            ]
+        ]
+    },
+    {
+        "id": "2391abfbae7258e2",
+        "type": "switch",
+        "z": "c5b9039a5fc48f97",
+        "name": "data found ?",
+        "property": "found",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 550,
+        "y": 300,
+        "wires": [
+            [
+                "bc1ab5bdfd6e6010"
+            ],
+            [
+                "bf084d0da5f01b31"
             ]
         ]
     }
