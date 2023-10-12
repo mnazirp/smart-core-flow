@@ -632,6 +632,30 @@
         "color": "#DDAA99"
     },
     {
+        "id": "92d8c02087d4e3d3",
+        "type": "junction",
+        "z": "c5b9039a5fc48f97",
+        "x": 1420,
+        "y": 520,
+        "wires": [
+            [
+                "75ff0174239450e9"
+            ]
+        ]
+    },
+    {
+        "id": "75ff0174239450e9",
+        "type": "junction",
+        "z": "c5b9039a5fc48f97",
+        "x": 360,
+        "y": 420,
+        "wires": [
+            [
+                "050293e83401bb46"
+            ]
+        ]
+    },
+    {
         "id": "784d89e62dfb5070",
         "type": "cloudantplus",
         "host": "${DIGA_COUCHDB}",
@@ -8894,7 +8918,7 @@
         "name": "",
         "statusCode": "400",
         "headers": {},
-        "x": 1460,
+        "x": 1480,
         "y": 600,
         "wires": []
     },
@@ -9028,7 +9052,7 @@
         "y": 560,
         "wires": [
             [
-                "050293e83401bb46"
+                "92d8c02087d4e3d3"
             ],
             [
                 "fab1bfa7b82e5a27"
@@ -9597,8 +9621,8 @@
                 "t": "set",
                 "p": "payload",
                 "pt": "msg",
-                "to": "PNMP not found",
-                "tot": "str"
+                "to": "{\"message\":\"check again your parameter\"}",
+                "tot": "json"
             }
         ],
         "action": "",
