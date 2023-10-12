@@ -562,7 +562,7 @@
         ],
         "out": [
             {
-                "x": 1120,
+                "x": 1360,
                 "y": 420,
                 "wires": [
                     {
@@ -1720,7 +1720,7 @@
         "authType": "",
         "senderr": false,
         "headers": [],
-        "x": 210,
+        "x": 250,
         "y": 120,
         "wires": [
             [
@@ -1739,7 +1739,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 540,
+        "x": 780,
         "y": 80,
         "wires": [
             [
@@ -1751,7 +1751,7 @@
         "id": "b47d8660c8311e88",
         "type": "switch",
         "z": "34c9e2e17c31980a",
-        "name": "",
+        "name": "status code",
         "property": "statusCode",
         "propertyType": "msg",
         "rules": [
@@ -1772,8 +1772,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 3,
-        "x": 270,
-        "y": 220,
+        "x": 470,
+        "y": 300,
         "wires": [
             [
                 "60a76718d2bdac31"
@@ -1802,7 +1802,7 @@
         "authType": "basic",
         "senderr": false,
         "headers": [],
-        "x": 1230,
+        "x": 1490,
         "y": 260,
         "wires": [
             [
@@ -1821,7 +1821,7 @@
         "search": "_view_",
         "design": "filter",
         "index": "division",
-        "x": 830,
+        "x": 1090,
         "y": 140,
         "wires": [
             [
@@ -1849,7 +1849,7 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 1030,
+        "x": 1290,
         "y": 140,
         "wires": [
             [
@@ -1871,7 +1871,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1270,
+        "x": 1530,
         "y": 100,
         "wires": [
             [
@@ -1895,7 +1895,7 @@
         "authType": "basic",
         "senderr": false,
         "headers": [],
-        "x": 1230,
+        "x": 1490,
         "y": 140,
         "wires": [
             [
@@ -1922,7 +1922,7 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1250,
+        "x": 1510,
         "y": 220,
         "wires": [
             [
@@ -1946,7 +1946,7 @@
         "authType": "",
         "senderr": false,
         "headers": [],
-        "x": 490,
+        "x": 730,
         "y": 340,
         "wires": [
             [
@@ -1974,7 +1974,7 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 530,
+        "x": 770,
         "y": 380,
         "wires": [
             [
@@ -1989,14 +1989,14 @@
         "id": "6dfd2d0d5832ee58",
         "type": "change",
         "z": "34c9e2e17c31980a",
-        "name": "set no attempt",
+        "name": "set renewToken",
         "rules": [
             {
                 "t": "set",
-                "p": "attempt",
+                "p": "renewToken",
                 "pt": "msg",
-                "to": "1",
-                "tot": "num"
+                "to": "true",
+                "tot": "bool"
             }
         ],
         "action": "",
@@ -2004,7 +2004,7 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 720,
+        "x": 960,
         "y": 340,
         "wires": [
             [
@@ -2017,19 +2017,17 @@
         "type": "switch",
         "z": "34c9e2e17c31980a",
         "name": "if attempt = 0",
-        "property": "attempt",
+        "property": "renewToken",
         "propertyType": "msg",
         "rules": [
             {
-                "t": "eq",
-                "v": "0",
-                "vt": "num"
+                "t": "false"
             }
         ],
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 470,
+        "x": 710,
         "y": 300,
         "wires": [
             [
@@ -2042,7 +2040,7 @@
         "type": "function",
         "z": "34c9e2e17c31980a",
         "name": "read sub payload",
-        "func": "/**backup payload */\nmsg.backup = msg.payload;\n\nlet { scopeType, ref1, ref2, ref3 } = msg.sub;\nlet url = `https://digistage.sinarmas-agri.com/api-app-portal-beta/api/pnmp_basemap?scope_type=${scopeType}&ref1=${ref1}`;\nif (ref2) {\n    url += `&ref2=${ref2}`;\n    if (ref3) url += `&ref3=${ref3}`;\n}\nmsg.url = url;\nmsg.attempt = 0;\nreturn msg;",
+        "func": "/**backup payload */\nmsg.backup = msg.payload;\n\nlet { scopeType, ref1, ref2, ref3 } = msg.sub;\nlet url = `https://digistage.sinarmas-agri.com/api-app-portal-beta/api/pnmp_basemap?scope_type=${scopeType}&ref1=${ref1}`;\nif (ref2) {\n    url += `&ref2=${ref2}`;\n    if (ref3) url += `&ref3=${ref3}`;\n}\nmsg.url = url;\nmsg.renewToken = false;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -2067,8 +2065,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 210,
-        "y": 160,
+        "x": 470,
+        "y": 80,
         "wires": [
             [
                 "b47d8660c8311e88"
@@ -2086,7 +2084,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 990,
+        "x": 1230,
         "y": 420,
         "wires": [
             []
@@ -2111,7 +2109,7 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 740,
+        "x": 980,
         "y": 400,
         "wires": [
             [
@@ -2156,7 +2154,7 @@
         "checkall": "true",
         "repair": false,
         "outputs": 5,
-        "x": 630,
+        "x": 870,
         "y": 140,
         "wires": [
             [
@@ -2187,7 +2185,7 @@
         "search": "_view_",
         "design": "filter",
         "index": "block",
-        "x": 820,
+        "x": 1080,
         "y": 180,
         "wires": [
             [
@@ -2206,7 +2204,7 @@
         "search": "_view_",
         "design": "filter",
         "index": "road",
-        "x": 820,
+        "x": 1080,
         "y": 220,
         "wires": [
             [
@@ -2225,7 +2223,7 @@
         "search": "_view_",
         "design": "filter",
         "index": "estate",
-        "x": 830,
+        "x": 1090,
         "y": 100,
         "wires": [
             [
@@ -2244,7 +2242,7 @@
         "search": "_view_",
         "design": "filter",
         "index": "psm",
-        "x": 820,
+        "x": 1080,
         "y": 60,
         "wires": [
             [
@@ -2263,7 +2261,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 470,
+        "x": 710,
         "y": 420,
         "wires": [
             [
@@ -2280,13 +2278,31 @@
             "fccbeff34d3395f5"
         ],
         "uncaught": false,
-        "x": 790,
+        "x": 1030,
         "y": 460,
         "wires": [
             [
-                "b5780a4c4612bc87"
+                "b5780a4c4612bc87",
+                "9222285ab967bcdd"
             ]
         ]
+    },
+    {
+        "id": "9222285ab967bcdd",
+        "type": "debug",
+        "z": "34c9e2e17c31980a",
+        "name": "debug 53",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1220,
+        "y": 480,
+        "wires": []
     },
     {
         "id": "09ce6f4f9faad7e1",
@@ -8726,7 +8742,7 @@
         "type": "function",
         "z": "c5b9039a5fc48f97",
         "name": "prepare query",
-        "func": "msg.ori = msg.payload;\nlet { geoType, groupBy, key } = msg.payload;\nlet keyString = Array.isArray(key) ? key.join(':') : key;\nlet redisKey = `geo:${geoType}:${(Array.isArray(key) ? key.join(':') : key)}`;\nif (groupBy) redisKey = `geo:${geoType}:group-by-${groupBy}:${keyString}`;\nmsg.redisKey = redisKey;\nmsg.payload = redisKey;\nreturn msg;",
+        "func": "msg.ori = msg.payload;\nlet { geoType, groupBy, key } = msg.payload;\nlet keyString = Array.isArray(key) ? key.join(':') : key;\nlet redisKey = `geo:${geoType}:${(Array.isArray(key) ? key.join(':') : key)}`;\nif (groupBy) redisKey = `geo:${geoType}:group-by-${groupBy}:${keyString}`;\nmsg.redisKey = redisKey;\nmsg.payload = redisKey;\nmsg.askPNMP = false;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -8851,7 +8867,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 980,
+        "x": 1000,
         "y": 300,
         "wires": [
             [
@@ -8878,8 +8894,8 @@
         "name": "",
         "statusCode": "400",
         "headers": {},
-        "x": 1360,
-        "y": 500,
+        "x": 1420,
+        "y": 600,
         "wires": []
     },
     {
@@ -8929,13 +8945,13 @@
         "repair": false,
         "outputs": 2,
         "x": 770,
-        "y": 340,
+        "y": 400,
         "wires": [
             [
                 "bc1ab5bdfd6e6010"
             ],
             [
-                "87cbd51cea452447"
+                "4892d8eee861b094"
             ]
         ]
     },
@@ -8944,8 +8960,8 @@
         "type": "subflow:34c9e2e17c31980a",
         "z": "c5b9039a5fc48f97",
         "name": "",
-        "x": 1000,
-        "y": 440,
+        "x": 1220,
+        "y": 480,
         "wires": [
             [
                 "9aa91097cda8fa4d"
@@ -8963,8 +8979,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1000,
-        "y": 400,
+        "x": 1220,
+        "y": 440,
         "wires": [
             [
                 "439f7293831d0618"
@@ -8982,8 +8998,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1040,
-        "y": 480,
+        "x": 1260,
+        "y": 520,
         "wires": [
             [
                 "ca03c8808883ea6c"
@@ -9008,8 +9024,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 1210,
-        "y": 480,
+        "x": 1270,
+        "y": 560,
         "wires": [
             [
                 "050293e83401bb46"
@@ -9514,5 +9530,99 @@
                 "c6b4b8b36d3cba79"
             ]
         ]
+    },
+    {
+        "id": "e0cdd9416d39b75f",
+        "type": "change",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "askPNMP",
+                "pt": "msg",
+                "to": "true",
+                "tot": "bool"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1210,
+        "y": 400,
+        "wires": [
+            [
+                "87cbd51cea452447"
+            ]
+        ]
+    },
+    {
+        "id": "4892d8eee861b094",
+        "type": "switch",
+        "z": "c5b9039a5fc48f97",
+        "name": "ask PNMP ?",
+        "property": "askPNMP",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "false"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 990,
+        "y": 520,
+        "wires": [
+            [
+                "e0cdd9416d39b75f"
+            ],
+            [
+                "fddba91bdc5a2a4e"
+            ]
+        ]
+    },
+    {
+        "id": "fddba91bdc5a2a4e",
+        "type": "change",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "PNMP not found",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1200,
+        "y": 620,
+        "wires": [
+            [
+                "d8c18798b2f32ff6"
+            ]
+        ]
+    },
+    {
+        "id": "d8c18798b2f32ff6",
+        "type": "http response",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "statusCode": "400",
+        "headers": {},
+        "x": 1220,
+        "y": 660,
+        "wires": []
     }
 ]
