@@ -2,7 +2,6 @@
     "name": "smart-core-flow",
     "description": "nodered flow for smart platform core",
     "version": "0.0.1",
-    "dependencies": {},
     "node-red": {
         "settings": {
             "flowFile": "flow.json",

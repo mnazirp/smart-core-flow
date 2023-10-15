@@ -754,7 +754,7 @@
         "libs": [
             {
                 "var": "bcrypt",
-                "module": "bcrypt"
+                "module": "bcryptjs"
             }
         ],
         "x": 200,
@@ -776,7 +776,7 @@
         "libs": [
             {
                 "var": "bcrypt",
-                "module": "bcrypt"
+                "module": "bcryptjs"
             }
         ],
         "x": 200,
