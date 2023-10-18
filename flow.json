@@ -658,42 +658,42 @@
     {
         "id": "784d89e62dfb5070",
         "type": "cloudantplus",
-        "host": "${DIGA_COUCHDB}",
-        "name": "diga-couchdb"
+        "host": "${DOCKER_COUCHDB}",
+        "name": "docker-couchdb"
     },
     {
         "id": "9dc2644ec5b51cb2",
         "type": "mysql2-server",
-        "host": "${DIGA_MYSQL_HOST}",
-        "port": "${DIGA_MYSQL_PORT}",
-        "username": "${DIGA_MYSQL_USER}",
+        "host": "${DOCKER_MYSQL_HOST}",
+        "port": "${DOCKER_MYSQL_PORT}",
+        "username": "${DOCKER_MYSQL_USER}",
         "password": "password",
-        "db": "${DIGA_MYSQL_DBNAME}",
-        "servername": ""
+        "db": "${DOCKER_MYSQL_DBNAME}",
+        "servername": "DOCKER_MYSQL"
     },
     {
         "id": "0fb96b870afb5c15",
         "type": "redis-config",
-        "name": "Local",
-        "options": "REDIS_URL",
+        "name": "DOCKER_REDIS",
+        "options": "DOCKER_REDIS_URL",
         "cluster": false,
         "optionsType": "env"
     },
     {
         "id": "3cc67d60c90e6c5d",
         "type": "redis-config",
-        "name": "redis_ts",
-        "options": "REDIS_TS_URL",
+        "name": "DOCKER_REDIS_TS",
+        "options": "DOCKER_REDIS_TS_URL",
         "cluster": false,
         "optionsType": "env"
     },
     {
         "id": "7f9d98d6c341571a",
         "type": "MySQLdatabase",
-        "name": "smart-mysql",
-        "host": "127.0.0.1",
-        "port": "3330",
-        "db": "digaportal",
+        "name": "DOCKER_MYSQL2",
+        "host": "${DOCKER_MYSQL_HOST}",
+        "port": "${DOCKER_MYSQL_PORT}",
+        "db": "${DOCKER_MYSQL_DBNAME}",
         "tz": "",
         "charset": "UTF8"
     },
@@ -9688,6 +9688,71 @@
         "headers": {},
         "x": 600,
         "y": 160,
+        "wires": []
+    },
+    {
+        "id": "02984958951db283",
+        "type": "inject",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 100,
+        "y": 680,
+        "wires": [
+            [
+                "51e39a7e766ca5ae"
+            ]
+        ]
+    },
+    {
+        "id": "51e39a7e766ca5ae",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "function 51",
+        "func": "node.warn(env.get('DOCKER_COUCHDB'));\nnode.warn(env.get('DOCKER_REDIS_URL'));\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 290,
+        "y": 680,
+        "wires": [
+            [
+                "ff587e4058c5ac84"
+            ]
+        ]
+    },
+    {
+        "id": "ff587e4058c5ac84",
+        "type": "debug",
+        "z": "c5b9039a5fc48f97",
+        "name": "debug 53",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 520,
+        "y": 680,
         "wires": []
     }
 ]
