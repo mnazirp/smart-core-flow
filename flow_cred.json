@@ -1,5 +1,8 @@
 {
-    "784d89e62dfb5070": {},
+    "784d89e62dfb5070": {
+        "pass": "password",
+        "username": "diga"
+    },
     "36b892547277fd3e": {
         "user": "diga",
         "password": "password"
