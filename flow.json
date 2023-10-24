@@ -9397,7 +9397,7 @@
         "type": "function",
         "z": "c5b9039a5fc48f97",
         "name": "function 58",
-        "func": "// msg.sub = {\n//     obj: msg.payload[0].data,\n//     key: 'name',\n//     val: 'LIBE'\n// }\n\nmsg.sub = {\n    obj: msg.payload[0].data,\n    key: 'name',\n    scopes: ['PSM 1']\n}\nreturn msg;",
+        "func": "// msg.sub = {\n//     obj: msg.payload[0].data,\n//     key: 'name',\n//     val: 'LIBE'\n// }\n\nmsg.sub = {\n    obj: msg.payload[0].data,\n    key: 'name',\n    scopes: ['LIBE']\n}\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -9410,17 +9410,6 @@
             [
                 "a6497b6e68bc5e2b"
             ]
-        ]
-    },
-    {
-        "id": "ea91d3a7747927bb",
-        "type": "subflow:44e549ae5408d3d3",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "x": 470,
-        "y": 420,
-        "wires": [
-            []
         ]
     },
     {
