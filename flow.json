@@ -402,7 +402,7 @@
     {
         "id": "63baa18a398cf25b",
         "type": "subflow",
-        "name": "algo: find-scope",
+        "name": "algo: nested-find-flatten",
         "info": "",
         "category": "",
         "in": [
@@ -933,6 +933,7 @@
         "name": "find",
         "func": "try {\n    let { obj, key, val } = msg.sub;\n    let nest = findNestedObj(obj, key, val);\n    msg.sub = nest;\n} catch (error) {\n    msg.sub = null;\n    msg.error = error.message;\n}\nreturn msg;\n\nfunction findNestedObj(entireObj, keyToFind, valToFind) {\n    let foundObj;\n    JSON.stringify(entireObj, (_, nestedValue) => {\n        if (nestedValue && nestedValue[keyToFind] === valToFind) {\n            foundObj = nestedValue;\n        }\n        return nestedValue;\n    });\n    return foundObj;\n}",
         "outputs": 1,
+        "timeout": "",
         "noerr": 0,
         "initialize": "",
         "finalize": "",
@@ -948,8 +949,9 @@
         "type": "function",
         "z": "63baa18a398cf25b",
         "name": "mapping sub result",
-        "func": "try {\n    let { obj, scopes } = msg.sub;\n    let rs = [];\n    let combineObj = [];\n    if (Array.isArray(scopes)) {\n        scopes.forEach(id => {\n            let items = findNestedObj(obj, 'id', id);\n            let flat = flatten(items);\n            let fullFLat = flatten(obj);\n            let parents = getParents(fullFLat, id);\n            flat[0].parentId = parents[0].parentId;\n            parents.shift();\n            rs.push(parents.sort().reverse().concat(flat));\n        });\n    }\n    combineObj = combineArrays(...rs);\n    msg.sub = combineObj;\n} catch (error) {\n    msg.sub = null;\n    msg.error = {\n        hint: '',\n        error: error.message\n    }\n}\nreturn msg;\n\nfunction findNestedObj(entireObj, keyToFind, valToFind) {\n    let foundObj = [];\n    JSON.stringify(entireObj, (_, nestedValue) => {\n        if (nestedValue && nestedValue[keyToFind] === valToFind) {\n            foundObj = nestedValue;\n        }\n        return nestedValue;\n    });\n    return [foundObj];\n}\n\nfunction flatten(arr, level = 0, filter = {}, parentId = null) {\n    const filterKeys = Object.keys(filter);\n    return arr.reduce((acc, { id, children, ...rest }) => {\n        const flattenedChildren = children ? flatten(children, level + 1, filter, id) : [];\n        const flattenedObject = { ...rest, id, level, parentId };\n        if (filterKeys.every(key => flattenedObject[key] === filter[key])) {\n            return [...acc, flattenedObject, ...flattenedChildren];\n        }\n        return acc.concat(flattenedChildren);\n    }, []);\n}\n\nfunction getParents(flatObj, childId) {\n    let parents = [];\n    let child = flatObj.find(x => x.id === childId);\n    if (child) {\n        parents.push(child);\n        do {\n            let parent = (child) ? flatObj.find(x => x.id === child.parentId) : [];\n            if (parent) parents.push(parent);\n            child = parent;\n        }\n        while (child && child.parentId != null);\n    }\n    return parents;\n}\n\nfunction combineArrays(...arrays) {\n    const combinedArray = [].concat(...arrays);\n    const uniqueObject = {};\n    const uniqueArray = [];\n\n    for (let obj of combinedArray) {\n        const objString = JSON.stringify(obj);\n        if (!uniqueObject[objString]) {\n            uniqueObject[objString] = true;\n            uniqueArray.push(obj);\n        }\n    }\n\n    return uniqueArray;\n}\n",
+        "func": "try {\n    let { obj, key, scopes } = msg.sub;\n    let rs = [];\n    let combineObj = [];\n    let keyToFind = (key) ? key : 'id';\n    if (Array.isArray(scopes)) {\n        scopes.forEach(value => {\n            let items = findNestedObj(obj, keyToFind, value);\n            let flat = flatten(items);\n            let fullFLat = flatten(obj);\n            node.warn(fullFLat);\n            let parents = getParents(fullFLat, keyToFind, value);\n            flat[0].parentId = parents[0].parentId;\n            parents.shift();\n            rs.push(parents.sort().reverse().concat(flat));\n        });\n    }\n    combineObj = combineArrays(...rs);\n    msg.sub = combineObj;\n} catch (error) {\n    msg.sub = null;\n    msg.error = {\n        hint: '',\n        error: error.message\n    }\n}\nreturn msg;\n\nfunction findNestedObj(entireObj, keyToFind, valToFind) {\n    let foundObj = [];\n    JSON.stringify(entireObj, (_, nestedValue) => {\n        if (nestedValue && nestedValue[keyToFind] === valToFind) {\n            foundObj = nestedValue;\n        }\n        return nestedValue;\n    });\n    return [foundObj];\n}\n\nfunction flatten(arr, level = 0, filter = {}, parentId = null) {\n    const filterKeys = Object.keys(filter);\n    return arr.reduce((acc, { id, children, ...rest }) => {\n        const flattenedChildren = children ? flatten(children, level + 1, filter, id) : [];\n        const flattenedObject = { ...rest, id, level, parentId };\n        if (filterKeys.every(key => flattenedObject[key] === filter[key])) {\n            return [...acc, flattenedObject, ...flattenedChildren];\n        }\n        return acc.concat(flattenedChildren);\n    }, []);\n}\n\nfunction getParents(flatObj, keyToFind, childId) {\n    let parents = [];\n    let child = flatObj.find(x => x[keyToFind] === childId);\n    if (child) {\n        parents.push(child);\n        do {\n            let parent = (child) ? flatObj.find(x => x.id === child.parentId) : [];\n            if (parent) parents.push(parent);\n            child = parent;\n        }\n        while (child && child.parentId != null);\n    }\n    return parents;\n}\n\nfunction combineArrays(...arrays) {\n    const combinedArray = [].concat(...arrays);\n    const uniqueObject = {};\n    const uniqueArray = [];\n\n    for (let obj of combinedArray) {\n        const objString = JSON.stringify(obj);\n        if (!uniqueObject[objString]) {\n            uniqueObject[objString] = true;\n            uniqueArray.push(obj);\n        }\n    }\n\n    return uniqueArray;\n}\n",
         "outputs": 1,
+        "timeout": "",
         "noerr": 0,
         "initialize": "",
         "finalize": "",
@@ -965,7 +967,7 @@
         "type": "subflow:63baa18a398cf25b",
         "z": "25a729f30c43b341",
         "name": "",
-        "x": 1040,
+        "x": 1070,
         "y": 140,
         "wires": [
             [
@@ -8777,84 +8779,6 @@
         "wires": []
     },
     {
-        "id": "4d11e3541c97639d",
-        "type": "debug",
-        "z": "c5b9039a5fc48f97",
-        "name": "debug 47",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 580,
-        "y": 800,
-        "wires": []
-    },
-    {
-        "id": "51375f655958253f",
-        "type": "subflow:34c9e2e17c31980a",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "x": 340,
-        "y": 800,
-        "wires": [
-            [
-                "4d11e3541c97639d"
-            ]
-        ]
-    },
-    {
-        "id": "8bd30c9e0bb2309c",
-        "type": "inject",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 100,
-        "y": 760,
-        "wires": [
-            [
-                "591fedcb39ee0343"
-            ]
-        ]
-    },
-    {
-        "id": "591fedcb39ee0343",
-        "type": "function",
-        "z": "c5b9039a5fc48f97",
-        "name": "function 43",
-        "func": "msg.sub = {\n    \"scopeType\": \"division\",\n    \"ref1\": \"LIBE\",\n    \"ref2\": null,\n    \"ref3\": null\n}\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 310,
-        "y": 760,
-        "wires": [
-            [
-                "51375f655958253f"
-            ]
-        ]
-    },
-    {
         "id": "5b97d92a9bb49e05",
         "type": "http in",
         "z": "c5b9039a5fc48f97",
@@ -8957,6 +8881,7 @@
         "name": "prepare sub",
         "func": "let { geoType, groupBy, key } = msg.ori;\nlet pKey;\nlet psm = (key[0]) ? key[0] : null;\nlet estate = (key[0]) ? key[1] : null;\nlet division = (key[0]) ? key[2] : null;\n\nswitch (groupBy) {\n    case 'psm':\n        pKey = psm;\n        break;\n    case 'estate':\n        pKey = [psm, estate];\n        break;\n    case 'division':\n        pKey = [psm, estate, division];\n        break;\n    default:\n        pKey = key;\n        break;\n}\nmsg.sub = {\n    database: 'smart-geojson',\n    design: geoType,\n    view: (groupBy != null) ? `geo-by-${groupBy}` : 'geometry',\n    key: pKey\n}\nreturn msg;",
         "outputs": 1,
+        "timeout": "",
         "noerr": 0,
         "initialize": "",
         "finalize": "",
@@ -9249,436 +9174,6 @@
         "wires": []
     },
     {
-        "id": "63394a26cf2e181a",
-        "type": "function",
-        "z": "c5b9039a5fc48f97",
-        "name": "select oa_basemap",
-        "func": "let query = `\n    SELECT\n        base.iScope as id,\n        case\n            when base.iTypeMap = 1 then 'PSM'\n            when base.iTypeMap = 2 then 'Estate'\n            when base.iTypeMap = 3 then 'Road'\n            when base.iTypeMap = 4 then 'Block'\n            when base.iTypeMap = 5 then 'Mill'\n            when base.iTypeMap = 6 then 'Division'\n            else 'Complex'\n        end as category,\n        org.szOrgName as name,\n        base.txtBasemap1 as geojson,\n        base.txtProperties as props\n    FROM\n`;\nquery += '`app-portal-beta2`.oa_basemap base inner join `app-portal-beta2`.oa_organization org ON org.iOrgID = base.iScope order by base.iTypeMap';\nmsg.payload = null;\nmsg.topic = query;\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 330,
-        "y": 860,
-        "wires": [
-            [
-                "62b41246db0c24aa"
-            ]
-        ]
-    },
-    {
-        "id": "62b41246db0c24aa",
-        "type": "mysql2",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "server": "9dc2644ec5b51cb2",
-        "bind": "",
-        "topic": "",
-        "x": 300,
-        "y": 900,
-        "wires": [
-            [
-                "e906efe22a2efd8a"
-            ]
-        ]
-    },
-    {
-        "id": "8dba743fb188db79",
-        "type": "debug",
-        "z": "c5b9039a5fc48f97",
-        "name": "debug 40",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 560,
-        "y": 900,
-        "wires": []
-    },
-    {
-        "id": "4cc6be81caca93a9",
-        "type": "inject",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 100,
-        "y": 860,
-        "wires": [
-            [
-                "63394a26cf2e181a"
-            ]
-        ]
-    },
-    {
-        "id": "e906efe22a2efd8a",
-        "type": "function",
-        "z": "c5b9039a5fc48f97",
-        "name": "function 38",
-        "func": "msg.payload = msg.payload.map(x => {\n    return {\n        id: x.id,\n        category: x.category,\n        name: x.name,\n        geojson: JSON.parse(x.geojson),\n        props: JSON.parse(x.props)\n    }\n});\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 570,
-        "y": 860,
-        "wires": [
-            [
-                "8dba743fb188db79"
-            ]
-        ]
-    },
-    {
-        "id": "ad079653c2293230",
-        "type": "inject",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 100,
-        "y": 1200,
-        "wires": [
-            [
-                "9dc622e2b160af4f"
-            ]
-        ]
-    },
-    {
-        "id": "6c3c51da7ecfada3",
-        "type": "cloudantplus in",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "cloudant": "784d89e62dfb5070",
-        "database": "smart-geojson",
-        "service": "_ext_",
-        "search": "_view_",
-        "design": "filter",
-        "index": "divisi",
-        "x": 320,
-        "y": 1240,
-        "wires": [
-            [
-                "6cb053bde18f145b"
-            ]
-        ]
-    },
-    {
-        "id": "6cb053bde18f145b",
-        "type": "debug",
-        "z": "c5b9039a5fc48f97",
-        "name": "debug 46",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 500,
-        "y": 1240,
-        "wires": []
-    },
-    {
-        "id": "9dc622e2b160af4f",
-        "type": "function",
-        "z": "c5b9039a5fc48f97",
-        "name": "function 40",
-        "func": "msg.payload = {\n    keys: [\n        [\"PSM 5\", \"IVO MAS TUNGGAL\", \"LIBE\", \"DIVISI 1\"],\n        [\"PSM 5\", \"IVO MAS TUNGGAL\", \"LIBE\", \"DIVISI 3\"]\n    ]\n}\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 310,
-        "y": 1200,
-        "wires": [
-            [
-                "6c3c51da7ecfada3"
-            ]
-        ]
-    },
-    {
-        "id": "5c1ab17d9b961b05",
-        "type": "inject",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 100,
-        "y": 960,
-        "wires": [
-            [
-                "0876b73191fa5100"
-            ]
-        ]
-    },
-    {
-        "id": "905212f96eccf0ba",
-        "type": "cloudantplus in",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "cloudant": "784d89e62dfb5070",
-        "database": "smart-geojson",
-        "service": "_ext_",
-        "search": "_view_",
-        "design": "block",
-        "index": "geo-by-psm",
-        "x": 320,
-        "y": 1000,
-        "wires": [
-            [
-                "3eaff2c3f1c9d48d",
-                "8ae8252acbea1169"
-            ]
-        ]
-    },
-    {
-        "id": "3eaff2c3f1c9d48d",
-        "type": "debug",
-        "z": "c5b9039a5fc48f97",
-        "name": "debug 48",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 540,
-        "y": 960,
-        "wires": []
-    },
-    {
-        "id": "0876b73191fa5100",
-        "type": "function",
-        "z": "c5b9039a5fc48f97",
-        "name": "function 44",
-        "func": "msg.payload = {\n    // key: ['PSM 5', 'LIBE', 'DIVISI 2']\n    // key: ['PSM 2', 'SMSE']\n    key: 'PSM 5'\n}\nmsg.key = ['PSM 2']\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 310,
-        "y": 960,
-        "wires": [
-            [
-                "905212f96eccf0ba"
-            ]
-        ]
-    },
-    {
-        "id": "8ae8252acbea1169",
-        "type": "function",
-        "z": "c5b9039a5fc48f97",
-        "name": "save to redis",
-        "func": "/**to set expire set topic into null\n * and set payload to an Array with EX on it [topic, value, EX, ex-value]\n */\nmsg.payload = [`geo:block:by-psm:${msg.key.join(':')}`, JSON.stringify(msg.payload.map(x => {\n    return {...x}\n})), 'EX', Number(env.get('NODERED_TTL')) * 60];\nmsg.topic = null;\nreturn msg;",
-        "outputs": 1,
-        "timeout": "",
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 550,
-        "y": 1000,
-        "wires": [
-            [
-                "bafbc4a609dc25ce"
-            ]
-        ]
-    },
-    {
-        "id": "bafbc4a609dc25ce",
-        "type": "redis-command",
-        "z": "c5b9039a5fc48f97",
-        "server": "0fb96b870afb5c15",
-        "command": "set",
-        "name": "",
-        "topic": "",
-        "params": "[]",
-        "paramsType": "json",
-        "payloadType": "json",
-        "block": false,
-        "x": 540,
-        "y": 1040,
-        "wires": [
-            [
-                "933c7a3db7c6c761"
-            ]
-        ]
-    },
-    {
-        "id": "933c7a3db7c6c761",
-        "type": "debug",
-        "z": "c5b9039a5fc48f97",
-        "name": "debug 49",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 740,
-        "y": 1040,
-        "wires": []
-    },
-    {
-        "id": "622cf54d7c620f65",
-        "type": "inject",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 100,
-        "y": 1100,
-        "wires": [
-            [
-                "d0790ce895126769"
-            ]
-        ]
-    },
-    {
-        "id": "d0790ce895126769",
-        "type": "function",
-        "z": "c5b9039a5fc48f97",
-        "name": "get scope by code",
-        "func": "msg.backup = msg.payload;\nmsg.ori = msg.sub;\nmsg.payload = `geo:block:by-estate:PSM 2:SMSE`;\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 330,
-        "y": 1100,
-        "wires": [
-            [
-                "9b8229086a7f4736"
-            ]
-        ]
-    },
-    {
-        "id": "9b8229086a7f4736",
-        "type": "redis-command",
-        "z": "c5b9039a5fc48f97",
-        "server": "0fb96b870afb5c15",
-        "command": "GET",
-        "name": "",
-        "topic": "",
-        "params": "[]",
-        "paramsType": "json",
-        "payloadType": "json",
-        "block": false,
-        "x": 360,
-        "y": 1140,
-        "wires": [
-            [
-                "6f0d16abae370cce"
-            ]
-        ]
-    },
-    {
-        "id": "c6b4b8b36d3cba79",
-        "type": "debug",
-        "z": "c5b9039a5fc48f97",
-        "name": "debug 50",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 760,
-        "y": 1100,
-        "wires": []
-    },
-    {
-        "id": "6f0d16abae370cce",
-        "type": "function",
-        "z": "c5b9039a5fc48f97",
-        "name": "function 45",
-        "func": "msg.payload = JSON.parse(msg.payload)\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 570,
-        "y": 1100,
-        "wires": [
-            [
-                "c6b4b8b36d3cba79"
-            ]
-        ]
-    },
-    {
         "id": "e0cdd9416d39b75f",
         "type": "change",
         "z": "c5b9039a5fc48f97",
@@ -9813,7 +9308,7 @@
         "wires": []
     },
     {
-        "id": "02984958951db283",
+        "id": "a99c691cc162ad69",
         "type": "inject",
         "z": "c5b9039a5fc48f97",
         "name": "",
@@ -9834,37 +9329,57 @@
         "payload": "",
         "payloadType": "date",
         "x": 100,
-        "y": 680,
+        "y": 540,
         "wires": [
             [
-                "51e39a7e766ca5ae"
+                "0d1bce6d9d023063"
             ]
         ]
     },
     {
-        "id": "51e39a7e766ca5ae",
+        "id": "2daf693ac1eea4ce",
+        "type": "cloudantplus in",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-libs",
+        "service": "_ext_",
+        "search": "_view_",
+        "design": "hierarchy",
+        "index": "code",
+        "x": 280,
+        "y": 580,
+        "wires": [
+            [
+                "deeb91c3977c5392"
+            ]
+        ]
+    },
+    {
+        "id": "0d1bce6d9d023063",
         "type": "function",
         "z": "c5b9039a5fc48f97",
-        "name": "function 51",
-        "func": "node.warn(env.get('DOCKER_COUCHDB'));\nnode.warn(env.get('DOCKER_REDIS_URL'));\nreturn msg;",
+        "name": "function 57",
+        "func": "msg.payload = {\n    key: 'DIG01-AREA-PNMP'\n}\nreturn msg;",
         "outputs": 1,
+        "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
         "x": 290,
-        "y": 680,
+        "y": 540,
         "wires": [
             [
-                "ff587e4058c5ac84"
+                "2daf693ac1eea4ce"
             ]
         ]
     },
     {
-        "id": "ff587e4058c5ac84",
+        "id": "dcdc514ec032e6ae",
         "type": "debug",
         "z": "c5b9039a5fc48f97",
-        "name": "debug 53",
+        "name": "debug 59",
         "active": true,
         "tosidebar": true,
         "console": false,
@@ -9873,9 +9388,53 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 520,
-        "y": 680,
+        "x": 560,
+        "y": 660,
         "wires": []
+    },
+    {
+        "id": "deeb91c3977c5392",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "function 58",
+        "func": "// msg.sub = {\n//     obj: msg.payload[0].data,\n//     key: 'name',\n//     val: 'LIBE'\n// }\n\nmsg.sub = {\n    obj: msg.payload[0].data,\n    key: 'name',\n    scopes: ['PSM 1']\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 290,
+        "y": 620,
+        "wires": [
+            [
+                "a6497b6e68bc5e2b"
+            ]
+        ]
+    },
+    {
+        "id": "ea91d3a7747927bb",
+        "type": "subflow:44e549ae5408d3d3",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "x": 470,
+        "y": 420,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "a6497b6e68bc5e2b",
+        "type": "subflow:63baa18a398cf25b",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "x": 330,
+        "y": 660,
+        "wires": [
+            [
+                "dcdc514ec032e6ae"
+            ]
+        ]
     },
     {
         "id": "2158300e6fc8788f",
