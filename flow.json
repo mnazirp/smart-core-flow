@@ -128,6 +128,14 @@
         "env": []
     },
     {
+        "id": "d13820078197e616",
+        "type": "tab",
+        "label": "Vehicle Tracking",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
         "id": "77002254b872fa8e",
         "type": "subflow",
         "name": "algo: jwt-sign",
@@ -627,6 +635,39 @@
             }
         ],
         "out": [],
+        "env": [],
+        "meta": {},
+        "color": "#DDAA99"
+    },
+    {
+        "id": "f0ae825b26a06b48",
+        "type": "subflow",
+        "name": "sub: couch-bulk-insert",
+        "info": "## Input\r\n\r\nmsg.sub\r\n\r\n    {\r\n        database: 'smart-tracking',\r\n        docs: docs\r\n    }\r\n",
+        "category": "",
+        "in": [
+            {
+                "x": 60,
+                "y": 80,
+                "wires": [
+                    {
+                        "id": "8cc48b7d698dead4"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 380,
+                "y": 160,
+                "wires": [
+                    {
+                        "id": "45ba03c6a9768c57",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
         "env": [],
         "meta": {},
         "color": "#DDAA99"
@@ -2382,8 +2423,9 @@
         "type": "function",
         "z": "d7ccf53b2b9fe097",
         "name": "result",
-        "func": "msg.sub = JSON.parse(msg.payload);\nmsg.payload = msg.backup;\ndelete msg.url;\nreturn msg;",
+        "func": "msg.sub = JSON.parse(msg.payload);\nmsg.payload = msg.backup;\ndelete msg.backup;\ndelete msg.url;\nreturn msg;",
         "outputs": 1,
+        "timeout": "",
         "noerr": 0,
         "initialize": "",
         "finalize": "",
@@ -2449,6 +2491,68 @@
         "x": 220,
         "y": 160,
         "wires": []
+    },
+    {
+        "id": "c732a3d57c8f41e1",
+        "type": "http request",
+        "z": "f0ae825b26a06b48",
+        "name": "",
+        "method": "POST",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "http://localhost:5930/smart-tracking/_bulk_docs",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "basic",
+        "senderr": false,
+        "headers": [],
+        "x": 210,
+        "y": 120,
+        "wires": [
+            [
+                "45ba03c6a9768c57"
+            ]
+        ]
+    },
+    {
+        "id": "8cc48b7d698dead4",
+        "type": "function",
+        "z": "f0ae825b26a06b48",
+        "name": "read sub",
+        "func": "msg.backup = msg.payload;\n\nlet { database, docs } = msg.sub;\nmsg.payload = {\n    docs: docs\n};\nmsg.headers = {\n    \"Content-Type\": \"application/json\"\n};\nmsg.url = `http://localhost:5930/${database}/_bulk_docs`;\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 200,
+        "y": 80,
+        "wires": [
+            [
+                "c732a3d57c8f41e1"
+            ]
+        ]
+    },
+    {
+        "id": "45ba03c6a9768c57",
+        "type": "function",
+        "z": "f0ae825b26a06b48",
+        "name": "result",
+        "func": "msg.sub = JSON.parse(msg.payload);\nmsg.payload = msg.backup;\ndelete msg.backup;\ndelete msg.url;\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 190,
+        "y": 160,
+        "wires": [
+            []
+        ]
     },
     {
         "id": "07090842a5b11d57",
@@ -9772,5 +9876,531 @@
         "x": 520,
         "y": 680,
         "wires": []
+    },
+    {
+        "id": "2158300e6fc8788f",
+        "type": "cronplus",
+        "z": "d13820078197e616",
+        "d": true,
+        "name": "hino vehicle tracking",
+        "outputField": "payload",
+        "timeZone": "",
+        "persistDynamic": false,
+        "commandResponseMsgOutput": "output1",
+        "outputs": 1,
+        "options": [
+            {
+                "name": "schedule1",
+                "topic": "topic1",
+                "payloadType": "default",
+                "payload": "",
+                "expressionType": "cron",
+                "expression": "0 */5 * * * * *",
+                "location": "",
+                "offset": "0",
+                "solarType": "all",
+                "solarEvents": "sunrise,sunset"
+            }
+        ],
+        "x": 140,
+        "y": 100,
+        "wires": [
+            [
+                "eb64ed52ae8f1a18"
+            ]
+        ]
+    },
+    {
+        "id": "eb64ed52ae8f1a18",
+        "type": "function",
+        "z": "d13820078197e616",
+        "name": "function 52",
+        "func": "msg.payload = {\n    grant_type: 'client_credentials'\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 100,
+        "wires": [
+            [
+                "51fab92465e0c058"
+            ]
+        ]
+    },
+    {
+        "id": "57d69253250a4ac2",
+        "type": "inject",
+        "z": "d13820078197e616",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 100,
+        "y": 140,
+        "wires": [
+            [
+                "eb64ed52ae8f1a18"
+            ]
+        ]
+    },
+    {
+        "id": "51fab92465e0c058",
+        "type": "http request",
+        "z": "d13820078197e616",
+        "name": "Hino get vehiclepositions",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "https://api-sandbox.hino.co.id/hmsi/hmsi-std-api/v2/vehiclepositions",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "bearer",
+        "senderr": false,
+        "headers": [
+            {
+                "keyType": "other",
+                "keyValue": "X-IBM-Client-Id",
+                "valueType": "other",
+                "valueValue": "6823e121-a1ec-4fff-8711-b5c18486b57b"
+            },
+            {
+                "keyType": "other",
+                "keyValue": "accept",
+                "valueType": "other",
+                "valueValue": "application/json"
+            }
+        ],
+        "x": 470,
+        "y": 140,
+        "wires": [
+            [
+                "ec19fb40493e2b7c",
+                "7a473e3c7d03e91f"
+            ]
+        ]
+    },
+    {
+        "id": "ec19fb40493e2b7c",
+        "type": "function",
+        "z": "d13820078197e616",
+        "name": "validation",
+        "func": "let payload = JSON.parse(msg.payload);\nmsg.isValid = false;\nif (payload.data) {\n    msg.isValid = true;\n    msg.payload = payload;\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 520,
+        "y": 180,
+        "wires": [
+            [
+                "b3c015605912187d"
+            ]
+        ]
+    },
+    {
+        "id": "7a473e3c7d03e91f",
+        "type": "function",
+        "z": "d13820078197e616",
+        "name": "function 53",
+        "func": "msg.payload = JSON.parse(msg.payload);\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 730,
+        "y": 140,
+        "wires": [
+            [
+                "ab2a2452075f8e7f"
+            ]
+        ]
+    },
+    {
+        "id": "b3c015605912187d",
+        "type": "switch",
+        "z": "d13820078197e616",
+        "name": "",
+        "property": "isValid",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 530,
+        "y": 220,
+        "wires": [
+            [
+                "d291712a6ca4ce5f"
+            ],
+            [
+                "adb5dc9421af5579"
+            ]
+        ]
+    },
+    {
+        "id": "ab2a2452075f8e7f",
+        "type": "debug",
+        "z": "d13820078197e616",
+        "name": "debug 54",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 900,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "d291712a6ca4ce5f",
+        "type": "function",
+        "z": "d13820078197e616",
+        "name": "prepare documents",
+        "func": "let docs = msg.payload.data.map(x => {\n    return {\n        szDeviceID: (x.vin) ? x.vin : null,\n        szStatus: (x.vehiclestatus) ? x.vehiclestatus : null,\n        szCondition: null,\n        iOdometer: (x.odometer) ? parseInt(x.odometer) : null,\n        iFuel: null,\n        iSpeed: (x.speed) ? parseInt(x.speed) : null,\n        decLat: (x.latitude) ? x.latitude : null,\n        decLon: (x.longitude) ? x.longitude : null,\n        iAlt: (x.altitude) ? parseInt(x.altitude) : null,\n        dtmDevice: (x.printed_timezone) ? x.printed_timezone : null, //positiondatetime ga dipake\n        dtmServer: (x.createddatetime) ? x.createddatetime : null,\n        szDescription: (x.province_name) ? x.province_name : null,\n        iCreatedBy: 'cronjob-hino',\n        dtmCreatedDate: new Date(),\n        iModifiedBy: null,\n        dtmModifiedDate: new Date()\n    }\n});\nmsg.sub = {\n    database: 'smart-tracking',\n    docs: docs\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 750,
+        "y": 180,
+        "wires": [
+            [
+                "2d59f41d60594c41"
+            ]
+        ]
+    },
+    {
+        "id": "adb5dc9421af5579",
+        "type": "function",
+        "z": "d13820078197e616",
+        "name": "function 54",
+        "func": "msg.payload = JSON.parse(msg.payload);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 730,
+        "y": 280,
+        "wires": [
+            [
+                "be6ae8e32096a82a"
+            ]
+        ]
+    },
+    {
+        "id": "73b0fc70536de338",
+        "type": "debug",
+        "z": "d13820078197e616",
+        "name": "debug 55",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 980,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "be6ae8e32096a82a",
+        "type": "debug",
+        "z": "d13820078197e616",
+        "name": "debug 56",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 880,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "9d55b689d4cd8558",
+        "type": "cronplus",
+        "z": "d13820078197e616",
+        "d": true,
+        "name": "",
+        "outputField": "payload",
+        "timeZone": "",
+        "persistDynamic": false,
+        "commandResponseMsgOutput": "output1",
+        "outputs": 1,
+        "options": [
+            {
+                "name": "schedule1",
+                "topic": "topic1",
+                "payloadType": "default",
+                "payload": "",
+                "expressionType": "cron",
+                "expression": "0 0 */1 * * * *",
+                "location": "",
+                "offset": "0",
+                "solarType": "all",
+                "solarEvents": "sunrise,sunset"
+            }
+        ],
+        "x": 100,
+        "y": 760,
+        "wires": [
+            [
+                "28dec8cb7278843d"
+            ]
+        ]
+    },
+    {
+        "id": "28dec8cb7278843d",
+        "type": "function",
+        "z": "d13820078197e616",
+        "name": "function 55",
+        "func": "msg.payload = {\n    grant_type: 'client_credentials'\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 760,
+        "wires": [
+            [
+                "e5a3172e2c504f7e"
+            ]
+        ]
+    },
+    {
+        "id": "28b5063b74f6e089",
+        "type": "inject",
+        "z": "d13820078197e616",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 100,
+        "y": 800,
+        "wires": [
+            [
+                "28dec8cb7278843d"
+            ]
+        ]
+    },
+    {
+        "id": "e5a3172e2c504f7e",
+        "type": "http request",
+        "z": "d13820078197e616",
+        "name": "Hino get vehicles",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "https://api-sandbox.hino.co.id/hmsi/hmsi-std-api/vehicles?size=2000",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "bearer",
+        "senderr": false,
+        "headers": [
+            {
+                "keyType": "other",
+                "keyValue": "X-IBM-Client-Id",
+                "valueType": "other",
+                "valueValue": "6823e121-a1ec-4fff-8711-b5c18486b57b"
+            },
+            {
+                "keyType": "other",
+                "keyValue": "accept",
+                "valueType": "other",
+                "valueValue": "application/json"
+            }
+        ],
+        "x": 370,
+        "y": 800,
+        "wires": [
+            [
+                "8628d12fa8232121"
+            ]
+        ]
+    },
+    {
+        "id": "8628d12fa8232121",
+        "type": "function",
+        "z": "d13820078197e616",
+        "name": "Set query ",
+        "func": "let payload = JSON.parse(msg.payload);\nmsg.isValid = false;\nif (payload.data) {\n    msg.isValid = true;\n    msg.payload = payload;\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 600,
+        "y": 760,
+        "wires": [
+            [
+                "f8af11ab216893d8"
+            ]
+        ]
+    },
+    {
+        "id": "f8af11ab216893d8",
+        "type": "switch",
+        "z": "d13820078197e616",
+        "name": "",
+        "property": "isValid",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 610,
+        "y": 800,
+        "wires": [
+            [
+                "34fa04e5252242d0"
+            ],
+            [
+                "b65f6adae59e882c"
+            ]
+        ]
+    },
+    {
+        "id": "34fa04e5252242d0",
+        "type": "function",
+        "z": "d13820078197e616",
+        "name": "Insert query ",
+        "func": "let payload = msg.payload;\nmsg.data = payload;\nlet query = `INSERT INTO hino_vehicles (vin, plate, name, imei, brand, type, model) VALUES`;\nlet params = [];\npayload.data.forEach(x => {\n    let item = `('${x.vin}', '${x.plate}', '${x.name}', '${x.imei}', '${x.brand}', \n                '${x.type}', '${x.model}')`;\n    params.push(item.replace(/\\n/gm, \" \"));\n});\nquery = query.replace(/\\n/gm, \" \");\nquery = query + ' ' + params.join(', ');\nmsg.params = params;\nmsg.payload = null;\nmsg.topic = query;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 810,
+        "y": 760,
+        "wires": [
+            [
+                "a4be3110b4dfd601"
+            ]
+        ]
+    },
+    {
+        "id": "b65f6adae59e882c",
+        "type": "function",
+        "z": "d13820078197e616",
+        "name": "function 56",
+        "func": "msg.payload = JSON.parse(msg.payload);\ndelete msg.headers;\ndelete msg.headers;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 810,
+        "y": 860,
+        "wires": [
+            [
+                "c225b8fae60c88b9"
+            ]
+        ]
+    },
+    {
+        "id": "a4be3110b4dfd601",
+        "type": "mysql",
+        "z": "d13820078197e616",
+        "mydb": "7f9d98d6c341571a",
+        "name": "",
+        "x": 840,
+        "y": 800,
+        "wires": [
+            [
+                "c225b8fae60c88b9"
+            ]
+        ]
+    },
+    {
+        "id": "c225b8fae60c88b9",
+        "type": "debug",
+        "z": "d13820078197e616",
+        "name": "debug 57",
+        "active": true,
+        "tosidebar": true,
+        "console": true,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1070,
+        "y": 800,
+        "wires": []
+    },
+    {
+        "id": "2d59f41d60594c41",
+        "type": "subflow:f0ae825b26a06b48",
+        "z": "d13820078197e616",
+        "name": "",
+        "x": 760,
+        "y": 220,
+        "wires": [
+            [
+                "73b0fc70536de338"
+            ]
+        ]
     }
 ]
