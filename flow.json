@@ -10160,7 +10160,7 @@
         "type": "cronplus",
         "z": "d13820078197e616",
         "d": true,
-        "name": "",
+        "name": "hino vehicles",
         "outputField": "payload",
         "timeZone": "",
         "persistDynamic": false,
@@ -10180,8 +10180,8 @@
                 "solarEvents": "sunrise,sunset"
             }
         ],
-        "x": 100,
-        "y": 760,
+        "x": 110,
+        "y": 380,
         "wires": [
             [
                 "28dec8cb7278843d"
@@ -10200,7 +10200,7 @@
         "finalize": "",
         "libs": [],
         "x": 350,
-        "y": 760,
+        "y": 380,
         "wires": [
             [
                 "e5a3172e2c504f7e"
@@ -10229,7 +10229,7 @@
         "payload": "",
         "payloadType": "date",
         "x": 100,
-        "y": 800,
+        "y": 420,
         "wires": [
             [
                 "28dec8cb7278843d"
@@ -10266,7 +10266,7 @@
             }
         ],
         "x": 370,
-        "y": 800,
+        "y": 420,
         "wires": [
             [
                 "8628d12fa8232121"
@@ -10280,12 +10280,13 @@
         "name": "Set query ",
         "func": "let payload = JSON.parse(msg.payload);\nmsg.isValid = false;\nif (payload.data) {\n    msg.isValid = true;\n    msg.payload = payload;\n}\nreturn msg;",
         "outputs": 1,
+        "timeout": "",
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
         "x": 600,
-        "y": 760,
+        "y": 380,
         "wires": [
             [
                 "f8af11ab216893d8"
@@ -10311,7 +10312,7 @@
         "repair": false,
         "outputs": 2,
         "x": 610,
-        "y": 800,
+        "y": 420,
         "wires": [
             [
                 "34fa04e5252242d0"
@@ -10325,18 +10326,19 @@
         "id": "34fa04e5252242d0",
         "type": "function",
         "z": "d13820078197e616",
-        "name": "Insert query ",
-        "func": "let payload = msg.payload;\nmsg.data = payload;\nlet query = `INSERT INTO hino_vehicles (vin, plate, name, imei, brand, type, model) VALUES`;\nlet params = [];\npayload.data.forEach(x => {\n    let item = `('${x.vin}', '${x.plate}', '${x.name}', '${x.imei}', '${x.brand}', \n                '${x.type}', '${x.model}')`;\n    params.push(item.replace(/\\n/gm, \" \"));\n});\nquery = query.replace(/\\n/gm, \" \");\nquery = query + ' ' + params.join(', ');\nmsg.params = params;\nmsg.payload = null;\nmsg.topic = query;\nreturn msg;",
+        "name": "prepare documents",
+        "func": "let docs = msg.payload.map(x => {\n    return {\n        szDeviceID: (x.vin) ? x.vin : null,\n        iCatID: null,\n        iSourceID: (x.name) ? x.name : null,\n        szPhysicalNo1: (x.plate) ? x.plate : null,\n        szPhysicalNo2: null,\n        szPhysicalNo3: null,\n        szIMEI: (x.imei) ? x.imei : null,\n        szBrand: (x.brand) ? x.brand : null,\n        szModel: (x.model) ? x.model : null,\n        szType: (x.type) ? x.type : null,\n        szDesciption: null,\n        iCreatedBy: 'cronjob-hino',\n        dtmCreatedDate: new Date(),\n        iModifiedBy: null,\n        dtmModifiedDate: new Date()\n    }\n});\n\nmsg.sub = {\n    database: 'smart-devices',\n    docs: docs\n}\n\nreturn msg;",
         "outputs": 1,
+        "timeout": "",
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 810,
-        "y": 760,
+        "x": 830,
+        "y": 380,
         "wires": [
             [
-                "a4be3110b4dfd601"
+                "df776ab7fafa518d"
             ]
         ]
     },
@@ -10352,43 +10354,12 @@
         "finalize": "",
         "libs": [],
         "x": 810,
-        "y": 860,
+        "y": 460,
         "wires": [
             [
-                "c225b8fae60c88b9"
+                "3614fadd0a981a76"
             ]
         ]
-    },
-    {
-        "id": "a4be3110b4dfd601",
-        "type": "mysql",
-        "z": "d13820078197e616",
-        "mydb": "7f9d98d6c341571a",
-        "name": "",
-        "x": 840,
-        "y": 800,
-        "wires": [
-            [
-                "c225b8fae60c88b9"
-            ]
-        ]
-    },
-    {
-        "id": "c225b8fae60c88b9",
-        "type": "debug",
-        "z": "d13820078197e616",
-        "name": "debug 57",
-        "active": true,
-        "tosidebar": true,
-        "console": true,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 1070,
-        "y": 800,
-        "wires": []
     },
     {
         "id": "2d59f41d60594c41",
@@ -10402,5 +10373,52 @@
                 "73b0fc70536de338"
             ]
         ]
+    },
+    {
+        "id": "3614fadd0a981a76",
+        "type": "debug",
+        "z": "d13820078197e616",
+        "name": "debug 57",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1020,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "df776ab7fafa518d",
+        "type": "subflow:f0ae825b26a06b48",
+        "z": "d13820078197e616",
+        "name": "",
+        "x": 840,
+        "y": 420,
+        "wires": [
+            [
+                "e9dbbf2725b384df"
+            ]
+        ]
+    },
+    {
+        "id": "e9dbbf2725b384df",
+        "type": "debug",
+        "z": "d13820078197e616",
+        "name": "debug 58",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1060,
+        "y": 420,
+        "wires": []
     }
 ]
