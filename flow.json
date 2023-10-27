@@ -554,7 +554,7 @@
     {
         "id": "34c9e2e17c31980a",
         "type": "subflow",
-        "name": "sub: pnmp-get-geojson",
+        "name": "sub: geojson-pnmp-get",
         "info": "// nrlint no-loops:off\n",
         "category": "",
         "in": [
@@ -673,11 +673,77 @@
         "color": "#DDAA99"
     },
     {
+        "id": "7075118feab4d811",
+        "type": "subflow",
+        "name": "sub: geojson-redis-get",
+        "info": "",
+        "category": "",
+        "in": [
+            {
+                "x": 50,
+                "y": 30,
+                "wires": [
+                    {
+                        "id": "2620133002dbd2f4"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 380,
+                "y": 60,
+                "wires": [
+                    {
+                        "id": "2620133002dbd2f4",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [],
+        "meta": {},
+        "color": "#DDAA99"
+    },
+    {
+        "id": "2cfd802f51415515",
+        "type": "subflow",
+        "name": "sub: geojson-couchdb-get",
+        "info": "",
+        "category": "",
+        "in": [
+            {
+                "x": 50,
+                "y": 30,
+                "wires": [
+                    {
+                        "id": "3183d03b99f891d5"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 420,
+                "y": 200,
+                "wires": [
+                    {
+                        "id": "45fa618254c2782e",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [],
+        "meta": {},
+        "color": "#DDAA99"
+    },
+    {
         "id": "92d8c02087d4e3d3",
         "type": "junction",
         "z": "c5b9039a5fc48f97",
-        "x": 1720,
-        "y": 480,
+        "x": 1120,
+        "y": 1240,
         "wires": [
             [
                 "75ff0174239450e9"
@@ -688,8 +754,8 @@
         "id": "75ff0174239450e9",
         "type": "junction",
         "z": "c5b9039a5fc48f97",
-        "x": 660,
-        "y": 380,
+        "x": 60,
+        "y": 1140,
         "wires": [
             [
                 "050293e83401bb46"
@@ -1001,6 +1067,7 @@
         "name": "get scope by code",
         "func": "msg.backup = msg.payload;\nmsg.ori = msg.sub;\nmsg.payload = `scope:${msg.sub}`;\nreturn msg;",
         "outputs": 1,
+        "timeout": "",
         "noerr": 0,
         "initialize": "",
         "finalize": "",
@@ -2551,6 +2618,74 @@
         "finalize": "",
         "libs": [],
         "x": 190,
+        "y": 160,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "2620133002dbd2f4",
+        "type": "redis-command",
+        "z": "7075118feab4d811",
+        "server": "0fb96b870afb5c15",
+        "command": "GET",
+        "name": "",
+        "topic": "",
+        "params": "[]",
+        "paramsType": "json",
+        "payloadType": "json",
+        "block": false,
+        "x": 200,
+        "y": 60,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "3183d03b99f891d5",
+        "type": "function",
+        "z": "2cfd802f51415515",
+        "name": "prepare sub",
+        "func": "let { geoType, groupBy, key } = msg.ori;\nlet pKey;\nlet psm = (key[0]) ? key[0] : null;\nlet estate = (key[0]) ? key[1] : null;\nlet division = (key[0]) ? key[2] : null;\n\nswitch (groupBy) {\n    case 'psm':\n        pKey = psm;\n        break;\n    case 'estate':\n        pKey = [psm, estate];\n        break;\n    case 'division':\n        pKey = [psm, estate, division];\n        break;\n    default:\n        pKey = key;\n        break;\n}\nmsg.sub = {\n    database: 'smart-geojson',\n    design: geoType,\n    view: (groupBy != null) ? `geo-by-${groupBy}` : 'geometry',\n    key: pKey\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 210,
+        "y": 80,
+        "wires": [
+            [
+                "880b6c24e2472c35"
+            ]
+        ]
+    },
+    {
+        "id": "880b6c24e2472c35",
+        "type": "subflow:d7ccf53b2b9fe097",
+        "z": "2cfd802f51415515",
+        "name": "",
+        "x": 240,
+        "y": 120,
+        "wires": [
+            [
+                "45fa618254c2782e"
+            ]
+        ]
+    },
+    {
+        "id": "45fa618254c2782e",
+        "type": "function",
+        "z": "2cfd802f51415515",
+        "name": "check sub",
+        "func": "let found = false;\nlet error = (msg.sub.error) ? true : false;\nif (!msg.sub.error && msg.sub.rows.length > 0) found = true;\n\nmsg.found = found;\nmsg.error = error;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 280,
         "y": 160,
         "wires": [
             []
@@ -7534,7 +7669,7 @@
         "z": "2e56a74c132aeaaf",
         "mydb": "7f9d98d6c341571a",
         "name": "",
-        "x": 650,
+        "x": 680,
         "y": 1300,
         "wires": [
             [
@@ -7572,7 +7707,7 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 900,
+        "x": 980,
         "y": 1300,
         "wires": []
     },
@@ -7786,7 +7921,7 @@
         "z": "2e56a74c132aeaaf",
         "mydb": "7f9d98d6c341571a",
         "name": "",
-        "x": 810,
+        "x": 840,
         "y": 1460,
         "wires": [
             [
@@ -7807,7 +7942,7 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1030,
+        "x": 1070,
         "y": 1460,
         "wires": []
     },
@@ -8788,7 +8923,7 @@
         "upload": false,
         "swaggerDoc": "",
         "x": 100,
-        "y": 60,
+        "y": 300,
         "wires": [
             [
                 "3cdc106f1f3ace69"
@@ -8796,29 +8931,19 @@
         ]
     },
     {
-        "id": "b44d1f07ad63f74b",
-        "type": "http response",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "statusCode": "200",
-        "headers": {},
-        "x": 980,
-        "y": 60,
-        "wires": []
-    },
-    {
         "id": "3cdc106f1f3ace69",
         "type": "function",
         "z": "c5b9039a5fc48f97",
-        "name": "validate & prepare query",
-        "func": "msg.ori = msg.payload;\n\n/**validate */\nlet { geoType, groupBy, key } = msg.payload;\n\nlet { valid, message } = validate(geoType, groupBy, key);\nmsg.valid = valid;\nif (valid) {\n    let keyString = Array.isArray(key) ? key.join(':') : key;\n    let redisKey = `geo:${geoType}:${key.join(':')}`;\n    if (groupBy) redisKey = `geo:${geoType}:group-by-${groupBy}:${keyString}`;\n    msg.redisKey = redisKey;\n    msg.payload = redisKey;\n    msg.askPNMP = false;\n} else {\n    msg.payload = {\n        message: message\n    }\n}\n\nreturn msg;\n\nfunction validate(geoType, groupBy, key) {\n    if (geoType && Array.isArray(key) && key.length > 0) {\n        let psm = (key.length > 0) ? key[0] : null;\n        let estate = (key.length > 1) ? key[1] : null;\n        let division = (key.length > 2) ? key[2] : null;\n        let other = (key.length > 3) ? key[3] : null;\n\n        switch (geoType) {\n            case 'psm':\n                if (key.length > 1 && groupBy != null) {\n                    return {\n                        valid: false,\n                        message: 'key not valid for psm and groupBy must be null'\n                    }\n                }\n                return {\n                    valid: true\n                }\n            case 'estate':\n                if (groupBy === null) {\n                    if (!psm || !estate) {\n                        return {\n                            valid: false,\n                            message: 'provide psm & estate only in key'\n                        }\n                    }\n                } else {\n                    if (groupBy != 'psm') {\n                        return {\n                            valid: false,\n                            message: 'estate can be only group by psm'\n                        }\n                    }\n                    if (!psm) {\n                        return {\n                            valid: false,\n                            message: 'provide at least psm'\n                        }\n                    }\n                }\n                return {\n                    valid: true\n                }\n            case 'division':\n                if (groupBy === null) {\n                    if (!psm || !estate || !division) {\n                        return {\n                            valid: false,\n                            message: 'provide psm, estate, and division only in key'\n                        }\n                    }\n                } else {\n                    if (groupBy != 'psm' && groupBy != 'estate') {\n                        return {\n                            valid: false,\n                            message: 'division can be only group by psm or estate'\n                        }\n                    }\n                    if (groupBy === 'psm' && key.length != 1) {\n                        return {\n                            valid: false,\n                            message: 'provide only psm only in key'\n                        }\n                    }\n                    if (groupBy === 'estate' && key.length != 2) {\n                        return {\n                            valid: false,\n                            message: 'provide psm & estate in key'\n                        }\n                    }\n                }\n                return {\n                    valid: true\n                }\n            case 'block':\n                if (groupBy === null) {\n                    if (!psm || !estate || !division || !other) {\n                        return {\n                            valid: false,\n                            message: 'provide psm, estate, division, block into key'\n                        }\n                    }\n                } else {\n                    if (groupBy != 'psm' && groupBy != 'estate' && groupBy != 'division') {\n                        return {\n                            valid: false,\n                            message: 'block can be only group by psm, estate, or division'\n                        }\n                    }\n                    if (groupBy === 'psm' && key.length != 1) {\n                        return {\n                            valid: false,\n                            message: 'provide only psm only in key'\n                        }\n                    }\n                    if (groupBy === 'estate' && key.length != 2) {\n                        return {\n                            valid: false,\n                            message: 'provide psm & estate only in key'\n                        }\n                    }\n                    if (groupBy === 'division' && key.length != 3) {\n                        return {\n                            valid: false,\n                            message: 'provide psm, estate, and division only in key'\n                        }\n                    }\n                }\n                return {\n                    valid: true\n                }\n            case 'road':\n                if (groupBy === null) {\n                    if (!psm && !estate && !division && !other) {\n                        return {\n                            valid: false,\n                            message: 'provide psm, estate, division, roadID into key'\n                        }\n                    }\n                } else {\n                    if (groupBy != 'psm' && groupBy != 'estate' && groupBy != 'division') {\n                        return {\n                            valid: false,\n                            message: 'road can be only group by psm, estate, or division'\n                        }\n                    }\n                    if (groupBy === 'psm' && key.length != 1) {\n                        return {\n                            valid: false,\n                            message: 'provide only psm only in key'\n                        }\n                    }\n                    if (groupBy === 'estate' && key.length != 2) {\n                        return {\n                            valid: false,\n                            message: 'provide psm & estate only in key'\n                        }\n                    }\n                    if (groupBy === 'division' && key.length != 3) {\n                        return {\n                            valid: false,\n                            message: 'provide psm, estate, and division only in key'\n                        }\n                    }\n                }\n                return {\n                    valid: true\n                }\n            default:\n                return {\n                    valid: false,\n                    message: 'your parameters is not suitable for this api'\n                }\n        }\n    }\n}",
+        "name": "validate",
+        "func": "msg.ori = msg.payload;\n\n/**validate */\nlet { geoType, keys, group } = msg.payload;\nlet { valid, message } = validate(geoType, keys, group);\nif (!valid) msg.payload = message;\nmsg.valid = valid;\nreturn msg;\n\nfunction validate(type, keys, group) {\n    let valid = false;\n    if (!group) {\n        if (!Array.isArray(keys) || keys.length == 0) {\n            return {\n                valid,\n                message: 'at least provide psm on keys'\n            }\n        }\n        return {\n            valid: true\n        }\n    } else {        \n        switch (type) {\n            case 'division':\n                if (keys.length > 2) {\n                    return {\n                        valid,\n                        message: 'set psm, and estate on keys'\n                    }\n                }\n                return {\n                    valid: true\n                }\n            case 'estate':\n                if (keys.length > 1) {\n                    return {\n                        valid,\n                        message: 'set only psm on keys'\n                    }\n                }\n                return {\n                    valid: true\n                }\n            default:\n                if (keys.length == 0) {\n                    return {\n                        valid,\n                        message: 'cannot group on psm'\n                    }\n                }\n                return {\n                    valid: true\n                }\n        }\n    }\n}",
         "outputs": 1,
+        "timeout": "",
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 350,
-        "y": 60,
+        "x": 300,
+        "y": 300,
         "wires": [
             [
                 "851f7f85faba6429"
@@ -8826,137 +8951,147 @@
         ]
     },
     {
-        "id": "b30c98643fb6dc09",
-        "type": "redis-command",
-        "z": "c5b9039a5fc48f97",
-        "server": "0fb96b870afb5c15",
-        "command": "GET",
-        "name": "",
-        "topic": "",
-        "params": "[]",
-        "paramsType": "json",
-        "payloadType": "json",
-        "block": false,
-        "x": 600,
-        "y": 60,
-        "wires": [
-            [
-                "1414e7875149cbbd"
-            ]
-        ]
-    },
-    {
-        "id": "1414e7875149cbbd",
+        "id": "851f7f85faba6429",
         "type": "switch",
         "z": "c5b9039a5fc48f97",
-        "name": "",
-        "property": "payload",
+        "name": "is param valid?",
+        "property": "valid",
         "propertyType": "msg",
         "rules": [
             {
-                "t": "nnull"
+                "t": "true"
             },
             {
-                "t": "else"
+                "t": "false"
             }
         ],
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 610,
-        "y": 100,
+        "x": 320,
+        "y": 340,
         "wires": [
             [
-                "37e7769403f58aaa"
+                "ac196b081e86d3b1"
             ],
             [
-                "050293e83401bb46"
+                "3e72d505847354ab"
             ]
         ]
     },
     {
-        "id": "050293e83401bb46",
+        "id": "3e72d505847354ab",
+        "type": "http response",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "statusCode": "400",
+        "headers": {},
+        "x": 340,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "882309720ac517b1",
+        "type": "cloudantplus in",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-libs",
+        "service": "_ext_",
+        "search": "_view_",
+        "design": "hierarchy",
+        "index": "code",
+        "x": 720,
+        "y": 200,
+        "wires": [
+            [
+                "8ebc0dd80839a811"
+            ]
+        ]
+    },
+    {
+        "id": "3b36d33cf5bcc5e6",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "DIG01-AREA-PNMP",
+        "func": "msg.payload = {\n    key: 'DIG01-AREA-PNMP'\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 760,
+        "y": 160,
+        "wires": [
+            [
+                "882309720ac517b1"
+            ]
+        ]
+    },
+    {
+        "id": "1f7c6a9bef178878",
+        "type": "subflow:44e549ae5408d3d3",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "x": 750,
+        "y": 280,
+        "wires": [
+            [
+                "b6d199accfa5150c"
+            ]
+        ]
+    },
+    {
+        "id": "8ebc0dd80839a811",
         "type": "function",
         "z": "c5b9039a5fc48f97",
         "name": "prepare sub",
-        "func": "let { geoType, groupBy, key } = msg.ori;\nlet pKey;\nlet psm = (key[0]) ? key[0] : null;\nlet estate = (key[0]) ? key[1] : null;\nlet division = (key[0]) ? key[2] : null;\n\nswitch (groupBy) {\n    case 'psm':\n        pKey = psm;\n        break;\n    case 'estate':\n        pKey = [psm, estate];\n        break;\n    case 'division':\n        pKey = [psm, estate, division];\n        break;\n    default:\n        pKey = key;\n        break;\n}\nmsg.sub = {\n    database: 'smart-geojson',\n    design: geoType,\n    view: (groupBy != null) ? `geo-by-${groupBy}` : 'geometry',\n    key: pKey\n}\nreturn msg;",
+        "func": "let { group, keys } = msg.ori;\nlet [psm, estate, division] = [...keys];\nlet scope = keys[keys.length - 1];\nif (group) {\n    if (psm && !estate && !division) scope = psm;\n    else if (psm && estate && !division) scope = estate;\n    else if (psm && estate && division) scope = division;\n}\n\nmsg.sub = {\n    obj: msg.payload[0].data,\n    key: 'name',\n    val: scope\n}\nreturn msg;",
         "outputs": 1,
-        "timeout": "",
+        "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 790,
-        "y": 140,
+        "x": 730,
+        "y": 240,
         "wires": [
             [
-                "9557bf780ba895b6"
+                "1f7c6a9bef178878"
             ]
         ]
     },
     {
-        "id": "9557bf780ba895b6",
-        "type": "subflow:d7ccf53b2b9fe097",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "x": 820,
-        "y": 180,
-        "wires": [
-            [
-                "66ba522f6c15c4fc"
-            ]
-        ]
-    },
-    {
-        "id": "37e7769403f58aaa",
-        "type": "function",
-        "z": "c5b9039a5fc48f97",
-        "name": "function 49",
-        "func": "msg.payload = JSON.parse(msg.payload);\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 790,
-        "y": 60,
-        "wires": [
-            [
-                "b44d1f07ad63f74b"
-            ]
-        ]
-    },
-    {
-        "id": "bc1ab5bdfd6e6010",
-        "type": "function",
-        "z": "c5b9039a5fc48f97",
-        "name": "prepare & result",
-        "func": "\nlet payload = {\n    geojson: {\n        type: 'FeatureCollection',\n        features: msg.sub.rows.map(x => {\n            return { ...x }\n        })\n    }\n};\n\nmsg.sub = {\n    key: msg.redisKey,\n    payload: JSON.stringify(payload),\n    ttl: Number(env.get('NODERED_TTL')) * 60\n}\nmsg.payload = payload;\nreturn msg;",
-        "outputs": 1,
-        "timeout": "",
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 1300,
-        "y": 260,
-        "wires": [
-            [
-                "52c38b07acdd2b44",
-                "69d30779b2ab588f"
-            ]
-        ]
-    },
-    {
-        "id": "52c38b07acdd2b44",
+        "id": "d49f98aeb3bb1961",
         "type": "http response",
         "z": "c5b9039a5fc48f97",
         "name": "",
         "statusCode": "200",
         "headers": {},
-        "x": 1520,
-        "y": 260,
+        "x": 920,
+        "y": 320,
         "wires": []
+    },
+    {
+        "id": "b6d199accfa5150c",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "function 59",
+        "func": "let payload = msg.sub;\nlet { geoType, keys } = msg.ori;\n\nmsg.payload = destruction(payload, geoType, keys)\nreturn msg;\n\nfunction destruction(obj, type, keys) {\n  let [psm, estate] = [...keys];\n  let rs = [];\n  switch (obj.category) {\n    case 'PSM':\n      let p = obj.name;\n      if (type == 'psm') {\n        rs.push({\n          psm: p\n        })\n      } else {\n        obj.children.forEach(estate => {\n          let e = estate.name;\n          if (type == 'estate') {\n            rs.push({\n              psm: p,\n              estate: e\n            })\n          } else {\n            estate.children.forEach(division => {\n              let d = division.name;\n              if (type == 'division' || type == 'block' || type == 'road') {\n                rs.push({\n                  psm: p,\n                  estate: e,\n                  division: d\n                })\n              }\n            })\n          }\n        });\n      }\n      break;\n    case 'ESTATE':\n      let e = obj.name;\n      if (type == 'estate') {\n        rs.push({\n          psm: psm,\n          estate: e\n        })\n      } else {\n        obj.children.forEach(division => {\n          let d = division.name;\n          if (type == 'division' || type == 'block' || type == 'road') {\n            rs.push({\n              psm: psm,\n              estate: e,\n              division: d\n            })\n          }\n        })\n      }\n      break;\n    case 'DIVISION':\n      rs.push({\n        psm,\n        estate,\n        division: obj.name\n      })\n      break;\n  }\n  return rs;\n}",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 730,
+        "y": 320,
+        "wires": [
+            [
+                "d49f98aeb3bb1961"
+            ]
+        ]
     },
     {
         "id": "fab1bfa7b82e5a27",
@@ -8965,37 +9100,9 @@
         "name": "",
         "statusCode": "400",
         "headers": {},
-        "x": 1780,
-        "y": 560,
+        "x": 1180,
+        "y": 1320,
         "wires": []
-    },
-    {
-        "id": "69d30779b2ab588f",
-        "type": "subflow:183547d77875ed65",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "x": 1540,
-        "y": 300,
-        "wires": []
-    },
-    {
-        "id": "66ba522f6c15c4fc",
-        "type": "function",
-        "z": "c5b9039a5fc48f97",
-        "name": "check sub",
-        "func": "let found = false;\nlet error = (msg.sub.error) ? true : false;\nif (!msg.sub.error && msg.sub.rows.length > 0) found = true;\n\nmsg.found = found;\nmsg.error = error;\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 860,
-        "y": 220,
-        "wires": [
-            [
-                "351c3d9473e73624"
-            ]
-        ]
     },
     {
         "id": "2391abfbae7258e2",
@@ -9015,8 +9122,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 1070,
-        "y": 360,
+        "x": 470,
+        "y": 1120,
         "wires": [
             [
                 "bc1ab5bdfd6e6010"
@@ -9031,8 +9138,8 @@
         "type": "subflow:34c9e2e17c31980a",
         "z": "c5b9039a5fc48f97",
         "name": "",
-        "x": 1560,
-        "y": 440,
+        "x": 960,
+        "y": 1200,
         "wires": [
             [
                 "9aa91097cda8fa4d"
@@ -9050,8 +9157,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1560,
-        "y": 400,
+        "x": 960,
+        "y": 1160,
         "wires": [
             [
                 "439f7293831d0618"
@@ -9069,8 +9176,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1600,
-        "y": 480,
+        "x": 1000,
+        "y": 1240,
         "wires": [
             [
                 "ca03c8808883ea6c"
@@ -9095,8 +9202,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 1610,
-        "y": 520,
+        "x": 1010,
+        "y": 1280,
         "wires": [
             [
                 "92d8c02087d4e3d3"
@@ -9105,73 +9212,6 @@
                 "fab1bfa7b82e5a27"
             ]
         ]
-    },
-    {
-        "id": "351c3d9473e73624",
-        "type": "switch",
-        "z": "c5b9039a5fc48f97",
-        "name": "error ?",
-        "property": "error",
-        "propertyType": "msg",
-        "rules": [
-            {
-                "t": "true"
-            },
-            {
-                "t": "false"
-            }
-        ],
-        "checkall": "true",
-        "repair": false,
-        "outputs": 2,
-        "x": 870,
-        "y": 260,
-        "wires": [
-            [
-                "8b1a94a59e2923b4"
-            ],
-            [
-                "2391abfbae7258e2"
-            ]
-        ]
-    },
-    {
-        "id": "8b1a94a59e2923b4",
-        "type": "change",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "rules": [
-            {
-                "t": "set",
-                "p": "payload",
-                "pt": "msg",
-                "to": "sub",
-                "tot": "msg"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 1080,
-        "y": 220,
-        "wires": [
-            [
-                "918e0eb45089e3ff"
-            ]
-        ]
-    },
-    {
-        "id": "918e0eb45089e3ff",
-        "type": "http response",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "statusCode": "400",
-        "headers": {},
-        "x": 1280,
-        "y": 220,
-        "wires": []
     },
     {
         "id": "e0cdd9416d39b75f",
@@ -9192,8 +9232,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1550,
-        "y": 360,
+        "x": 950,
+        "y": 1120,
         "wires": [
             [
                 "87cbd51cea452447"
@@ -9218,8 +9258,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 1290,
-        "y": 480,
+        "x": 690,
+        "y": 1240,
         "wires": [
             [
                 "e0cdd9416d39b75f"
@@ -9248,8 +9288,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1540,
-        "y": 580,
+        "x": 940,
+        "y": 1340,
         "wires": [
             [
                 "d8c18798b2f32ff6"
@@ -9263,48 +9303,8 @@
         "name": "",
         "statusCode": "400",
         "headers": {},
-        "x": 1560,
-        "y": 620,
-        "wires": []
-    },
-    {
-        "id": "851f7f85faba6429",
-        "type": "switch",
-        "z": "c5b9039a5fc48f97",
-        "name": "is param valid?",
-        "property": "valid",
-        "propertyType": "msg",
-        "rules": [
-            {
-                "t": "true"
-            },
-            {
-                "t": "false"
-            }
-        ],
-        "checkall": "true",
-        "repair": false,
-        "outputs": 2,
-        "x": 380,
-        "y": 100,
-        "wires": [
-            [
-                "b30c98643fb6dc09"
-            ],
-            [
-                "98437c080838f515"
-            ]
-        ]
-    },
-    {
-        "id": "98437c080838f515",
-        "type": "http response",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "statusCode": "400",
-        "headers": {},
-        "x": 600,
-        "y": 160,
+        "x": 960,
+        "y": 1380,
         "wires": []
     },
     {
@@ -9328,8 +9328,8 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 100,
-        "y": 540,
+        "x": 140,
+        "y": 1280,
         "wires": [
             [
                 "0d1bce6d9d023063"
@@ -9347,8 +9347,8 @@
         "search": "_view_",
         "design": "hierarchy",
         "index": "code",
-        "x": 280,
-        "y": 580,
+        "x": 320,
+        "y": 1320,
         "wires": [
             [
                 "deeb91c3977c5392"
@@ -9367,8 +9367,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 290,
-        "y": 540,
+        "x": 330,
+        "y": 1280,
         "wires": [
             [
                 "2daf693ac1eea4ce"
@@ -9388,8 +9388,8 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 560,
-        "y": 660,
+        "x": 600,
+        "y": 1400,
         "wires": []
     },
     {
@@ -9397,15 +9397,15 @@
         "type": "function",
         "z": "c5b9039a5fc48f97",
         "name": "function 58",
-        "func": "// msg.sub = {\n//     obj: msg.payload[0].data,\n//     key: 'name',\n//     val: 'LIBE'\n// }\n\nmsg.sub = {\n    obj: msg.payload[0].data,\n    key: 'name',\n    scopes: ['LIBE']\n}\nreturn msg;",
+        "func": "// msg.sub = {\n//     obj: msg.payload[0].data,\n//     key: 'name',\n//     val: 'LIBE'\n// }\n\nmsg.sub = {\n    obj: msg.payload[0].data,\n    key: 'name',\n    scopes: ['PSM 1']\n}\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 290,
-        "y": 620,
+        "x": 330,
+        "y": 1360,
         "wires": [
             [
                 "a6497b6e68bc5e2b"
@@ -9417,13 +9417,513 @@
         "type": "subflow:63baa18a398cf25b",
         "z": "c5b9039a5fc48f97",
         "name": "",
-        "x": 330,
-        "y": 660,
+        "x": 370,
+        "y": 1400,
         "wires": [
             [
                 "dcdc514ec032e6ae"
             ]
         ]
+    },
+    {
+        "id": "050293e83401bb46",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "prepare sub",
+        "func": "let { geoType, groupBy, key } = msg.ori;\nlet pKey;\nlet psm = (key[0]) ? key[0] : null;\nlet estate = (key[0]) ? key[1] : null;\nlet division = (key[0]) ? key[2] : null;\n\nswitch (groupBy) {\n    case 'psm':\n        pKey = psm;\n        break;\n    case 'estate':\n        pKey = [psm, estate];\n        break;\n    case 'division':\n        pKey = [psm, estate, division];\n        break;\n    default:\n        pKey = key;\n        break;\n}\nmsg.sub = {\n    database: 'smart-geojson',\n    design: geoType,\n    view: (groupBy != null) ? `geo-by-${groupBy}` : 'geometry',\n    key: pKey\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 190,
+        "y": 900,
+        "wires": [
+            [
+                "9557bf780ba895b6"
+            ]
+        ]
+    },
+    {
+        "id": "9557bf780ba895b6",
+        "type": "subflow:d7ccf53b2b9fe097",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "x": 220,
+        "y": 940,
+        "wires": [
+            [
+                "66ba522f6c15c4fc"
+            ]
+        ]
+    },
+    {
+        "id": "bc1ab5bdfd6e6010",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "prepare & result",
+        "func": "\nlet payload = {\n    geojson: {\n        type: 'FeatureCollection',\n        features: msg.sub.rows.map(x => {\n            return { ...x }\n        })\n    }\n};\n\nmsg.sub = {\n    key: msg.redisKey,\n    payload: JSON.stringify(payload),\n    ttl: Number(env.get('NODERED_TTL')) * 60\n}\nmsg.payload = payload;\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 700,
+        "y": 1020,
+        "wires": [
+            [
+                "52c38b07acdd2b44",
+                "69d30779b2ab588f"
+            ]
+        ]
+    },
+    {
+        "id": "52c38b07acdd2b44",
+        "type": "http response",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 920,
+        "y": 1020,
+        "wires": []
+    },
+    {
+        "id": "69d30779b2ab588f",
+        "type": "subflow:183547d77875ed65",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "x": 940,
+        "y": 1060,
+        "wires": []
+    },
+    {
+        "id": "66ba522f6c15c4fc",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "check sub",
+        "func": "let found = false;\nlet error = (msg.sub.error) ? true : false;\nif (!msg.sub.error && msg.sub.rows.length > 0) found = true;\n\nmsg.found = found;\nmsg.error = error;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 260,
+        "y": 980,
+        "wires": [
+            [
+                "351c3d9473e73624"
+            ]
+        ]
+    },
+    {
+        "id": "351c3d9473e73624",
+        "type": "switch",
+        "z": "c5b9039a5fc48f97",
+        "name": "error ?",
+        "property": "error",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 270,
+        "y": 1020,
+        "wires": [
+            [
+                "8b1a94a59e2923b4"
+            ],
+            [
+                "2391abfbae7258e2"
+            ]
+        ]
+    },
+    {
+        "id": "8b1a94a59e2923b4",
+        "type": "change",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "sub",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 480,
+        "y": 980,
+        "wires": [
+            [
+                "918e0eb45089e3ff"
+            ]
+        ]
+    },
+    {
+        "id": "918e0eb45089e3ff",
+        "type": "http response",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "statusCode": "400",
+        "headers": {},
+        "x": 680,
+        "y": 980,
+        "wires": []
+    },
+    {
+        "id": "6b83e97108c72deb",
+        "type": "http response",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 940,
+        "y": 700,
+        "wires": []
+    },
+    {
+        "id": "55f2f1f5ac69a94d",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "set key",
+        "func": "msg.payload = {\n    key: 'DIG01-AREA-PNMP'\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 160,
+        "y": 660,
+        "wires": [
+            [
+                "428b8c36af7e7149"
+            ]
+        ]
+    },
+    {
+        "id": "428b8c36af7e7149",
+        "type": "cloudantplus in",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-libs",
+        "service": "_ext_",
+        "search": "_view_",
+        "design": "hierarchy",
+        "index": "code",
+        "x": 160,
+        "y": 700,
+        "wires": [
+            [
+                "26c60847a2f4d7e1"
+            ]
+        ]
+    },
+    {
+        "id": "26c60847a2f4d7e1",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "prepare sub",
+        "func": "let { groupBy, key } = msg.ori;\nlet [psm, estate, division] = key;\n\nlet keyScope;\nswitch (groupBy) {\n    case 'division':\n        keyScope = division;\n        break;\n    case 'estate':\n        keyScope = estate;\n        break;\n    default:\n        keyScope = psm;\n        break;\n}\n\nmsg.sub = {\n    obj: msg.payload[0].data,\n    key: 'name',\n    scopes: [keyScope]\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 170,
+        "y": 740,
+        "wires": [
+            [
+                "1421fe8e100e41f4"
+            ]
+        ]
+    },
+    {
+        "id": "1421fe8e100e41f4",
+        "type": "subflow:63baa18a398cf25b",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "x": 210,
+        "y": 780,
+        "wires": [
+            [
+                "72c29794fbdcbdae"
+            ]
+        ]
+    },
+    {
+        "id": "72c29794fbdcbdae",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "prepare array",
+        "func": "if (Array.isArray(msg.sub) && msg.sub.length > 0) {\n    let { geoType } = msg.ori;\n    let data = msg.sub.filter(x => x.category === geoType.toUpperCase());\n    msg.payload = data;\n} else {\n    msg.payload = [];\n}\ndelete msg.sub;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 180,
+        "y": 820,
+        "wires": [
+            [
+                "6d0c9dce088335ec"
+            ]
+        ]
+    },
+    {
+        "id": "6d0c9dce088335ec",
+        "type": "split",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "splt": "\\n",
+        "spltType": "str",
+        "arraySplt": 1,
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "x": 270,
+        "y": 860,
+        "wires": [
+            [
+                "5b59c3cbc2a003cc"
+            ]
+        ]
+    },
+    {
+        "id": "2d802b81087a9783",
+        "type": "join",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "mode": "auto",
+        "build": "object",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "accumulate": "false",
+        "timeout": "",
+        "count": "",
+        "reduceRight": false,
+        "x": 930,
+        "y": 660,
+        "wires": [
+            [
+                "6b83e97108c72deb",
+                "7b82b02362cc8e68"
+            ]
+        ]
+    },
+    {
+        "id": "5b59c3cbc2a003cc",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "prepare sub",
+        "func": "let { geoType, key } = msg.ori;\nlet [psm, estate, division, other] = key;\nmsg.sub = {\n    key: `geo:${geoType}:${psm}${(estate) ? ':' + estate : ''}${(division) ? ':' + division : ''}${(other) ? ':' + other : ''}`\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 490,
+        "y": 660,
+        "wires": [
+            [
+                "16e7002ad60085eb",
+                "b4325ad2188b6ce7"
+            ]
+        ]
+    },
+    {
+        "id": "16e7002ad60085eb",
+        "type": "redis-command",
+        "z": "c5b9039a5fc48f97",
+        "server": "0fb96b870afb5c15",
+        "command": "GET",
+        "name": "",
+        "topic": "",
+        "params": "[]",
+        "paramsType": "json",
+        "payloadType": "json",
+        "block": false,
+        "x": 480,
+        "y": 700,
+        "wires": [
+            [
+                "1c23152a4840b220"
+            ]
+        ]
+    },
+    {
+        "id": "7b82b02362cc8e68",
+        "type": "debug",
+        "z": "c5b9039a5fc48f97",
+        "name": "debug 60",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1140,
+        "y": 660,
+        "wires": []
+    },
+    {
+        "id": "b4325ad2188b6ce7",
+        "type": "debug",
+        "z": "c5b9039a5fc48f97",
+        "name": "debug 61",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 680,
+        "y": 660,
+        "wires": []
+    },
+    {
+        "id": "1c23152a4840b220",
+        "type": "switch",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "nnull"
+            },
+            {
+                "t": "null"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 510,
+        "y": 740,
+        "wires": [
+            [
+                "2d802b81087a9783"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "4fb04838da890f62",
+        "type": "subflow:63baa18a398cf25b",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "x": 870,
+        "y": 480,
+        "wires": [
+            [
+                "0f040af1fac2d403"
+            ]
+        ]
+    },
+    {
+        "id": "0f040af1fac2d403",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "filter by geoType",
+        "func": "let { geoType } = msg.ori;\nif (msg.sub) msg.payload = msg.sub.filter(x => x.category === geoType.toUpperCase());\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 840,
+        "y": 520,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ac196b081e86d3b1",
+        "type": "switch",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "property": "ori.group",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 510,
+        "y": 300,
+        "wires": [
+            [
+                "3b36d33cf5bcc5e6"
+            ],
+            [
+                "b2eada42f9e5af3a"
+            ]
+        ]
+    },
+    {
+        "id": "b2eada42f9e5af3a",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "function 60",
+        "func": "let { geoType, keys } = msg.ori;\nlet [psm, estate, division, other] = keys;\nmsg.payload = [`geo:${geoType}:${psm}${(estate) ? ':' + estate : ''}${(division) ? ':' + division : ''}${(other) ? ':' + other : ''}`];\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 730,
+        "y": 380,
+        "wires": [
+            [
+                "7330dececec1df2b"
+            ]
+        ]
+    },
+    {
+        "id": "7330dececec1df2b",
+        "type": "http response",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 920,
+        "y": 380,
+        "wires": []
     },
     {
         "id": "2158300e6fc8788f",
