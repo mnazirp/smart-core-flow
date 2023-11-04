@@ -124,13 +124,21 @@
         "type": "tab",
         "label": "GeoJSON",
         "disabled": false,
-        "info": "// nrlint no-loops:off\n",
+        "info": "// nrlint no-loops:off, function-eslint:off\n",
         "env": []
     },
     {
         "id": "d13820078197e616",
         "type": "tab",
         "label": "Vehicle Tracking",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "f26db8e574ea05fe",
+        "type": "tab",
+        "label": "CouchDB",
         "disabled": false,
         "info": "",
         "env": []
@@ -370,7 +378,7 @@
         "id": "44e549ae5408d3d3",
         "type": "subflow",
         "name": "algo: find-nested",
-        "info": "",
+        "info": "# Input\r\n\r\n### msg.sub\r\n\r\n    {\r\n        obj: msg.payload[0].data,\r\n        key: 'name',\r\n        val: scope\r\n    }",
         "category": "",
         "in": [
             {
@@ -555,7 +563,7 @@
         "id": "34c9e2e17c31980a",
         "type": "subflow",
         "name": "sub: geojson-pnmp-get",
-        "info": "// nrlint no-loops:off\n",
+        "info": "# Input\n\n### sub input\n\n    {\n        scopeType: 'psm',\n        ref1: psm,\n        ref2: null,\n        ref3: null\n    }\n\n### sub output\n\n    {\n        \n    }",
         "category": "",
         "in": [
             {
@@ -588,7 +596,7 @@
         "id": "d7ccf53b2b9fe097",
         "type": "subflow",
         "name": "sub: couch-view-get",
-        "info": "## input\r\n\r\nmsg.sub\r\n\r\n    {\r\n        database: 'smart-geojson',\r\n        design: 'division',\r\n        view: 'geo-by-estate',\r\n        key: ['PSM 5', 'LIBE']\r\n    }\r\n",
+        "info": "## input\r\n\r\nmsg.sub\r\n\r\n    {\r\n        database: 'smart-geojson',\r\n        design: 'division',\r\n        view: 'geo-by-estate',\r\n        key: ['PSM 5', 'LIBE']\r\n    }\n\n// nrlint function-eslint:off\n",
         "category": "",
         "in": [
             {
@@ -739,28 +747,74 @@
         "color": "#DDAA99"
     },
     {
-        "id": "92d8c02087d4e3d3",
-        "type": "junction",
-        "z": "c5b9039a5fc48f97",
-        "x": 1120,
-        "y": 1240,
-        "wires": [
-            [
-                "75ff0174239450e9"
-            ]
-        ]
+        "id": "188768fc5fe509fd",
+        "type": "subflow",
+        "name": "sub: pnmp-basemap",
+        "info": "",
+        "category": "",
+        "in": [
+            {
+                "x": 60,
+                "y": 80,
+                "wires": [
+                    {
+                        "id": "bb765dc76a562151"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 780,
+                "y": 80,
+                "wires": [
+                    {
+                        "id": "a7ca5ffbce7ac4a7",
+                        "port": 0
+                    },
+                    {
+                        "id": "f4842fd4e028e2af",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [],
+        "meta": {},
+        "color": "#DDAA99"
     },
     {
-        "id": "75ff0174239450e9",
-        "type": "junction",
-        "z": "c5b9039a5fc48f97",
-        "x": 60,
-        "y": 1140,
-        "wires": [
-            [
-                "050293e83401bb46"
-            ]
-        ]
+        "id": "3c790259a2397aef",
+        "type": "subflow",
+        "name": "sub: geojson-bulk-delete-insert",
+        "info": "// nrlint function-eslint:off\n",
+        "category": "",
+        "in": [
+            {
+                "x": 60,
+                "y": 100,
+                "wires": [
+                    {
+                        "id": "124d7410ca5363a8"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 1040,
+                "y": 280,
+                "wires": [
+                    {
+                        "id": "983841bc2a8d699f",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [],
+        "meta": {},
+        "color": "#DDAA99"
     },
     {
         "id": "784d89e62dfb5070",
@@ -1873,6 +1927,7 @@
         "name": "mapping data & set filter by props",
         "func": "let payload = JSON.parse(msg.payload);\nlet docs;\nlet keys;\nmsg.type = msg.sub.scopeType;\nswitch (msg.sub.scopeType) {\n    case 'psm':\n        docs = payload.data.geojson.features.map(x => {\n            return {\n                psm: x.properties.psm,\n                pt: x.properties.pt,\n                type: x.type,\n                properties: x.properties,\n                geometry: x.geometry\n            }\n        });\n        keys = payload.data.geojson.features.map(x => {\n            return [\n                x.properties.psm,\n                x.properties.pt\n            ];\n        });\n        break;\n    case 'estate':\n        docs = payload.data.geojson.features.map(x => {\n            return {\n                psm: x.properties.psm,\n                pt: x.properties.pt,\n                estate: x.properties.estate,\n                type: x.type,\n                properties: x.properties,\n                geometry: x.geometry\n            }\n        });\n        keys = payload.data.geojson.features.map(x => {\n            return [\n                x.properties.psm,\n                x.properties.pt,\n                x.properties.estate,\n            ];\n        });\n        break;\n    case 'division':\n        docs = payload.data.geojson.features.map(x => {\n            return {\n                psm: x.properties.psm,\n                pt: x.properties.pt,\n                estate: x.properties.estate,\n                division: x.properties.divisi,\n                type: x.type,\n                properties: x.properties,\n                geometry: x.geometry\n            }\n        });\n        keys = payload.data.geojson.features.map(x => {\n            return [\n                x.properties.psm,\n                x.properties.pt,\n                x.properties.estate,\n                x.properties.divisi,\n            ];\n        });\n        break;\n    case 'block':\n        docs = payload.data.geojson.features.map(x => {\n            return {\n                psm: x.properties.psm,\n                pt: x.properties.pt,\n                estate: x.properties.estate,\n                division: x.properties.divisi,\n                block: x.properties.blok,\n                type: x.type,\n                properties: x.properties,\n                geometry: x.geometry\n            }\n        });\n        keys = payload.data.geojson.features.map(x => {\n            return [\n                x.properties.psm,\n                x.properties.pt,\n                x.properties.estate,\n                x.properties.divisi,\n                x.properties.blok,\n            ];\n        });\n        break;\n    case 'road':\n        docs = payload.data.geojson.features.map(x => {\n            return {\n                psm: x.properties.psm,\n                pt: x.properties.pt,\n                estate: x.properties.estate_code,\n                division: x.properties.divisi,\n                roadID: x.properties.id_jalan,\n                roadType: x.properties.kls_jalan,\n                type: x.type,\n                properties: x.properties,\n                geometry: x.geometry\n            }\n        });\n        keys = payload.data.geojson.features.map(x => {\n            return [\n                x.properties.psm,\n                x.properties.pt,\n                x.properties.estate_code,\n                x.properties.divisi,\n                x.properties.id_jalan\n            ];\n        });\n        break;\n}\nmsg.payload = {\n    keys: keys\n}\nmsg.documents = {\n    docs: docs\n}\nreturn msg;",
         "outputs": 1,
+        "timeout": "",
         "noerr": 0,
         "initialize": "",
         "finalize": "",
@@ -2181,6 +2236,7 @@
         "name": "read sub payload",
         "func": "/**backup payload */\nmsg.backup = msg.payload;\n\nlet { scopeType, ref1, ref2, ref3 } = msg.sub;\nlet url = `https://digistage.sinarmas-agri.com/api-app-portal-beta/api/pnmp_basemap?scope_type=${scopeType}&ref1=${ref1}`;\nif (ref2) {\n    url += `&ref2=${ref2}`;\n    if (ref3) url += `&ref3=${ref3}`;\n}\nmsg.url = url;\nmsg.renewToken = false;\nreturn msg;",
         "outputs": 1,
+        "timeout": "",
         "noerr": 0,
         "initialize": "",
         "finalize": "",
@@ -2200,6 +2256,7 @@
         "name": "function 42",
         "func": "delete msg.url;\nreturn msg;",
         "outputs": 1,
+        "timeout": "",
         "noerr": 0,
         "initialize": "",
         "finalize": "",
@@ -2449,8 +2506,9 @@
         "type": "function",
         "z": "d7ccf53b2b9fe097",
         "name": "read sub",
-        "func": "msg.backup = msg.payload;\n\nlet { database, design, view, key } = msg.sub;\nlet keyStr = (Array.isArray(key)) ? `[${key.map(x => `\"${x}\"`).join(',')}]` : `\"${key}\"`;\nmsg.url = `http://localhost:5930/${database}/_design/${design}/_view/${view}?key=${keyStr}`;\n\nreturn msg;",
+        "func": "msg.backup = msg.payload;\n\nlet { database, design, view, key } = msg.sub;\nlet keyStr = (Array.isArray(key)) ? `[${key.map(x => `\"${x}\"`).join(',')}]` : `\"${key}\"`;\nmsg.url = `${env.get('DOCKER_COUCHDB_DOMAIN')}/${database}/_design/${design}/_view/${view}?key=${keyStr}`;\nmsg.headers = {\n    \"Authorization\": \"Basic \" +\n        Buffer.from(`${env.get('DOCKER_COUCHDB_USER')}:${env.get('DOCKER_COUCHDB_PASSWORD')}`).toString(\"base64\"),\n    \"Content-Type\": \"application/json; charset=utf-8\"\n}\nreturn msg;",
         "outputs": 1,
+        "timeout": "",
         "noerr": 0,
         "initialize": "",
         "finalize": "",
@@ -2689,6 +2747,397 @@
         "y": 160,
         "wires": [
             []
+        ]
+    },
+    {
+        "id": "81d4d62cd1c8e791",
+        "type": "http request",
+        "z": "188768fc5fe509fd",
+        "name": "",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 250,
+        "y": 120,
+        "wires": [
+            [
+                "74fc87c448219683"
+            ]
+        ]
+    },
+    {
+        "id": "bb765dc76a562151",
+        "type": "function",
+        "z": "188768fc5fe509fd",
+        "name": "read sub payload",
+        "func": "/**backup payload */\nmsg.backup = msg.payload;\n\nlet { scopeType, ref1, ref2, ref3 } = msg.sub;\nlet url = `${env.get('PNMP_API_URL')}/pnmp_basemap?scope_type=${scopeType}&ref1=${ref1}`;\nif (ref2) {\n    url += `&ref2=${ref2}`;\n    if (ref3) url += `&ref3=${ref3}`;\n}\nmsg.url = url;\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 230,
+        "y": 80,
+        "wires": [
+            [
+                "81d4d62cd1c8e791"
+            ]
+        ]
+    },
+    {
+        "id": "a7ca5ffbce7ac4a7",
+        "type": "function",
+        "z": "188768fc5fe509fd",
+        "name": "parse payload",
+        "func": "msg.sub = JSON.parse(msg.payload);\nmsg.payload = msg.backup;\ndelete msg.backup;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 620,
+        "y": 80,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "f4842fd4e028e2af",
+        "type": "function",
+        "z": "188768fc5fe509fd",
+        "name": "EAI_AGAIN",
+        "func": "msg.sub = {\n    error: msg.payload\n};\nmsg.payload = msg.backup;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 610,
+        "y": 160,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "74fc87c448219683",
+        "type": "switch",
+        "z": "188768fc5fe509fd",
+        "name": "error?",
+        "property": "statusCode",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "gte",
+                "v": "200",
+                "vt": "num"
+            },
+            {
+                "t": "eq",
+                "v": "EAI_AGAIN",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 430,
+        "y": 120,
+        "wires": [
+            [
+                "a7ca5ffbce7ac4a7"
+            ],
+            [
+                "f4842fd4e028e2af"
+            ]
+        ]
+    },
+    {
+        "id": "074505bef39bc7ec",
+        "type": "http request",
+        "z": "3c790259a2397aef",
+        "name": "",
+        "method": "POST",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "http://localhost:5930/smart-geojson/_bulk_docs",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "basic",
+        "senderr": false,
+        "headers": [],
+        "x": 730,
+        "y": 280,
+        "wires": [
+            [
+                "983841bc2a8d699f"
+            ]
+        ]
+    },
+    {
+        "id": "218a739b30e6520f",
+        "type": "cloudantplus in",
+        "z": "3c790259a2397aef",
+        "name": "filter/division",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-geojson",
+        "service": "_ext_",
+        "search": "_view_",
+        "design": "filter",
+        "index": "division",
+        "x": 490,
+        "y": 160,
+        "wires": [
+            [
+                "b7023ff3abe0b03f"
+            ]
+        ]
+    },
+    {
+        "id": "b7023ff3abe0b03f",
+        "type": "function",
+        "z": "3c790259a2397aef",
+        "name": "prepare docs id for delete",
+        "func": "msg.payload = {\n    docs: msg.payload.map(x => {\n        return { ...x, _deleted: true }\n    })\n}; \nmsg.url = `${env.get('DOCKER_COUCHDB_DOMAIN')}/smart-geojson/_bulk_docs`\nmsg.headers = {\n    \"Authorization\": \"Basic \" +\n        Buffer.from(`${env.get('DOCKER_COUCHDB_USER')}:${env.get('DOCKER_COUCHDB_PASSWORD')}`).toString(\"base64\"),\n    \"Content-Type\": \"application/json; charset=utf-8\"\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 770,
+        "y": 160,
+        "wires": [
+            [
+                "8713fa1ac7826c50"
+            ]
+        ]
+    },
+    {
+        "id": "8713fa1ac7826c50",
+        "type": "http request",
+        "z": "3c790259a2397aef",
+        "name": "bulk delete",
+        "method": "POST",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "http://localhost:5930/smart-geojson/_bulk_docs",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 730,
+        "y": 200,
+        "wires": [
+            [
+                "56e8c7384d076572"
+            ]
+        ]
+    },
+    {
+        "id": "73ed853ed8ccad3c",
+        "type": "switch",
+        "z": "3c790259a2397aef",
+        "name": "",
+        "property": "type",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "psm",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "estate",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "division",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "block",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "road",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 5,
+        "x": 270,
+        "y": 160,
+        "wires": [
+            [
+                "366861ce468a7842"
+            ],
+            [
+                "e618929b83c729a0"
+            ],
+            [
+                "218a739b30e6520f"
+            ],
+            [
+                "39fc646bfe061a2b"
+            ],
+            [
+                "9eb43b3be552f09d"
+            ]
+        ]
+    },
+    {
+        "id": "39fc646bfe061a2b",
+        "type": "cloudantplus in",
+        "z": "3c790259a2397aef",
+        "name": "filter/block",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-geojson",
+        "service": "_ext_",
+        "search": "_view_",
+        "design": "filter",
+        "index": "block",
+        "x": 480,
+        "y": 200,
+        "wires": [
+            [
+                "b7023ff3abe0b03f"
+            ]
+        ]
+    },
+    {
+        "id": "9eb43b3be552f09d",
+        "type": "cloudantplus in",
+        "z": "3c790259a2397aef",
+        "name": "filter/road",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-geojson",
+        "service": "_ext_",
+        "search": "_view_",
+        "design": "filter",
+        "index": "road",
+        "x": 480,
+        "y": 240,
+        "wires": [
+            [
+                "b7023ff3abe0b03f"
+            ]
+        ]
+    },
+    {
+        "id": "e618929b83c729a0",
+        "type": "cloudantplus in",
+        "z": "3c790259a2397aef",
+        "name": "filter/estate",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-geojson",
+        "service": "_ext_",
+        "search": "_view_",
+        "design": "filter",
+        "index": "estate",
+        "x": 490,
+        "y": 120,
+        "wires": [
+            [
+                "b7023ff3abe0b03f"
+            ]
+        ]
+    },
+    {
+        "id": "366861ce468a7842",
+        "type": "cloudantplus in",
+        "z": "3c790259a2397aef",
+        "name": "filter/psm",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-geojson",
+        "service": "_ext_",
+        "search": "_view_",
+        "design": "filter",
+        "index": "psm",
+        "x": 480,
+        "y": 80,
+        "wires": [
+            [
+                "b7023ff3abe0b03f"
+            ]
+        ]
+    },
+    {
+        "id": "124d7410ca5363a8",
+        "type": "function",
+        "z": "3c790259a2397aef",
+        "name": "extract keys & docs",
+        "func": "msg.payload = msg.backup;\nlet { type, keys, docs } = msg.sub;\nmsg.payload = {\n    keys: keys\n}\nmsg.documents = {\n    docs: docs\n}\nmsg.type = type;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 230,
+        "y": 100,
+        "wires": [
+            [
+                "73ed853ed8ccad3c"
+            ]
+        ]
+    },
+    {
+        "id": "983841bc2a8d699f",
+        "type": "function",
+        "z": "3c790259a2397aef",
+        "name": "result",
+        "func": "msg.sub = msg.payload;\nmsg.payload = msg.backup;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 910,
+        "y": 280,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "56e8c7384d076572",
+        "type": "function",
+        "z": "3c790259a2397aef",
+        "name": "prepare docs to insert",
+        "func": "msg.payload = msg.documents;\nmsg.url = `${env.get('DOCKER_COUCHDB_DOMAIN')}/smart-geojson/_bulk_docs`\nmsg.headers = {\n    \"Authorization\": \"Basic \" +\n        Buffer.from(`${env.get('DOCKER_COUCHDB_USER')}:${env.get('DOCKER_COUCHDB_PASSWORD')}`).toString(\"base64\"),\n    \"Content-Type\": \"application/json; charset=utf-8\"\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 760,
+        "y": 240,
+        "wires": [
+            [
+                "074505bef39bc7ec"
+            ]
         ]
     },
     {
@@ -8923,7 +9372,7 @@
         "upload": false,
         "swaggerDoc": "",
         "x": 140,
-        "y": 200,
+        "y": 120,
         "wires": [
             [
                 "3cdc106f1f3ace69"
@@ -8935,7 +9384,7 @@
         "type": "function",
         "z": "c5b9039a5fc48f97",
         "name": "validate",
-        "func": "msg.ori = msg.payload;\n\n/**validate */\nlet { geoType, keys, group } = msg.payload;\nlet { valid, message } = validate(geoType, keys, group);\nif (!valid) msg.payload = message;\nmsg.valid = valid;\nreturn msg;\n\nfunction validate(type, keys, group) {\n    let valid = false;\n    if (!group) {\n        if (!Array.isArray(keys) || keys.length == 0) {\n            return {\n                valid,\n                message: 'at least provide psm on keys'\n            }\n        }\n        return {\n            valid: true\n        }\n    } else {        \n        switch (type) {\n            case 'division':\n                if (keys.length > 2) {\n                    return {\n                        valid,\n                        message: 'set psm, and estate on keys'\n                    }\n                }\n                return {\n                    valid: true\n                }\n            case 'estate':\n                if (keys.length > 1) {\n                    return {\n                        valid,\n                        message: 'set only psm on keys'\n                    }\n                }\n                return {\n                    valid: true\n                }\n            default:\n                if (keys.length == 0) {\n                    return {\n                        valid,\n                        message: 'cannot group on psm'\n                    }\n                }\n                return {\n                    valid: true\n                }\n        }\n    }\n}",
+        "func": "msg.ori = msg.payload;\n\n/**validate */\nlet { geoType, keys, group } = msg.payload;\nlet { valid, message } = validate(geoType, keys, group);\nif (!valid) msg.payload = message;\nmsg.valid = valid;\nreturn msg;\n\nfunction validate(type, keys, group) {\n    let valid = false;\n    if(!type || !keys || keys.length == 0 || group === undefined){\n        return{\n            valid,\n            message: 'invalid parameters !'\n        }\n    }\n    if (!group) {\n        if (!Array.isArray(keys) || keys.length == 0) {\n            return {\n                valid,\n                message: 'at least provide psm on keys'\n            }\n        }\n        return {\n            valid: true\n        }\n    } else {        \n        switch (type) {\n            case 'division':\n                if (keys.length > 2) {\n                    return {\n                        valid,\n                        message: 'set psm, and estate on keys'\n                    }\n                }\n                return {\n                    valid: true\n                }\n            case 'estate':\n                if (keys.length > 1) {\n                    return {\n                        valid,\n                        message: 'set only psm on keys'\n                    }\n                }\n                return {\n                    valid: true\n                }\n            default:\n                if (keys.length == 0) {\n                    return {\n                        valid,\n                        message: 'cannot group on psm'\n                    }\n                }\n                return {\n                    valid: true\n                }\n        }\n    }\n}",
         "outputs": 1,
         "timeout": "",
         "noerr": 0,
@@ -8943,7 +9392,7 @@
         "finalize": "",
         "libs": [],
         "x": 340,
-        "y": 200,
+        "y": 120,
         "wires": [
             [
                 "851f7f85faba6429"
@@ -8969,7 +9418,7 @@
         "repair": false,
         "outputs": 2,
         "x": 360,
-        "y": 240,
+        "y": 160,
         "wires": [
             [
                 "ac196b081e86d3b1"
@@ -8987,7 +9436,7 @@
         "statusCode": "400",
         "headers": {},
         "x": 380,
-        "y": 280,
+        "y": 200,
         "wires": []
     },
     {
@@ -9001,8 +9450,8 @@
         "search": "_view_",
         "design": "hierarchy",
         "index": "code",
-        "x": 760,
-        "y": 140,
+        "x": 120,
+        "y": 1380,
         "wires": [
             [
                 "8ebc0dd80839a811"
@@ -9021,8 +9470,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 800,
-        "y": 100,
+        "x": 160,
+        "y": 1340,
         "wires": [
             [
                 "882309720ac517b1"
@@ -9034,8 +9483,8 @@
         "type": "subflow:44e549ae5408d3d3",
         "z": "c5b9039a5fc48f97",
         "name": "",
-        "x": 790,
-        "y": 220,
+        "x": 150,
+        "y": 1460,
         "wires": [
             [
                 "b6d199accfa5150c"
@@ -9054,8 +9503,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 770,
-        "y": 180,
+        "x": 130,
+        "y": 1420,
         "wires": [
             [
                 "1f7c6a9bef178878"
@@ -9069,8 +9518,8 @@
         "name": "",
         "statusCode": "200",
         "headers": {},
-        "x": 960,
-        "y": 260,
+        "x": 820,
+        "y": 1580,
         "wires": []
     },
     {
@@ -9085,791 +9534,19 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 780,
-        "y": 260,
-        "wires": [
-            [
-                "d49f98aeb3bb1961"
-            ]
-        ]
-    },
-    {
-        "id": "fab1bfa7b82e5a27",
-        "type": "http response",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "statusCode": "400",
-        "headers": {},
-        "x": 1180,
-        "y": 1320,
-        "wires": []
-    },
-    {
-        "id": "2391abfbae7258e2",
-        "type": "switch",
-        "z": "c5b9039a5fc48f97",
-        "name": "data found ?",
-        "property": "found",
-        "propertyType": "msg",
-        "rules": [
-            {
-                "t": "true"
-            },
-            {
-                "t": "false"
-            }
-        ],
-        "checkall": "true",
-        "repair": false,
-        "outputs": 2,
-        "x": 470,
-        "y": 1120,
-        "wires": [
-            [
-                "bc1ab5bdfd6e6010"
-            ],
-            [
-                "4892d8eee861b094"
-            ]
-        ]
-    },
-    {
-        "id": "439f7293831d0618",
-        "type": "subflow:34c9e2e17c31980a",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "x": 960,
-        "y": 1200,
-        "wires": [
-            [
-                "9aa91097cda8fa4d"
-            ]
-        ]
-    },
-    {
-        "id": "87cbd51cea452447",
-        "type": "function",
-        "z": "c5b9039a5fc48f97",
-        "name": "validate & prepare sub",
-        "func": "let { geoType, key } = msg.ori;\nlet psm = key[0];\nlet estate = (Array.isArray(key) && key.length > 1) ? key[1] : null;\nlet division = (Array.isArray(key) && key.length > 2) ? key[2] : null;\nlet other = (Array.isArray(key) && key.length > 3) ? key[3] : null;\n\nlet sub;\nif (geoType == 'psm') {\n    sub = {\n        scopeType: 'psm',\n        ref1: psm,\n        ref2: null,\n        ref3: null\n    }\n} else if (geoType == 'estate') {\n    sub = {\n        scopeType: 'estate',\n        ref1: estate,\n        ref2: null,\n        ref3: null\n    }\n} else if (geoType == 'division' || geoType == 'block' || geoType == 'road') {\n    sub = {\n        scopeType: geoType,\n        ref1: estate,\n        ref2: (division) ? division : null,\n        ref3: (other) ? other : null\n    }\n\n}\n\nmsg.sub = sub;\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 960,
-        "y": 1160,
-        "wires": [
-            [
-                "439f7293831d0618"
-            ]
-        ]
-    },
-    {
-        "id": "9aa91097cda8fa4d",
-        "type": "function",
-        "z": "c5b9039a5fc48f97",
-        "name": "validate",
-        "func": "let valid = false;\nif (!msg.sub.error && msg.sub.length > 0) {\n    valid = true;\n} else {\n    msg.payload = {\n        message: 'pnmp error check again your parameter',\n        error: msg.sub\n    }\n}\nmsg.valid = valid;\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 1000,
-        "y": 1240,
-        "wires": [
-            [
-                "ca03c8808883ea6c"
-            ]
-        ]
-    },
-    {
-        "id": "ca03c8808883ea6c",
-        "type": "switch",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "property": "valid",
-        "propertyType": "msg",
-        "rules": [
-            {
-                "t": "true"
-            },
-            {
-                "t": "false"
-            }
-        ],
-        "checkall": "true",
-        "repair": false,
-        "outputs": 2,
-        "x": 1010,
-        "y": 1280,
-        "wires": [
-            [
-                "92d8c02087d4e3d3"
-            ],
-            [
-                "fab1bfa7b82e5a27"
-            ]
-        ]
-    },
-    {
-        "id": "e0cdd9416d39b75f",
-        "type": "change",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "rules": [
-            {
-                "t": "set",
-                "p": "askPNMP",
-                "pt": "msg",
-                "to": "true",
-                "tot": "bool"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 950,
-        "y": 1120,
-        "wires": [
-            [
-                "87cbd51cea452447"
-            ]
-        ]
-    },
-    {
-        "id": "4892d8eee861b094",
-        "type": "switch",
-        "z": "c5b9039a5fc48f97",
-        "name": "ask PNMP ?",
-        "property": "askPNMP",
-        "propertyType": "msg",
-        "rules": [
-            {
-                "t": "false"
-            },
-            {
-                "t": "else"
-            }
-        ],
-        "checkall": "true",
-        "repair": false,
-        "outputs": 2,
-        "x": 690,
-        "y": 1240,
-        "wires": [
-            [
-                "e0cdd9416d39b75f"
-            ],
-            [
-                "fddba91bdc5a2a4e"
-            ]
-        ]
-    },
-    {
-        "id": "fddba91bdc5a2a4e",
-        "type": "change",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "rules": [
-            {
-                "t": "set",
-                "p": "payload",
-                "pt": "msg",
-                "to": "{\"message\":\"data not found on pnmp\"}",
-                "tot": "json"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 940,
-        "y": 1340,
-        "wires": [
-            [
-                "d8c18798b2f32ff6"
-            ]
-        ]
-    },
-    {
-        "id": "d8c18798b2f32ff6",
-        "type": "http response",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "statusCode": "400",
-        "headers": {},
-        "x": 960,
-        "y": 1380,
-        "wires": []
-    },
-    {
-        "id": "a99c691cc162ad69",
-        "type": "inject",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
         "x": 140,
-        "y": 1280,
+        "y": 1500,
         "wires": [
             [
-                "0d1bce6d9d023063"
+                "171fa719441f4182"
             ]
-        ]
-    },
-    {
-        "id": "2daf693ac1eea4ce",
-        "type": "cloudantplus in",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "cloudant": "784d89e62dfb5070",
-        "database": "smart-libs",
-        "service": "_ext_",
-        "search": "_view_",
-        "design": "hierarchy",
-        "index": "code",
-        "x": 320,
-        "y": 1320,
-        "wires": [
-            [
-                "deeb91c3977c5392"
-            ]
-        ]
-    },
-    {
-        "id": "0d1bce6d9d023063",
-        "type": "function",
-        "z": "c5b9039a5fc48f97",
-        "name": "function 57",
-        "func": "msg.payload = {\n    key: 'DIG01-AREA-PNMP'\n}\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 330,
-        "y": 1280,
-        "wires": [
-            [
-                "2daf693ac1eea4ce"
-            ]
-        ]
-    },
-    {
-        "id": "dcdc514ec032e6ae",
-        "type": "debug",
-        "z": "c5b9039a5fc48f97",
-        "name": "debug 59",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 600,
-        "y": 1400,
-        "wires": []
-    },
-    {
-        "id": "deeb91c3977c5392",
-        "type": "function",
-        "z": "c5b9039a5fc48f97",
-        "name": "function 58",
-        "func": "// msg.sub = {\n//     obj: msg.payload[0].data,\n//     key: 'name',\n//     val: 'LIBE'\n// }\n\nmsg.sub = {\n    obj: msg.payload[0].data,\n    key: 'name',\n    scopes: ['PSM 1']\n}\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 330,
-        "y": 1360,
-        "wires": [
-            [
-                "a6497b6e68bc5e2b"
-            ]
-        ]
-    },
-    {
-        "id": "a6497b6e68bc5e2b",
-        "type": "subflow:63baa18a398cf25b",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "x": 370,
-        "y": 1400,
-        "wires": [
-            [
-                "dcdc514ec032e6ae"
-            ]
-        ]
-    },
-    {
-        "id": "050293e83401bb46",
-        "type": "function",
-        "z": "c5b9039a5fc48f97",
-        "name": "prepare sub",
-        "func": "let { geoType, groupBy, key } = msg.ori;\nlet pKey;\nlet psm = (key[0]) ? key[0] : null;\nlet estate = (key[0]) ? key[1] : null;\nlet division = (key[0]) ? key[2] : null;\n\nswitch (groupBy) {\n    case 'psm':\n        pKey = psm;\n        break;\n    case 'estate':\n        pKey = [psm, estate];\n        break;\n    case 'division':\n        pKey = [psm, estate, division];\n        break;\n    default:\n        pKey = key;\n        break;\n}\nmsg.sub = {\n    database: 'smart-geojson',\n    design: geoType,\n    view: (groupBy != null) ? `geo-by-${groupBy}` : 'geometry',\n    key: pKey\n}\nreturn msg;",
-        "outputs": 1,
-        "timeout": "",
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 190,
-        "y": 900,
-        "wires": [
-            [
-                "9557bf780ba895b6"
-            ]
-        ]
-    },
-    {
-        "id": "9557bf780ba895b6",
-        "type": "subflow:d7ccf53b2b9fe097",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "x": 220,
-        "y": 940,
-        "wires": [
-            [
-                "66ba522f6c15c4fc"
-            ]
-        ]
-    },
-    {
-        "id": "bc1ab5bdfd6e6010",
-        "type": "function",
-        "z": "c5b9039a5fc48f97",
-        "name": "prepare & result",
-        "func": "\nlet payload = {\n    geojson: {\n        type: 'FeatureCollection',\n        features: msg.sub.rows.map(x => {\n            return { ...x }\n        })\n    }\n};\n\nmsg.sub = {\n    key: msg.redisKey,\n    payload: JSON.stringify(payload),\n    ttl: Number(env.get('NODERED_TTL')) * 60\n}\nmsg.payload = payload;\nreturn msg;",
-        "outputs": 1,
-        "timeout": "",
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 700,
-        "y": 1020,
-        "wires": [
-            [
-                "52c38b07acdd2b44",
-                "69d30779b2ab588f"
-            ]
-        ]
-    },
-    {
-        "id": "52c38b07acdd2b44",
-        "type": "http response",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "statusCode": "200",
-        "headers": {},
-        "x": 920,
-        "y": 1020,
-        "wires": []
-    },
-    {
-        "id": "69d30779b2ab588f",
-        "type": "subflow:183547d77875ed65",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "x": 940,
-        "y": 1060,
-        "wires": []
-    },
-    {
-        "id": "66ba522f6c15c4fc",
-        "type": "function",
-        "z": "c5b9039a5fc48f97",
-        "name": "check sub",
-        "func": "let found = false;\nlet error = (msg.sub.error) ? true : false;\nif (!msg.sub.error && msg.sub.rows.length > 0) found = true;\n\nmsg.found = found;\nmsg.error = error;\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 260,
-        "y": 980,
-        "wires": [
-            [
-                "351c3d9473e73624"
-            ]
-        ]
-    },
-    {
-        "id": "351c3d9473e73624",
-        "type": "switch",
-        "z": "c5b9039a5fc48f97",
-        "name": "error ?",
-        "property": "error",
-        "propertyType": "msg",
-        "rules": [
-            {
-                "t": "true"
-            },
-            {
-                "t": "false"
-            }
-        ],
-        "checkall": "true",
-        "repair": false,
-        "outputs": 2,
-        "x": 270,
-        "y": 1020,
-        "wires": [
-            [
-                "8b1a94a59e2923b4"
-            ],
-            [
-                "2391abfbae7258e2"
-            ]
-        ]
-    },
-    {
-        "id": "8b1a94a59e2923b4",
-        "type": "change",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "rules": [
-            {
-                "t": "set",
-                "p": "payload",
-                "pt": "msg",
-                "to": "sub",
-                "tot": "msg"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 480,
-        "y": 980,
-        "wires": [
-            [
-                "918e0eb45089e3ff"
-            ]
-        ]
-    },
-    {
-        "id": "918e0eb45089e3ff",
-        "type": "http response",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "statusCode": "400",
-        "headers": {},
-        "x": 680,
-        "y": 980,
-        "wires": []
-    },
-    {
-        "id": "6b83e97108c72deb",
-        "type": "http response",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "statusCode": "200",
-        "headers": {},
-        "x": 940,
-        "y": 700,
-        "wires": []
-    },
-    {
-        "id": "55f2f1f5ac69a94d",
-        "type": "function",
-        "z": "c5b9039a5fc48f97",
-        "name": "set key",
-        "func": "msg.payload = {\n    key: 'DIG01-AREA-PNMP'\n}\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 160,
-        "y": 660,
-        "wires": [
-            [
-                "428b8c36af7e7149"
-            ]
-        ]
-    },
-    {
-        "id": "428b8c36af7e7149",
-        "type": "cloudantplus in",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "cloudant": "784d89e62dfb5070",
-        "database": "smart-libs",
-        "service": "_ext_",
-        "search": "_view_",
-        "design": "hierarchy",
-        "index": "code",
-        "x": 160,
-        "y": 700,
-        "wires": [
-            [
-                "26c60847a2f4d7e1"
-            ]
-        ]
-    },
-    {
-        "id": "26c60847a2f4d7e1",
-        "type": "function",
-        "z": "c5b9039a5fc48f97",
-        "name": "prepare sub",
-        "func": "let { groupBy, key } = msg.ori;\nlet [psm, estate, division] = key;\n\nlet keyScope;\nswitch (groupBy) {\n    case 'division':\n        keyScope = division;\n        break;\n    case 'estate':\n        keyScope = estate;\n        break;\n    default:\n        keyScope = psm;\n        break;\n}\n\nmsg.sub = {\n    obj: msg.payload[0].data,\n    key: 'name',\n    scopes: [keyScope]\n}\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 170,
-        "y": 740,
-        "wires": [
-            [
-                "1421fe8e100e41f4"
-            ]
-        ]
-    },
-    {
-        "id": "1421fe8e100e41f4",
-        "type": "subflow:63baa18a398cf25b",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "x": 210,
-        "y": 780,
-        "wires": [
-            [
-                "72c29794fbdcbdae"
-            ]
-        ]
-    },
-    {
-        "id": "72c29794fbdcbdae",
-        "type": "function",
-        "z": "c5b9039a5fc48f97",
-        "name": "prepare array",
-        "func": "if (Array.isArray(msg.sub) && msg.sub.length > 0) {\n    let { geoType } = msg.ori;\n    let data = msg.sub.filter(x => x.category === geoType.toUpperCase());\n    msg.payload = data;\n} else {\n    msg.payload = [];\n}\ndelete msg.sub;\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 180,
-        "y": 820,
-        "wires": [
-            [
-                "6d0c9dce088335ec"
-            ]
-        ]
-    },
-    {
-        "id": "6d0c9dce088335ec",
-        "type": "split",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "splt": "\\n",
-        "spltType": "str",
-        "arraySplt": 1,
-        "arraySpltType": "len",
-        "stream": false,
-        "addname": "",
-        "x": 270,
-        "y": 860,
-        "wires": [
-            [
-                "5b59c3cbc2a003cc"
-            ]
-        ]
-    },
-    {
-        "id": "2d802b81087a9783",
-        "type": "join",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "mode": "auto",
-        "build": "object",
-        "property": "payload",
-        "propertyType": "msg",
-        "key": "topic",
-        "joiner": "\\n",
-        "joinerType": "str",
-        "accumulate": "false",
-        "timeout": "",
-        "count": "",
-        "reduceRight": false,
-        "x": 930,
-        "y": 660,
-        "wires": [
-            [
-                "6b83e97108c72deb",
-                "7b82b02362cc8e68"
-            ]
-        ]
-    },
-    {
-        "id": "5b59c3cbc2a003cc",
-        "type": "function",
-        "z": "c5b9039a5fc48f97",
-        "name": "prepare sub",
-        "func": "let { geoType, key } = msg.ori;\nlet [psm, estate, division, other] = key;\nmsg.sub = {\n    key: `geo:${geoType}:${psm}${(estate) ? ':' + estate : ''}${(division) ? ':' + division : ''}${(other) ? ':' + other : ''}`\n}\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 490,
-        "y": 660,
-        "wires": [
-            [
-                "16e7002ad60085eb",
-                "b4325ad2188b6ce7"
-            ]
-        ]
-    },
-    {
-        "id": "16e7002ad60085eb",
-        "type": "redis-command",
-        "z": "c5b9039a5fc48f97",
-        "server": "0fb96b870afb5c15",
-        "command": "GET",
-        "name": "",
-        "topic": "",
-        "params": "[]",
-        "paramsType": "json",
-        "payloadType": "json",
-        "block": false,
-        "x": 480,
-        "y": 700,
-        "wires": [
-            [
-                "1c23152a4840b220"
-            ]
-        ]
-    },
-    {
-        "id": "7b82b02362cc8e68",
-        "type": "debug",
-        "z": "c5b9039a5fc48f97",
-        "name": "debug 60",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 1140,
-        "y": 660,
-        "wires": []
-    },
-    {
-        "id": "b4325ad2188b6ce7",
-        "type": "debug",
-        "z": "c5b9039a5fc48f97",
-        "name": "debug 61",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 680,
-        "y": 660,
-        "wires": []
-    },
-    {
-        "id": "1c23152a4840b220",
-        "type": "switch",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "property": "payload",
-        "propertyType": "msg",
-        "rules": [
-            {
-                "t": "nnull"
-            },
-            {
-                "t": "null"
-            }
-        ],
-        "checkall": "true",
-        "repair": false,
-        "outputs": 2,
-        "x": 510,
-        "y": 740,
-        "wires": [
-            [
-                "2d802b81087a9783"
-            ],
-            []
-        ]
-    },
-    {
-        "id": "4fb04838da890f62",
-        "type": "subflow:63baa18a398cf25b",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "x": 870,
-        "y": 480,
-        "wires": [
-            [
-                "0f040af1fac2d403"
-            ]
-        ]
-    },
-    {
-        "id": "0f040af1fac2d403",
-        "type": "function",
-        "z": "c5b9039a5fc48f97",
-        "name": "filter by geoType",
-        "func": "let { geoType } = msg.ori;\nif (msg.sub) msg.payload = msg.sub.filter(x => x.category === geoType.toUpperCase());\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 840,
-        "y": 520,
-        "wires": [
-            []
         ]
     },
     {
         "id": "ac196b081e86d3b1",
         "type": "switch",
         "z": "c5b9039a5fc48f97",
-        "name": "",
+        "name": "group?",
         "property": "ori.group",
         "propertyType": "msg",
         "rules": [
@@ -9883,11 +9560,11 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 550,
-        "y": 200,
+        "x": 560,
+        "y": 120,
         "wires": [
             [
-                "3b36d33cf5bcc5e6"
+                "075f9950ee7187eb"
             ],
             [
                 "b2eada42f9e5af3a"
@@ -9924,6 +9601,1514 @@
         "x": 960,
         "y": 320,
         "wires": []
+    },
+    {
+        "id": "171fa719441f4182",
+        "type": "switch",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "property": "payload.length",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "gt",
+                "v": "0",
+                "vt": "num"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 210,
+        "y": 1540,
+        "wires": [
+            [
+                "f22fbe4d9bdc9f47"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "f22fbe4d9bdc9f47",
+        "type": "split",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "splt": "\\n",
+        "spltType": "str",
+        "arraySplt": 1,
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "x": 410,
+        "y": 1340,
+        "wires": [
+            [
+                "743a28aca3ae6185"
+            ]
+        ]
+    },
+    {
+        "id": "d2125b14a428552e",
+        "type": "join",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "mode": "auto",
+        "build": "object",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "accumulate": "false",
+        "timeout": "",
+        "count": "",
+        "reduceRight": false,
+        "x": 630,
+        "y": 1580,
+        "wires": [
+            [
+                "d49f98aeb3bb1961"
+            ]
+        ]
+    },
+    {
+        "id": "743a28aca3ae6185",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "read payload",
+        "func": "msg.index = msg.payload;\nlet { keys, group } = msg.ori;\nlet other = keys[3];\nlet { psm, estate, division } = msg.payload;\nlet { geoType } = msg.ori;\nlet topic = `geo:${geoType}:${psm}`;\nif (estate) topic = `${topic}:${estate}`;\nif (division) topic = `${topic}:${division}`;\nmsg.topic = topic;\nmsg.redisKey = topic;\nmsg.payload = null;\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 1380,
+        "wires": [
+            [
+                "243a71c9d774497e"
+            ]
+        ]
+    },
+    {
+        "id": "243a71c9d774497e",
+        "type": "redis-command",
+        "z": "c5b9039a5fc48f97",
+        "server": "0fb96b870afb5c15",
+        "command": "GET",
+        "name": "",
+        "topic": "",
+        "params": "[]",
+        "paramsType": "json",
+        "payloadType": "json",
+        "block": false,
+        "x": 420,
+        "y": 1420,
+        "wires": [
+            [
+                "82a5e12469fc2e20"
+            ]
+        ]
+    },
+    {
+        "id": "82a5e12469fc2e20",
+        "type": "switch",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "null"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 450,
+        "y": 1460,
+        "wires": [
+            [
+                "eb4ec6664a5c6f30"
+            ],
+            [
+                "d89e155a95e12c37"
+            ]
+        ]
+    },
+    {
+        "id": "8a4f3ab7a6ee4ea1",
+        "type": "subflow:d7ccf53b2b9fe097",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "x": 680,
+        "y": 1380,
+        "wires": [
+            [
+                "f2ff1b05608d8193"
+            ]
+        ]
+    },
+    {
+        "id": "eb4ec6664a5c6f30",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "prepare sub",
+        "func": "let { psm, estate, division } = msg.index;\nlet { geoType } = msg.ori;\nlet other = msg.ori.keys[3];\nmsg.sub = {\n    database: 'smart-geojson',\n    design: geoType,\n    view: 'geometry',\n    key: (other)? [psm, estate, division, other] : [psm, estate, division]\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 650,
+        "y": 1340,
+        "wires": [
+            [
+                "8a4f3ab7a6ee4ea1"
+            ]
+        ]
+    },
+    {
+        "id": "f2ff1b05608d8193",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "function 62",
+        "func": "msg.payload = (msg.sub && msg.sub.rows && msg.sub.rows.length > 0) ? msg.sub.rows[0].value : {\n    ...msg.index,\n    message: 'ask PNMP'\n};\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 650,
+        "y": 1420,
+        "wires": [
+            [
+                "d2125b14a428552e",
+                "0db4379f44f6c1ef"
+            ]
+        ]
+    },
+    {
+        "id": "5101e0ed5f07061a",
+        "type": "subflow:34c9e2e17c31980a",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "x": 1080,
+        "y": 1500,
+        "wires": [
+            [
+                "237dfcd001918a4f"
+            ]
+        ]
+    },
+    {
+        "id": "43f9ef5e8d31363e",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "validate & prepare sub",
+        "func": "let { geoType, keys } = msg.ori;\nlet other = keys[3];\nlet { psm, estate, division } = msg.index;\nlet sub;\nswitch (geoType) {\n    case 'psm':\n        sub = {\n            scopeType: geoType,\n            ref1: psm,\n            ref2: null,\n            ref3: null\n        }\n        break;\n    case 'estate':\n        sub = {\n            scopeType: geoType,\n            ref1: estate,\n            ref2: null,\n            ref3: null\n        }\n        break;\n    case 'division':\n        sub = {\n            scopeType: geoType,\n            ref1: estate,\n            ref2: division,\n            ref3: null\n        }\n        break;\n    case 'block':\n        sub = {\n            scopeType: geoType,\n            ref1: estate,\n            ref2: division,\n            ref3: other\n        }\n        break;\n    case 'road':\n        sub = {\n            scopeType: geoType,\n            ref1: estate,\n            ref2: division,\n            ref3: other\n        }\n        break;\n}\n\nmsg.sub = sub;\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1080,
+        "y": 1460,
+        "wires": [
+            [
+                "5101e0ed5f07061a"
+            ]
+        ]
+    },
+    {
+        "id": "237dfcd001918a4f",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "validate",
+        "func": "let valid = false;\nif (!msg.sub.error && msg.sub.length > 0) {\n    valid = true;\n} else {\n    msg.payload = {\n        message: 'pnmp error check again your parameter',\n        error: msg.sub\n    }\n}\nmsg.valid = valid;\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1120,
+        "y": 1540,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "25fdaa4eb40a2ae4",
+        "type": "redis-command",
+        "z": "c5b9039a5fc48f97",
+        "server": "0fb96b870afb5c15",
+        "command": "set",
+        "name": "",
+        "topic": "",
+        "params": "[]",
+        "paramsType": "json",
+        "payloadType": "json",
+        "block": false,
+        "x": 1040,
+        "y": 1420,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "5fc648e4d8a06699",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "prepare payload",
+        "func": "msg.payload = [msg.redisKey, JSON.stringify(msg.payload), 'EX', Number(env.get('NODERED_TTL')) * 60];\nmsg.topic = msg.redisKey;\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1060,
+        "y": 1380,
+        "wires": [
+            [
+                "25fdaa4eb40a2ae4"
+            ]
+        ]
+    },
+    {
+        "id": "0db4379f44f6c1ef",
+        "type": "switch",
+        "z": "c5b9039a5fc48f97",
+        "name": "found?",
+        "property": "payload.type",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "nnull"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 850,
+        "y": 1420,
+        "wires": [
+            [
+                "5fc648e4d8a06699"
+            ],
+            [
+                "43f9ef5e8d31363e"
+            ]
+        ]
+    },
+    {
+        "id": "d89e155a95e12c37",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "JSON Parse",
+        "func": "msg.payload = JSON.parse(msg.payload);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 650,
+        "y": 1520,
+        "wires": [
+            [
+                "d2125b14a428552e"
+            ]
+        ]
+    },
+    {
+        "id": "075f9950ee7187eb",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "groupBy ?",
+        "func": "let { keys } = msg.ori;\nlet groupBy = 'psm';\nif (keys.length == 2) groupBy = 'estate';\nif (keys.length == 3) groupBy = 'division';\nmsg.groupBy = groupBy;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 750,
+        "y": 80,
+        "wires": [
+            [
+                "063e67538e8eb93c"
+            ]
+        ]
+    },
+    {
+        "id": "063e67538e8eb93c",
+        "type": "switch",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "psm",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "estate",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "division",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 3,
+        "x": 930,
+        "y": 80,
+        "wires": [
+            [],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "198c980a5da7f0b5",
+        "type": "inject",
+        "z": "c5b9039a5fc48f97",
+        "name": "update GEOJSON",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 150,
+        "y": 520,
+        "wires": [
+            [
+                "517c0e36530899f0"
+            ]
+        ]
+    },
+    {
+        "id": "f483eb1bd13f2967",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "get DIG01-AREA-PNMP",
+        "func": "msg.sub = {\n    database: 'smart-libs',\n    design: 'hierarchy',\n    view: 'code-data',\n    key: 'DIG01-AREA-PNMP'\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 520,
+        "wires": [
+            [
+                "456b39ddc47c6bda"
+            ]
+        ]
+    },
+    {
+        "id": "e5cac997c4579d08",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "split PSM",
+        "func": "let payload = msg.sub.rows[0].value;\nlet counter = 0;\nsplit();\ndelete msg.payload;\nreturn msg;\n\nfunction split() {\n    if (counter < payload.length) {\n        let data = payload[counter];\n        msg.payload = data;\n        msg.psm = data;\n        node.send({...msg});\n        counter++;\n        setTimeout(split, 20000);\n    }\n}",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 480,
+        "y": 600,
+        "wires": [
+            [
+                "795e928c18816c82"
+            ]
+        ]
+    },
+    {
+        "id": "456b39ddc47c6bda",
+        "type": "subflow:d7ccf53b2b9fe097",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "x": 440,
+        "y": 560,
+        "wires": [
+            [
+                "e5cac997c4579d08"
+            ]
+        ]
+    },
+    {
+        "id": "e38ea2e7c5ac9890",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "get psm",
+        "func": "let { name } = msg.payload;\nmsg.sub = {\n    scopeType: 'psm',\n    ref1: name,\n    ref2: null,\n    ref3: null\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 700,
+        "y": 560,
+        "wires": [
+            [
+                "14a6046b267b96d9"
+            ]
+        ]
+    },
+    {
+        "id": "ce819e1626359b57",
+        "type": "http request",
+        "z": "c5b9039a5fc48f97",
+        "name": "renew pnmp token",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "https://digistage.sinarmas-agri.com/api-app-portal-beta/api/pnmp_token",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 150,
+        "y": 1040,
+        "wires": [
+            [
+                "de1fa05287b24b64"
+            ]
+        ]
+    },
+    {
+        "id": "3586fca78e3e4b49",
+        "type": "inject",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 1000,
+        "wires": [
+            [
+                "ce819e1626359b57"
+            ]
+        ]
+    },
+    {
+        "id": "e014cd393d12dfc8",
+        "type": "switch",
+        "z": "c5b9039a5fc48f97",
+        "name": "found ?",
+        "property": "sub.status",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 780,
+        "y": 640,
+        "wires": [
+            [
+                "2d7f6435fecd86d5"
+            ],
+            [
+                "43b7d2a37373de03"
+            ]
+        ]
+    },
+    {
+        "id": "2d7f6435fecd86d5",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "prepare doc & key psm",
+        "func": "let docs = msg.sub.data?.geojson?.features.map(x => {\n    return {\n        geoType: 'psm',\n        psm: x.properties.psm,\n        pt: x.properties.pt,\n        type: x.type,\n        properties: x.properties,\n        geometry: x.geometry\n    }\n});\nlet keys = msg.sub.data?.geojson?.features.map(x => {\n    return [\n        x.properties.psm,\n        x.properties.pt\n    ];\n});\nmsg.sub = {\n    type: 'psm',\n    keys,\n    docs\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1030,
+        "y": 520,
+        "wires": [
+            [
+                "e961c76d8d1785a3"
+            ]
+        ]
+    },
+    {
+        "id": "de1fa05287b24b64",
+        "type": "debug",
+        "z": "c5b9039a5fc48f97",
+        "name": "debug 71",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 400,
+        "y": 1040,
+        "wires": []
+    },
+    {
+        "id": "1717c12f22121ab2",
+        "type": "inject",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[{\"id\":1221,\"name\":\"LWSE\",\"category\":\"ESTATE\",\"desc\":\"Leidong West Estate\",\"children\":[{\"id\":122101,\"name\":\"DIVISI 1\",\"desc\":\"DIVISI 1\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":122102,\"name\":\"DIVISI 2\",\"desc\":\"DIVISI 2\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":122103,\"name\":\"DIVISI 3\",\"desc\":\"DIVISI 3\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":122104,\"name\":\"DIVISI 4\",\"desc\":\"DIVISI 4\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":122105,\"name\":\"DIVISI 5\",\"desc\":\"DIVISI 5\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":122106,\"name\":\"DIVISI 6\",\"desc\":\"DIVISI 6\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":122107,\"name\":\"DIVISI 7\",\"desc\":\"DIVISI 7\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":122108,\"name\":\"DIVISI 8\",\"desc\":\"DIVISI 8\",\"category\":\"DIVISION\",\"children\":[]}]},{\"id\":1222,\"name\":\"LWUE\",\"category\":\"ESTATE\",\"desc\":\"Leidong West Utara Estate\",\"children\":[{\"id\":122201,\"name\":\"DIVISI 1\",\"desc\":\"DIVISI 1\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":122202,\"name\":\"DIVISI 2\",\"desc\":\"DIVISI 2\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":122203,\"name\":\"DIVISI 3\",\"desc\":\"DIVISI 3\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":122204,\"name\":\"DIVISI 4\",\"desc\":\"DIVISI 4\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":122205,\"name\":\"DIVISI 5\",\"desc\":\"DIVISI 5\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":122206,\"name\":\"DIVISI 6\",\"desc\":\"DIVISI 6\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":122207,\"name\":\"DIVISI 7\",\"desc\":\"DIVISI 7\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":122208,\"name\":\"DIVISI 8\",\"desc\":\"DIVISI 8\",\"category\":\"DIVISION\",\"children\":[]}]},{\"id\":1250,\"name\":\"LWSM\",\"category\":\"MILL\",\"desc\":\"Leidong West MIll\",\"children\":[]},{\"id\":2420,\"name\":\"SMSE\",\"category\":\"ESTATE\",\"desc\":\"Sawit Mas Estate\",\"children\":[{\"id\":242001,\"name\":\"DIVISI 1\",\"desc\":\"DIVISI 1\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242002,\"name\":\"DIVISI 2\",\"desc\":\"DIVISI 2\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242003,\"name\":\"DIVISI 3\",\"desc\":\"DIVISI 3\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242004,\"name\":\"DIVISI 4\",\"desc\":\"DIVISI 4\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242005,\"name\":\"DIVISI 5\",\"desc\":\"DIVISI 5\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242006,\"name\":\"DIVISI 6\",\"desc\":\"DIVISI 6\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242007,\"name\":\"DIVISI 7\",\"desc\":\"DIVISI 7\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242008,\"name\":\"DIVISI 8\",\"desc\":\"DIVISI 8\",\"category\":\"DIVISION\",\"children\":[]}]},{\"id\":2423,\"name\":\"SKME\",\"category\":\"ESTATE\",\"desc\":\"Sungai Kikim Estate\",\"children\":[{\"id\":242301,\"name\":\"DIVISI 1\",\"desc\":\"DIVISI 1\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242302,\"name\":\"DIVISI 2\",\"desc\":\"DIVISI 2\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242303,\"name\":\"DIVISI 3\",\"desc\":\"DIVISI 3\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242304,\"name\":\"DIVISI 4\",\"desc\":\"DIVISI 4\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242305,\"name\":\"DIVISI 5\",\"desc\":\"DIVISI 5\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242306,\"name\":\"DIVISI 6\",\"desc\":\"DIVISI 6\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242307,\"name\":\"DIVISI 7\",\"desc\":\"DIVISI 7\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242308,\"name\":\"DIVISI 8\",\"desc\":\"DIVISI 8\",\"category\":\"DIVISION\",\"children\":[]}]},{\"id\":2424,\"name\":\"SSLE\",\"category\":\"ESTATE\",\"desc\":\"Sungai Saling Estate\",\"children\":[{\"id\":242401,\"name\":\"DIVISI 1\",\"desc\":\"DIVISI 1\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242402,\"name\":\"DIVISI 2\",\"desc\":\"DIVISI 2\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242403,\"name\":\"DIVISI 3\",\"desc\":\"DIVISI 3\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242404,\"name\":\"DIVISI 4\",\"desc\":\"DIVISI 4\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242405,\"name\":\"DIVISI 5\",\"desc\":\"DIVISI 5\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242406,\"name\":\"DIVISI 6\",\"desc\":\"DIVISI 6\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242407,\"name\":\"DIVISI 7\",\"desc\":\"DIVISI 7\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242408,\"name\":\"DIVISI 8\",\"desc\":\"DIVISI 8\",\"category\":\"DIVISION\",\"children\":[]}]},{\"id\":2425,\"name\":\"SPGE\",\"category\":\"ESTATE\",\"desc\":\"Sungai Pangi Estate\",\"children\":[{\"id\":242501,\"name\":\"DIVISI 1\",\"desc\":\"DIVISI 1\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242502,\"name\":\"DIVISI 2\",\"desc\":\"DIVISI 2\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242503,\"name\":\"DIVISI 3\",\"desc\":\"DIVISI 3\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242504,\"name\":\"DIVISI 4\",\"desc\":\"DIVISI 4\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242505,\"name\":\"DIVISI 5\",\"desc\":\"DIVISI 5\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242506,\"name\":\"DIVISI 6\",\"desc\":\"DIVISI 6\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242507,\"name\":\"DIVISI 7\",\"desc\":\"DIVISI 7\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242508,\"name\":\"DIVISI 8\",\"desc\":\"DIVISI 8\",\"category\":\"DIVISION\",\"children\":[]}]},{\"id\":2426,\"name\":\"SMIE\",\"category\":\"ESTATE\",\"desc\":\"Sungai Musi Estate\",\"children\":[{\"id\":242601,\"name\":\"DIVISI 1\",\"desc\":\"DIVISI 1\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242602,\"name\":\"DIVISI 2\",\"desc\":\"DIVISI 2\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242603,\"name\":\"DIVISI 3\",\"desc\":\"DIVISI 3\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242604,\"name\":\"DIVISI 4\",\"desc\":\"DIVISI 4\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242605,\"name\":\"DIVISI 5\",\"desc\":\"DIVISI 5\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242606,\"name\":\"DIVISI 6\",\"desc\":\"DIVISI 6\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242607,\"name\":\"DIVISI 7\",\"desc\":\"DIVISI 7\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242608,\"name\":\"DIVISI 8\",\"desc\":\"DIVISI 8\",\"category\":\"DIVISION\",\"children\":[]}]},{\"id\":2450,\"name\":\"PPNM\",\"category\":\"MILL\",\"desc\":\"Pangkalan Panji Mill\",\"children\":[]},{\"id\":2451,\"name\":\"SKMM\",\"category\":\"MILL\",\"desc\":\"Sungai Kikim Mill\",\"children\":[]},{\"id\":2520,\"name\":\"SBYE\",\"category\":\"ESTATE\",\"desc\":\"Sungai Buaya Estate\",\"children\":[{\"id\":252001,\"name\":\"DIVISI 1\",\"desc\":\"DIVISI 1\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":252002,\"name\":\"DIVISI 2\",\"desc\":\"DIVISI 2\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":252003,\"name\":\"DIVISI 3\",\"desc\":\"DIVISI 3\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":252004,\"name\":\"DIVISI 4\",\"desc\":\"DIVISI 4\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":252005,\"name\":\"DIVISI 5\",\"desc\":\"DIVISI 5\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":252006,\"name\":\"DIVISI 6\",\"desc\":\"DIVISI 6\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":252007,\"name\":\"DIVISI 7\",\"desc\":\"DIVISI 7\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":252008,\"name\":\"DIVISI 8\",\"desc\":\"DIVISI 8\",\"category\":\"DIVISION\",\"children\":[]}]},{\"id\":2521,\"name\":\"SMRE\",\"category\":\"ESTATE\",\"desc\":\"Sungai Merah Estate\",\"children\":[{\"id\":252101,\"name\":\"DIVISI 1\",\"desc\":\"DIVISI 1\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":252102,\"name\":\"DIVISI 2\",\"desc\":\"DIVISI 2\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":252103,\"name\":\"DIVISI 3\",\"desc\":\"DIVISI 3\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":252104,\"name\":\"DIVISI 4\",\"desc\":\"DIVISI 4\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":252105,\"name\":\"DIVISI 5\",\"desc\":\"DIVISI 5\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":252106,\"name\":\"DIVISI 6\",\"desc\":\"DIVISI 6\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":252107,\"name\":\"DIVISI 7\",\"desc\":\"DIVISI 7\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":252108,\"name\":\"DIVISI 8\",\"desc\":\"DIVISI 8\",\"category\":\"DIVISION\",\"children\":[]}]},{\"id\":2550,\"name\":\"SBYM\",\"category\":\"MILL\",\"desc\":\"Sungai Buaya Mill\",\"children\":[]},{\"id\":2551,\"name\":\"SMRM\",\"category\":\"MILL\",\"desc\":\"Sungai Merah Mill\",\"children\":[]},{\"id\":2620,\"name\":\"BINE\",\"category\":\"ESTATE\",\"desc\":\"Bukit Intan Estate\",\"children\":[{\"id\":262001,\"name\":\"DIVISI 1\",\"desc\":\"DIVISI 1\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262002,\"name\":\"DIVISI 2\",\"desc\":\"DIVISI 2\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262003,\"name\":\"DIVISI 3\",\"desc\":\"DIVISI 3\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262004,\"name\":\"DIVISI 4\",\"desc\":\"DIVISI 4\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262005,\"name\":\"DIVISI 5\",\"desc\":\"DIVISI 5\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262006,\"name\":\"DIVISI 6\",\"desc\":\"DIVISI 6\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262007,\"name\":\"DIVISI 7\",\"desc\":\"DIVISI 7\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262008,\"name\":\"DIVISI 8\",\"desc\":\"DIVISI 8\",\"category\":\"DIVISION\",\"children\":[]}]},{\"id\":2621,\"name\":\"BMSE\",\"category\":\"ESTATE\",\"desc\":\"Bukit Mas Estate\",\"children\":[{\"id\":262101,\"name\":\"DIVISI 1\",\"desc\":\"DIVISI 1\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262102,\"name\":\"DIVISI 2\",\"desc\":\"DIVISI 2\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262103,\"name\":\"DIVISI 3\",\"desc\":\"DIVISI 3\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262104,\"name\":\"DIVISI 4\",\"desc\":\"DIVISI 4\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262105,\"name\":\"DIVISI 5\",\"desc\":\"DIVISI 5\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262106,\"name\":\"DIVISI 6\",\"desc\":\"DIVISI 6\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262107,\"name\":\"DIVISI 7\",\"desc\":\"DIVISI 7\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262108,\"name\":\"DIVISI 8\",\"desc\":\"DIVISI 8\",\"category\":\"DIVISION\",\"children\":[]}]},{\"id\":2622,\"name\":\"BPRE\",\"category\":\"ESTATE\",\"desc\":\"Bukit Perak Estate\",\"children\":[{\"id\":262201,\"name\":\"DIVISI 1\",\"desc\":\"DIVISI 1\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262202,\"name\":\"DIVISI 2\",\"desc\":\"DIVISI 2\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262203,\"name\":\"DIVISI 3\",\"desc\":\"DIVISI 3\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262204,\"name\":\"DIVISI 4\",\"desc\":\"DIVISI 4\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262205,\"name\":\"DIVISI 5\",\"desc\":\"DIVISI 5\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262206,\"name\":\"DIVISI 6\",\"desc\":\"DIVISI 6\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262207,\"name\":\"DIVISI 7\",\"desc\":\"DIVISI 7\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262208,\"name\":\"DIVISI 8\",\"desc\":\"DIVISI 8\",\"category\":\"DIVISION\",\"children\":[]}]},{\"id\":2623,\"name\":\"BPTE\",\"category\":\"ESTATE\",\"desc\":\"Bukit Permata Estate\",\"children\":[{\"id\":262301,\"name\":\"DIVISI 1\",\"desc\":\"DIVISI 1\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262302,\"name\":\"DIVISI 2\",\"desc\":\"DIVISI 2\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262303,\"name\":\"DIVISI 3\",\"desc\":\"DIVISI 3\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262304,\"name\":\"DIVISI 4\",\"desc\":\"DIVISI 4\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262305,\"name\":\"DIVISI 5\",\"desc\":\"DIVISI 5\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262306,\"name\":\"DIVISI 6\",\"desc\":\"DIVISI 6\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262307,\"name\":\"DIVISI 7\",\"desc\":\"DIVISI 7\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262308,\"name\":\"DIVISI 8\",\"desc\":\"DIVISI 8\",\"category\":\"DIVISION\",\"children\":[]}]},{\"id\":2650,\"name\":\"BPRM\",\"category\":\"MILL\",\"desc\":\"Bukit Perak Mill\",\"children\":[]},{\"id\":2651,\"name\":\"BNKB\",\"category\":\"BULKING\",\"desc\":\"Bangka Bulking Station\",\"children\":[]},{\"id\":2720,\"name\":\"BSWE\",\"category\":\"ESTATE\",\"desc\":\"Bumi Sawit Estate\",\"children\":[{\"id\":272001,\"name\":\"DIVISI 1\",\"desc\":\"DIVISI 1\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":272002,\"name\":\"DIVISI 2\",\"desc\":\"DIVISI 2\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":272003,\"name\":\"DIVISI 3\",\"desc\":\"DIVISI 3\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":272004,\"name\":\"DIVISI 4\",\"desc\":\"DIVISI 4\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":272005,\"name\":\"DIVISI 5\",\"desc\":\"DIVISI 5\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":272006,\"name\":\"DIVISI 6\",\"desc\":\"DIVISI 6\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":272007,\"name\":\"DIVISI 7\",\"desc\":\"DIVISI 7\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":272008,\"name\":\"DIVISI 8\",\"desc\":\"DIVISI 8\",\"category\":\"DIVISION\",\"children\":[]}]},{\"id\":2722,\"name\":\"SLME\",\"category\":\"ESTATE\",\"desc\":\"Sungai Lematang Estate\",\"children\":[{\"id\":272201,\"name\":\"DIVISI 1\",\"desc\":\"DIVISI 1\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":272202,\"name\":\"DIVISI 2\",\"desc\":\"DIVISI 2\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":272203,\"name\":\"DIVISI 3\",\"desc\":\"DIVISI 3\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":272204,\"name\":\"DIVISI 4\",\"desc\":\"DIVISI 4\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":272205,\"name\":\"DIVISI 5\",\"desc\":\"DIVISI 5\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":272206,\"name\":\"DIVISI 6\",\"desc\":\"DIVISI 6\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":272207,\"name\":\"DIVISI 7\",\"desc\":\"DIVISI 7\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":272208,\"name\":\"DIVISI 8\",\"desc\":\"DIVISI 8\",\"category\":\"DIVISION\",\"children\":[]}]},{\"id\":2723,\"name\":\"SENE\",\"category\":\"ESTATE\",\"desc\":\"Sungai Enim Estate\",\"children\":[{\"id\":272301,\"name\":\"DIVISI 1\",\"desc\":\"DIVISI 1\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":272302,\"name\":\"DIVISI 2\",\"desc\":\"DIVISI 2\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":272303,\"name\":\"DIVISI 3\",\"desc\":\"DIVISI 3\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":272304,\"name\":\"DIVISI 4\",\"desc\":\"DIVISI 4\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":272305,\"name\":\"DIVISI 5\",\"desc\":\"DIVISI 5\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":272306,\"name\":\"DIVISI 6\",\"desc\":\"DIVISI 6\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":272307,\"name\":\"DIVISI 7\",\"desc\":\"DIVISI 7\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":272308,\"name\":\"DIVISI 8\",\"desc\":\"DIVISI 8\",\"category\":\"DIVISION\",\"children\":[]}]},{\"id\":2750,\"name\":\"BSWM\",\"category\":\"MILL\",\"desc\":\"Bumi Sawit Mill\",\"children\":[]},{\"id\":2820,\"name\":\"MKNE\",\"category\":\"ESTATE\",\"desc\":\"Muara Kandis Estate\",\"children\":[{\"id\":282001,\"name\":\"DIVISI 1\",\"desc\":\"DIVISI 1\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":282002,\"name\":\"DIVISI 2\",\"desc\":\"DIVISI 2\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":282003,\"name\":\"DIVISI 3\",\"desc\":\"DIVISI 3\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":282004,\"name\":\"DIVISI 4\",\"desc\":\"DIVISI 4\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":282005,\"name\":\"DIVISI 5\",\"desc\":\"DIVISI 5\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":282006,\"name\":\"DIVISI 6\",\"desc\":\"DIVISI 6\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":282007,\"name\":\"DIVISI 7\",\"desc\":\"DIVISI 7\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":282008,\"name\":\"DIVISI 8\",\"desc\":\"DIVISI 8\",\"category\":\"DIVISION\",\"children\":[]}]},{\"id\":2821,\"name\":\"MTWE\",\"category\":\"ESTATE\",\"desc\":\"Muara Tawas Estate\",\"children\":[{\"id\":282101,\"name\":\"DIVISI 1\",\"desc\":\"DIVISI 1\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":282102,\"name\":\"DIVISI 2\",\"desc\":\"DIVISI 2\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":282103,\"name\":\"DIVISI 3\",\"desc\":\"DIVISI 3\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":282104,\"name\":\"DIVISI 4\",\"desc\":\"DIVISI 4\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":282105,\"name\":\"DIVISI 5\",\"desc\":\"DIVISI 5\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":282106,\"name\":\"DIVISI 6\",\"desc\":\"DIVISI 6\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":282107,\"name\":\"DIVISI 7\",\"desc\":\"DIVISI 7\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":282108,\"name\":\"DIVISI 8\",\"desc\":\"DIVISI 8\",\"category\":\"DIVISION\",\"children\":[]}]},{\"id\":2850,\"name\":\"MKNM\",\"category\":\"MILL\",\"desc\":\"Muara Kandis Mill\",\"children\":[]},{\"id\":2920,\"name\":\"TKME\",\"category\":\"ESTATE\",\"desc\":\"Tanjung Kembiri Estate\",\"children\":[{\"id\":292001,\"name\":\"DIVISI 1\",\"desc\":\"DIVISI 1\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":292002,\"name\":\"DIVISI 2\",\"desc\":\"DIVISI 2\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":292003,\"name\":\"DIVISI 3\",\"desc\":\"DIVISI 3\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":292004,\"name\":\"DIVISI 4\",\"desc\":\"DIVISI 4\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":292005,\"name\":\"DIVISI 5\",\"desc\":\"DIVISI 5\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":292006,\"name\":\"DIVISI 6\",\"desc\":\"DIVISI 6\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":292007,\"name\":\"DIVISI 7\",\"desc\":\"DIVISI 7\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":292008,\"name\":\"DIVISI 8\",\"desc\":\"DIVISI 8\",\"category\":\"DIVISION\",\"children\":[]}]},{\"id\":2921,\"name\":\"TRSE\",\"category\":\"ESTATE\",\"desc\":\"Tanjung Rusa Estate\",\"children\":[{\"id\":292101,\"name\":\"DIVISI 1\",\"desc\":\"DIVISI 1\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":292102,\"name\":\"DIVISI 2\",\"desc\":\"DIVISI 2\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":292103,\"name\":\"DIVISI 3\",\"desc\":\"DIVISI 3\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":292104,\"name\":\"DIVISI 4\",\"desc\":\"DIVISI 4\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":292105,\"name\":\"DIVISI 5\",\"desc\":\"DIVISI 5\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":292106,\"name\":\"DIVISI 6\",\"desc\":\"DIVISI 6\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":292107,\"name\":\"DIVISI 7\",\"desc\":\"DIVISI 7\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":292108,\"name\":\"DIVISI 8\",\"desc\":\"DIVISI 8\",\"category\":\"DIVISION\",\"children\":[]}]},{\"id\":2950,\"name\":\"TKMM\",\"category\":\"MILL\",\"desc\":\"Tanjung Kembiri Mill\",\"children\":[]},{\"id\":2951,\"name\":\"BLTB\",\"category\":\"BULKING\",\"desc\":\"Belitung Bulking Station\",\"children\":[]},{\"id\":6120,\"name\":\"SBGE\",\"category\":\"ESTATE\",\"desc\":\"Sungai Bungur Estate\",\"children\":[{\"id\":612001,\"name\":\"DIVISI 1\",\"desc\":\"DIVISI 1\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":612002,\"name\":\"DIVISI 2\",\"desc\":\"DIVISI 2\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":612003,\"name\":\"DIVISI 3\",\"desc\":\"DIVISI 3\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":612004,\"name\":\"DIVISI 4\",\"desc\":\"DIVISI 4\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":612005,\"name\":\"DIVISI 5\",\"desc\":\"DIVISI 5\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":612006,\"name\":\"DIVISI 6\",\"desc\":\"DIVISI 6\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":612007,\"name\":\"DIVISI 7\",\"desc\":\"DIVISI 7\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":612008,\"name\":\"DIVISI 8\",\"desc\":\"DIVISI 8\",\"category\":\"DIVISION\",\"children\":[]}]},{\"id\":6121,\"name\":\"SLGE\",\"category\":\"ESTATE\",\"desc\":\"Sungai Lingsing Estate\",\"children\":[{\"id\":612101,\"name\":\"DIVISI 1\",\"desc\":\"DIVISI 1\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":612102,\"name\":\"DIVISI 2\",\"desc\":\"DIVISI 2\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":612103,\"name\":\"DIVISI 3\",\"desc\":\"DIVISI 3\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":612104,\"name\":\"DIVISI 4\",\"desc\":\"DIVISI 4\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":612105,\"name\":\"DIVISI 5\",\"desc\":\"DIVISI 5\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":612106,\"name\":\"DIVISI 6\",\"desc\":\"DIVISI 6\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":612107,\"name\":\"DIVISI 7\",\"desc\":\"DIVISI 7\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":612108,\"name\":\"DIVISI 8\",\"desc\":\"DIVISI 8\",\"category\":\"DIVISION\",\"children\":[]}]},{\"id\":6220,\"name\":\"BPAE\",\"category\":\"Estate\",\"desc\":\"Bukit Permai Estate\",\"children\":[]},{\"id\":6320,\"name\":\"BLSE\",\"category\":\"Estate\",\"desc\":\"Bukit Lestari Estate\",\"children\":[]},{\"id\":6520,\"name\":\"TSWE\",\"category\":\"ESTATE\",\"desc\":\"Tanjung Sawit Estate\",\"children\":[{\"id\":652001,\"name\":\"DIVISI 1\",\"desc\":\"DIVISI 1\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":652002,\"name\":\"DIVISI 2\",\"desc\":\"DIVISI 2\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":652003,\"name\":\"DIVISI 3\",\"desc\":\"DIVISI 3\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":652004,\"name\":\"DIVISI 4\",\"desc\":\"DIVISI 4\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":652005,\"name\":\"DIVISI 5\",\"desc\":\"DIVISI 5\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":652006,\"name\":\"DIVISI 6\",\"desc\":\"DIVISI 6\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":652007,\"name\":\"DIVISI 7\",\"desc\":\"DIVISI 7\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":652008,\"name\":\"DIVISI 8\",\"desc\":\"DIVISI 8\",\"category\":\"DIVISION\",\"children\":[]}]}]",
+        "payloadType": "json",
+        "x": 110,
+        "y": 1080,
+        "wires": [
+            [
+                "a7336695f66109a7"
+            ]
+        ]
+    },
+    {
+        "id": "a7336695f66109a7",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "function 66",
+        "func": "let payload = msg.payload;\ndelete msg.payload\nlet counter = 0;\nprocessRow();\nfunction processRow() {\n    if (counter < payload.length) {\n        let data = payload[counter];\n        node.send(data);\n        counter++;\n        setTimeout(processRow, 5000);\n    }\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 130,
+        "y": 1120,
+        "wires": [
+            [
+                "4500169bee01dbf1"
+            ]
+        ]
+    },
+    {
+        "id": "4500169bee01dbf1",
+        "type": "debug",
+        "z": "c5b9039a5fc48f97",
+        "name": "debug 74",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 360,
+        "y": 1120,
+        "wires": []
+    },
+    {
+        "id": "43b7d2a37373de03",
+        "type": "debug",
+        "z": "c5b9039a5fc48f97",
+        "name": "debug 75",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 980,
+        "y": 760,
+        "wires": []
+    },
+    {
+        "id": "14a6046b267b96d9",
+        "type": "subflow:188768fc5fe509fd",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "x": 740,
+        "y": 600,
+        "wires": [
+            [
+                "e014cd393d12dfc8"
+            ]
+        ]
+    },
+    {
+        "id": "e961c76d8d1785a3",
+        "type": "subflow:3c790259a2397aef",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "x": 1050,
+        "y": 560,
+        "wires": [
+            [
+                "a155ec0a0c355391"
+            ]
+        ]
+    },
+    {
+        "id": "795e928c18816c82",
+        "type": "switch",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "nnull"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 490,
+        "y": 640,
+        "wires": [
+            [
+                "e38ea2e7c5ac9890"
+            ]
+        ]
+    },
+    {
+        "id": "20bea84fea9d51e6",
+        "type": "subflow:188768fc5fe509fd",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "x": 1080,
+        "y": 680,
+        "wires": [
+            [
+                "f28c06a47830c563"
+            ]
+        ]
+    },
+    {
+        "id": "ed1af66838f34b6c",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "get estate",
+        "func": "let { name } = msg.estate;\nmsg.sub = {\n    scopeType: 'estate',\n    ref1: name,\n    ref2: null,\n    ref3: null\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1120,
+        "y": 640,
+        "wires": [
+            [
+                "20bea84fea9d51e6"
+            ]
+        ]
+    },
+    {
+        "id": "a155ec0a0c355391",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "split ESTATE",
+        "func": "let estates = msg.psm.children;\nlet counter = 0;\nsplit();\ndelete msg.payload;\nreturn msg;\n\nfunction split() {\n    if (counter < estates.length) {\n        let data = estates[counter];\n        msg.payload = data;\n        msg.estate = data;\n        node.send({...msg});\n        counter++;\n        setTimeout(split, 5000);\n    }\n}",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 990,
+        "y": 600,
+        "wires": [
+            [
+                "9daf4f25dea3a99a"
+            ]
+        ]
+    },
+    {
+        "id": "9daf4f25dea3a99a",
+        "type": "switch",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "nnull"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 1130,
+        "y": 600,
+        "wires": [
+            [
+                "ed1af66838f34b6c"
+            ]
+        ]
+    },
+    {
+        "id": "f28c06a47830c563",
+        "type": "switch",
+        "z": "c5b9039a5fc48f97",
+        "name": "found ?",
+        "property": "sub.status",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 1120,
+        "y": 720,
+        "wires": [
+            [
+                "49b6dd4283c849c7"
+            ],
+            [
+                "2c122037a23b9dda"
+            ]
+        ]
+    },
+    {
+        "id": "2c122037a23b9dda",
+        "type": "debug",
+        "z": "c5b9039a5fc48f97",
+        "name": "debug 76",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1320,
+        "y": 800,
+        "wires": []
+    },
+    {
+        "id": "49b6dd4283c849c7",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "prepare doc & key estate",
+        "func": "let docs = msg.sub.data?.geojson?.features.map(x => {\n    return {\n        geoType: 'estate',\n        psm: x.properties.psm,\n        pt: x.properties.pt,\n        estate: x.properties.estate,\n        type: x.type,\n        properties: x.properties,\n        geometry: x.geometry\n    }\n});\nlet keys = msg.sub.data?.geojson?.features.map(x => {\n    return [\n        x.properties.psm,\n        x.properties.pt,\n        x.properties.estate,\n    ];\n});\nmsg.sub = {\n    type: 'estate',\n    keys,\n    docs\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1370,
+        "y": 600,
+        "wires": [
+            [
+                "d0d5b272e6ba046f"
+            ]
+        ]
+    },
+    {
+        "id": "d0d5b272e6ba046f",
+        "type": "subflow:3c790259a2397aef",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "x": 1390,
+        "y": 640,
+        "wires": [
+            [
+                "83d90a3bc2e23907"
+            ]
+        ]
+    },
+    {
+        "id": "83d90a3bc2e23907",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "get division",
+        "func": "let { name } = msg.estate;\nmsg.sub = {\n    scopeType: 'division',\n    ref1: name,\n    ref2: null,\n    ref3: null\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1450,
+        "y": 680,
+        "wires": [
+            [
+                "6ac48da85eb49ba8"
+            ]
+        ]
+    },
+    {
+        "id": "6ac48da85eb49ba8",
+        "type": "subflow:188768fc5fe509fd",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "x": 1420,
+        "y": 720,
+        "wires": [
+            [
+                "ae537177a43c1cd2"
+            ]
+        ]
+    },
+    {
+        "id": "ae537177a43c1cd2",
+        "type": "switch",
+        "z": "c5b9039a5fc48f97",
+        "name": "found ?",
+        "property": "sub.status",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 1460,
+        "y": 760,
+        "wires": [
+            [
+                "22bf37bb7ac1deef"
+            ],
+            [
+                "fa7708891b46ba9e"
+            ]
+        ]
+    },
+    {
+        "id": "fa7708891b46ba9e",
+        "type": "debug",
+        "z": "c5b9039a5fc48f97",
+        "name": "debug 77",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1660,
+        "y": 820,
+        "wires": []
+    },
+    {
+        "id": "22bf37bb7ac1deef",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "prepare doc & key division",
+        "func": "let docs = msg.sub.data?.geojson?.features.map(x => {\n    return {\n        geoType: 'division',\n        psm: x.properties.psm,\n        pt: x.properties.pt,\n        estate: x.properties.estate,\n        division: x.properties.divisi,\n        type: x.type,\n        properties: x.properties,\n        geometry: x.geometry\n    }\n});\nlet keys = msg.sub.data?.geojson?.features.map(x => {\n    return [\n        x.properties.psm,\n        x.properties.pt,\n        x.properties.estate,\n        x.properties.divisi,\n    ];\n});\nmsg.divisions = msg.sub.data?.geojson?.features.map(x => {\n    return {\n        name: x.properties.divisi,\n        desc: x.properties.divisi,\n        category: 'DIVISION'\n    }\n});\nmsg.sub = {\n    type: 'division',\n    keys,\n    docs\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1720,
+        "y": 720,
+        "wires": [
+            [
+                "c5b50d54f6b998c5",
+                "00ad3cd5ef7ac15d"
+            ]
+        ]
+    },
+    {
+        "id": "c5b50d54f6b998c5",
+        "type": "subflow:3c790259a2397aef",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "x": 1730,
+        "y": 760,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "d4328058b56fd136",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "get block",
+        "func": "msg.sub = {\n    scopeType: 'block',\n    ref1: msg.estate.name,\n    ref2: msg.division.name,\n    ref3: null\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2000,
+        "y": 760,
+        "wires": [
+            [
+                "37b2efdec8d2dad9"
+            ]
+        ]
+    },
+    {
+        "id": "37b2efdec8d2dad9",
+        "type": "subflow:188768fc5fe509fd",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "x": 2040,
+        "y": 800,
+        "wires": [
+            [
+                "0115fbb7e949b866",
+                "de4799a109451ed5"
+            ]
+        ]
+    },
+    {
+        "id": "0115fbb7e949b866",
+        "type": "switch",
+        "z": "c5b9039a5fc48f97",
+        "name": "block found ?",
+        "property": "sub.status",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 2290,
+        "y": 760,
+        "wires": [
+            [
+                "5825cba23c72fcf8"
+            ],
+            [
+                "9c2d1ed1d2b4c46a"
+            ]
+        ]
+    },
+    {
+        "id": "de4799a109451ed5",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "get road",
+        "func": "msg.sub = {\n    scopeType: 'road',\n    ref1: msg.estate.name,\n    ref2: msg.division.name,\n    ref3: null\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2280,
+        "y": 840,
+        "wires": [
+            [
+                "33e4671cbd5da025"
+            ]
+        ]
+    },
+    {
+        "id": "33e4671cbd5da025",
+        "type": "subflow:188768fc5fe509fd",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "x": 2320,
+        "y": 880,
+        "wires": [
+            [
+                "fe94eebb9a0d99b6"
+            ]
+        ]
+    },
+    {
+        "id": "fe94eebb9a0d99b6",
+        "type": "switch",
+        "z": "c5b9039a5fc48f97",
+        "name": "road found ?",
+        "property": "sub.status",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 2550,
+        "y": 880,
+        "wires": [
+            [
+                "9b0e6ae5a1565b9d"
+            ],
+            [
+                "609e4b5617aa7e18"
+            ]
+        ]
+    },
+    {
+        "id": "5825cba23c72fcf8",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "prepare doc & key block",
+        "func": "let docs = msg.sub.data?.geojson?.features.map(x => {\n    return {\n        geoType: 'block',\n        psm: x.properties.psm,\n        pt: x.properties.pt,\n        estate: x.properties.estate,\n        division: x.properties.divisi,\n        block: x.properties.blok,\n        type: x.type,\n        properties: x.properties,\n        geometry: x.geometry\n    }\n});\nlet keys = msg.sub.data?.geojson?.features.map(x => {\n    return [\n        x.properties.psm,\n        x.properties.pt,\n        x.properties.estate,\n        x.properties.divisi,\n        x.properties.blok\n    ];\n});\nmsg.sub = {\n    type: 'block',\n    keys,\n    docs\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2550,
+        "y": 700,
+        "wires": [
+            [
+                "59597b8cc3477726"
+            ]
+        ]
+    },
+    {
+        "id": "59597b8cc3477726",
+        "type": "subflow:3c790259a2397aef",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "x": 2570,
+        "y": 740,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "9b0e6ae5a1565b9d",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "prepare doc & key road",
+        "func": "let docs = msg.sub.data?.geojson?.features.map(x => {\n    return {\n        geoType: 'road',\n        psm: x.properties.psm,\n        pt: x.properties.pt,\n        estate: x.properties.estate_code,\n        division: x.properties.divisi,\n        road: x.properties.id_jalan,\n        roadType: x.properties.kls_jalan,\n        type: x.type,\n        properties: x.properties,\n        geometry: x.geometry\n    }\n});\nlet keys = msg.sub.data?.geojson?.features.map(x => {\n    return [\n        x.properties.psm,\n        x.properties.pt,\n        x.properties.estate_code,\n        x.properties.divisi,\n        x.properties.id_jalan\n    ];\n});\nmsg.sub = {\n    type: 'road',\n    keys,\n    docs\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2790,
+        "y": 840,
+        "wires": [
+            [
+                "b1f58278efca7e59"
+            ]
+        ]
+    },
+    {
+        "id": "b1f58278efca7e59",
+        "type": "subflow:3c790259a2397aef",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "x": 2810,
+        "y": 880,
+        "wires": [
+            [
+                "1333e1900f9a4119"
+            ]
+        ]
+    },
+    {
+        "id": "9c2d1ed1d2b4c46a",
+        "type": "debug",
+        "z": "c5b9039a5fc48f97",
+        "name": "debug 78",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 2500,
+        "y": 800,
+        "wires": []
+    },
+    {
+        "id": "609e4b5617aa7e18",
+        "type": "debug",
+        "z": "c5b9039a5fc48f97",
+        "name": "debug 79",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 2740,
+        "y": 940,
+        "wires": []
+    },
+    {
+        "id": "8d62a0cec06e1022",
+        "type": "inject",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[{\"id\":1221,\"name\":\"LWSE\",\"category\":\"ESTATE\",\"desc\":\"Leidong West Estate\",\"children\":[{\"id\":122101,\"name\":\"DIVISI 1\",\"desc\":\"DIVISI 1\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":122102,\"name\":\"DIVISI 2\",\"desc\":\"DIVISI 2\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":122103,\"name\":\"DIVISI 3\",\"desc\":\"DIVISI 3\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":122104,\"name\":\"DIVISI 4\",\"desc\":\"DIVISI 4\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":122105,\"name\":\"DIVISI 5\",\"desc\":\"DIVISI 5\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":122106,\"name\":\"DIVISI 6\",\"desc\":\"DIVISI 6\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":122107,\"name\":\"DIVISI 7\",\"desc\":\"DIVISI 7\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":122108,\"name\":\"DIVISI 8\",\"desc\":\"DIVISI 8\",\"category\":\"DIVISION\",\"children\":[]}]},{\"id\":1222,\"name\":\"LWUE\",\"category\":\"ESTATE\",\"desc\":\"Leidong West Utara Estate\",\"children\":[{\"id\":122201,\"name\":\"DIVISI 1\",\"desc\":\"DIVISI 1\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":122202,\"name\":\"DIVISI 2\",\"desc\":\"DIVISI 2\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":122203,\"name\":\"DIVISI 3\",\"desc\":\"DIVISI 3\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":122204,\"name\":\"DIVISI 4\",\"desc\":\"DIVISI 4\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":122205,\"name\":\"DIVISI 5\",\"desc\":\"DIVISI 5\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":122206,\"name\":\"DIVISI 6\",\"desc\":\"DIVISI 6\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":122207,\"name\":\"DIVISI 7\",\"desc\":\"DIVISI 7\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":122208,\"name\":\"DIVISI 8\",\"desc\":\"DIVISI 8\",\"category\":\"DIVISION\",\"children\":[]}]},{\"id\":1250,\"name\":\"LWSM\",\"category\":\"MILL\",\"desc\":\"Leidong West MIll\",\"children\":[]},{\"id\":2420,\"name\":\"SMSE\",\"category\":\"ESTATE\",\"desc\":\"Sawit Mas Estate\",\"children\":[{\"id\":242001,\"name\":\"DIVISI 1\",\"desc\":\"DIVISI 1\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242002,\"name\":\"DIVISI 2\",\"desc\":\"DIVISI 2\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242003,\"name\":\"DIVISI 3\",\"desc\":\"DIVISI 3\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242004,\"name\":\"DIVISI 4\",\"desc\":\"DIVISI 4\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242005,\"name\":\"DIVISI 5\",\"desc\":\"DIVISI 5\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242006,\"name\":\"DIVISI 6\",\"desc\":\"DIVISI 6\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242007,\"name\":\"DIVISI 7\",\"desc\":\"DIVISI 7\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242008,\"name\":\"DIVISI 8\",\"desc\":\"DIVISI 8\",\"category\":\"DIVISION\",\"children\":[]}]},{\"id\":2423,\"name\":\"SKME\",\"category\":\"ESTATE\",\"desc\":\"Sungai Kikim Estate\",\"children\":[{\"id\":242301,\"name\":\"DIVISI 1\",\"desc\":\"DIVISI 1\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242302,\"name\":\"DIVISI 2\",\"desc\":\"DIVISI 2\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242303,\"name\":\"DIVISI 3\",\"desc\":\"DIVISI 3\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242304,\"name\":\"DIVISI 4\",\"desc\":\"DIVISI 4\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242305,\"name\":\"DIVISI 5\",\"desc\":\"DIVISI 5\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242306,\"name\":\"DIVISI 6\",\"desc\":\"DIVISI 6\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242307,\"name\":\"DIVISI 7\",\"desc\":\"DIVISI 7\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242308,\"name\":\"DIVISI 8\",\"desc\":\"DIVISI 8\",\"category\":\"DIVISION\",\"children\":[]}]},{\"id\":2424,\"name\":\"SSLE\",\"category\":\"ESTATE\",\"desc\":\"Sungai Saling Estate\",\"children\":[{\"id\":242401,\"name\":\"DIVISI 1\",\"desc\":\"DIVISI 1\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242402,\"name\":\"DIVISI 2\",\"desc\":\"DIVISI 2\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242403,\"name\":\"DIVISI 3\",\"desc\":\"DIVISI 3\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242404,\"name\":\"DIVISI 4\",\"desc\":\"DIVISI 4\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242405,\"name\":\"DIVISI 5\",\"desc\":\"DIVISI 5\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242406,\"name\":\"DIVISI 6\",\"desc\":\"DIVISI 6\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242407,\"name\":\"DIVISI 7\",\"desc\":\"DIVISI 7\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242408,\"name\":\"DIVISI 8\",\"desc\":\"DIVISI 8\",\"category\":\"DIVISION\",\"children\":[]}]},{\"id\":2425,\"name\":\"SPGE\",\"category\":\"ESTATE\",\"desc\":\"Sungai Pangi Estate\",\"children\":[{\"id\":242501,\"name\":\"DIVISI 1\",\"desc\":\"DIVISI 1\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242502,\"name\":\"DIVISI 2\",\"desc\":\"DIVISI 2\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242503,\"name\":\"DIVISI 3\",\"desc\":\"DIVISI 3\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242504,\"name\":\"DIVISI 4\",\"desc\":\"DIVISI 4\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242505,\"name\":\"DIVISI 5\",\"desc\":\"DIVISI 5\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242506,\"name\":\"DIVISI 6\",\"desc\":\"DIVISI 6\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242507,\"name\":\"DIVISI 7\",\"desc\":\"DIVISI 7\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242508,\"name\":\"DIVISI 8\",\"desc\":\"DIVISI 8\",\"category\":\"DIVISION\",\"children\":[]}]},{\"id\":2426,\"name\":\"SMIE\",\"category\":\"ESTATE\",\"desc\":\"Sungai Musi Estate\",\"children\":[{\"id\":242601,\"name\":\"DIVISI 1\",\"desc\":\"DIVISI 1\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242602,\"name\":\"DIVISI 2\",\"desc\":\"DIVISI 2\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242603,\"name\":\"DIVISI 3\",\"desc\":\"DIVISI 3\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242604,\"name\":\"DIVISI 4\",\"desc\":\"DIVISI 4\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242605,\"name\":\"DIVISI 5\",\"desc\":\"DIVISI 5\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242606,\"name\":\"DIVISI 6\",\"desc\":\"DIVISI 6\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242607,\"name\":\"DIVISI 7\",\"desc\":\"DIVISI 7\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":242608,\"name\":\"DIVISI 8\",\"desc\":\"DIVISI 8\",\"category\":\"DIVISION\",\"children\":[]}]},{\"id\":2450,\"name\":\"PPNM\",\"category\":\"MILL\",\"desc\":\"Pangkalan Panji Mill\",\"children\":[]},{\"id\":2451,\"name\":\"SKMM\",\"category\":\"MILL\",\"desc\":\"Sungai Kikim Mill\",\"children\":[]},{\"id\":2520,\"name\":\"SBYE\",\"category\":\"ESTATE\",\"desc\":\"Sungai Buaya Estate\",\"children\":[{\"id\":252001,\"name\":\"DIVISI 1\",\"desc\":\"DIVISI 1\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":252002,\"name\":\"DIVISI 2\",\"desc\":\"DIVISI 2\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":252003,\"name\":\"DIVISI 3\",\"desc\":\"DIVISI 3\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":252004,\"name\":\"DIVISI 4\",\"desc\":\"DIVISI 4\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":252005,\"name\":\"DIVISI 5\",\"desc\":\"DIVISI 5\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":252006,\"name\":\"DIVISI 6\",\"desc\":\"DIVISI 6\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":252007,\"name\":\"DIVISI 7\",\"desc\":\"DIVISI 7\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":252008,\"name\":\"DIVISI 8\",\"desc\":\"DIVISI 8\",\"category\":\"DIVISION\",\"children\":[]}]},{\"id\":2521,\"name\":\"SMRE\",\"category\":\"ESTATE\",\"desc\":\"Sungai Merah Estate\",\"children\":[{\"id\":252101,\"name\":\"DIVISI 1\",\"desc\":\"DIVISI 1\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":252102,\"name\":\"DIVISI 2\",\"desc\":\"DIVISI 2\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":252103,\"name\":\"DIVISI 3\",\"desc\":\"DIVISI 3\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":252104,\"name\":\"DIVISI 4\",\"desc\":\"DIVISI 4\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":252105,\"name\":\"DIVISI 5\",\"desc\":\"DIVISI 5\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":252106,\"name\":\"DIVISI 6\",\"desc\":\"DIVISI 6\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":252107,\"name\":\"DIVISI 7\",\"desc\":\"DIVISI 7\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":252108,\"name\":\"DIVISI 8\",\"desc\":\"DIVISI 8\",\"category\":\"DIVISION\",\"children\":[]}]},{\"id\":2550,\"name\":\"SBYM\",\"category\":\"MILL\",\"desc\":\"Sungai Buaya Mill\",\"children\":[]},{\"id\":2551,\"name\":\"SMRM\",\"category\":\"MILL\",\"desc\":\"Sungai Merah Mill\",\"children\":[]},{\"id\":2620,\"name\":\"BINE\",\"category\":\"ESTATE\",\"desc\":\"Bukit Intan Estate\",\"children\":[{\"id\":262001,\"name\":\"DIVISI 1\",\"desc\":\"DIVISI 1\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262002,\"name\":\"DIVISI 2\",\"desc\":\"DIVISI 2\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262003,\"name\":\"DIVISI 3\",\"desc\":\"DIVISI 3\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262004,\"name\":\"DIVISI 4\",\"desc\":\"DIVISI 4\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262005,\"name\":\"DIVISI 5\",\"desc\":\"DIVISI 5\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262006,\"name\":\"DIVISI 6\",\"desc\":\"DIVISI 6\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262007,\"name\":\"DIVISI 7\",\"desc\":\"DIVISI 7\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262008,\"name\":\"DIVISI 8\",\"desc\":\"DIVISI 8\",\"category\":\"DIVISION\",\"children\":[]}]},{\"id\":2621,\"name\":\"BMSE\",\"category\":\"ESTATE\",\"desc\":\"Bukit Mas Estate\",\"children\":[{\"id\":262101,\"name\":\"DIVISI 1\",\"desc\":\"DIVISI 1\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262102,\"name\":\"DIVISI 2\",\"desc\":\"DIVISI 2\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262103,\"name\":\"DIVISI 3\",\"desc\":\"DIVISI 3\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262104,\"name\":\"DIVISI 4\",\"desc\":\"DIVISI 4\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262105,\"name\":\"DIVISI 5\",\"desc\":\"DIVISI 5\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262106,\"name\":\"DIVISI 6\",\"desc\":\"DIVISI 6\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262107,\"name\":\"DIVISI 7\",\"desc\":\"DIVISI 7\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262108,\"name\":\"DIVISI 8\",\"desc\":\"DIVISI 8\",\"category\":\"DIVISION\",\"children\":[]}]},{\"id\":2622,\"name\":\"BPRE\",\"category\":\"ESTATE\",\"desc\":\"Bukit Perak Estate\",\"children\":[{\"id\":262201,\"name\":\"DIVISI 1\",\"desc\":\"DIVISI 1\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262202,\"name\":\"DIVISI 2\",\"desc\":\"DIVISI 2\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262203,\"name\":\"DIVISI 3\",\"desc\":\"DIVISI 3\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262204,\"name\":\"DIVISI 4\",\"desc\":\"DIVISI 4\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262205,\"name\":\"DIVISI 5\",\"desc\":\"DIVISI 5\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262206,\"name\":\"DIVISI 6\",\"desc\":\"DIVISI 6\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262207,\"name\":\"DIVISI 7\",\"desc\":\"DIVISI 7\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262208,\"name\":\"DIVISI 8\",\"desc\":\"DIVISI 8\",\"category\":\"DIVISION\",\"children\":[]}]},{\"id\":2623,\"name\":\"BPTE\",\"category\":\"ESTATE\",\"desc\":\"Bukit Permata Estate\",\"children\":[{\"id\":262301,\"name\":\"DIVISI 1\",\"desc\":\"DIVISI 1\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262302,\"name\":\"DIVISI 2\",\"desc\":\"DIVISI 2\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262303,\"name\":\"DIVISI 3\",\"desc\":\"DIVISI 3\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262304,\"name\":\"DIVISI 4\",\"desc\":\"DIVISI 4\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262305,\"name\":\"DIVISI 5\",\"desc\":\"DIVISI 5\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262306,\"name\":\"DIVISI 6\",\"desc\":\"DIVISI 6\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262307,\"name\":\"DIVISI 7\",\"desc\":\"DIVISI 7\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":262308,\"name\":\"DIVISI 8\",\"desc\":\"DIVISI 8\",\"category\":\"DIVISION\",\"children\":[]}]},{\"id\":2650,\"name\":\"BPRM\",\"category\":\"MILL\",\"desc\":\"Bukit Perak Mill\",\"children\":[]},{\"id\":2651,\"name\":\"BNKB\",\"category\":\"BULKING\",\"desc\":\"Bangka Bulking Station\",\"children\":[]},{\"id\":2720,\"name\":\"BSWE\",\"category\":\"ESTATE\",\"desc\":\"Bumi Sawit Estate\",\"children\":[{\"id\":272001,\"name\":\"DIVISI 1\",\"desc\":\"DIVISI 1\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":272002,\"name\":\"DIVISI 2\",\"desc\":\"DIVISI 2\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":272003,\"name\":\"DIVISI 3\",\"desc\":\"DIVISI 3\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":272004,\"name\":\"DIVISI 4\",\"desc\":\"DIVISI 4\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":272005,\"name\":\"DIVISI 5\",\"desc\":\"DIVISI 5\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":272006,\"name\":\"DIVISI 6\",\"desc\":\"DIVISI 6\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":272007,\"name\":\"DIVISI 7\",\"desc\":\"DIVISI 7\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":272008,\"name\":\"DIVISI 8\",\"desc\":\"DIVISI 8\",\"category\":\"DIVISION\",\"children\":[]}]},{\"id\":2722,\"name\":\"SLME\",\"category\":\"ESTATE\",\"desc\":\"Sungai Lematang Estate\",\"children\":[{\"id\":272201,\"name\":\"DIVISI 1\",\"desc\":\"DIVISI 1\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":272202,\"name\":\"DIVISI 2\",\"desc\":\"DIVISI 2\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":272203,\"name\":\"DIVISI 3\",\"desc\":\"DIVISI 3\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":272204,\"name\":\"DIVISI 4\",\"desc\":\"DIVISI 4\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":272205,\"name\":\"DIVISI 5\",\"desc\":\"DIVISI 5\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":272206,\"name\":\"DIVISI 6\",\"desc\":\"DIVISI 6\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":272207,\"name\":\"DIVISI 7\",\"desc\":\"DIVISI 7\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":272208,\"name\":\"DIVISI 8\",\"desc\":\"DIVISI 8\",\"category\":\"DIVISION\",\"children\":[]}]},{\"id\":2723,\"name\":\"SENE\",\"category\":\"ESTATE\",\"desc\":\"Sungai Enim Estate\",\"children\":[{\"id\":272301,\"name\":\"DIVISI 1\",\"desc\":\"DIVISI 1\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":272302,\"name\":\"DIVISI 2\",\"desc\":\"DIVISI 2\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":272303,\"name\":\"DIVISI 3\",\"desc\":\"DIVISI 3\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":272304,\"name\":\"DIVISI 4\",\"desc\":\"DIVISI 4\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":272305,\"name\":\"DIVISI 5\",\"desc\":\"DIVISI 5\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":272306,\"name\":\"DIVISI 6\",\"desc\":\"DIVISI 6\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":272307,\"name\":\"DIVISI 7\",\"desc\":\"DIVISI 7\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":272308,\"name\":\"DIVISI 8\",\"desc\":\"DIVISI 8\",\"category\":\"DIVISION\",\"children\":[]}]},{\"id\":2750,\"name\":\"BSWM\",\"category\":\"MILL\",\"desc\":\"Bumi Sawit Mill\",\"children\":[]},{\"id\":2820,\"name\":\"MKNE\",\"category\":\"ESTATE\",\"desc\":\"Muara Kandis Estate\",\"children\":[{\"id\":282001,\"name\":\"DIVISI 1\",\"desc\":\"DIVISI 1\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":282002,\"name\":\"DIVISI 2\",\"desc\":\"DIVISI 2\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":282003,\"name\":\"DIVISI 3\",\"desc\":\"DIVISI 3\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":282004,\"name\":\"DIVISI 4\",\"desc\":\"DIVISI 4\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":282005,\"name\":\"DIVISI 5\",\"desc\":\"DIVISI 5\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":282006,\"name\":\"DIVISI 6\",\"desc\":\"DIVISI 6\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":282007,\"name\":\"DIVISI 7\",\"desc\":\"DIVISI 7\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":282008,\"name\":\"DIVISI 8\",\"desc\":\"DIVISI 8\",\"category\":\"DIVISION\",\"children\":[]}]},{\"id\":2821,\"name\":\"MTWE\",\"category\":\"ESTATE\",\"desc\":\"Muara Tawas Estate\",\"children\":[{\"id\":282101,\"name\":\"DIVISI 1\",\"desc\":\"DIVISI 1\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":282102,\"name\":\"DIVISI 2\",\"desc\":\"DIVISI 2\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":282103,\"name\":\"DIVISI 3\",\"desc\":\"DIVISI 3\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":282104,\"name\":\"DIVISI 4\",\"desc\":\"DIVISI 4\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":282105,\"name\":\"DIVISI 5\",\"desc\":\"DIVISI 5\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":282106,\"name\":\"DIVISI 6\",\"desc\":\"DIVISI 6\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":282107,\"name\":\"DIVISI 7\",\"desc\":\"DIVISI 7\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":282108,\"name\":\"DIVISI 8\",\"desc\":\"DIVISI 8\",\"category\":\"DIVISION\",\"children\":[]}]},{\"id\":2850,\"name\":\"MKNM\",\"category\":\"MILL\",\"desc\":\"Muara Kandis Mill\",\"children\":[]},{\"id\":2920,\"name\":\"TKME\",\"category\":\"ESTATE\",\"desc\":\"Tanjung Kembiri Estate\",\"children\":[{\"id\":292001,\"name\":\"DIVISI 1\",\"desc\":\"DIVISI 1\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":292002,\"name\":\"DIVISI 2\",\"desc\":\"DIVISI 2\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":292003,\"name\":\"DIVISI 3\",\"desc\":\"DIVISI 3\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":292004,\"name\":\"DIVISI 4\",\"desc\":\"DIVISI 4\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":292005,\"name\":\"DIVISI 5\",\"desc\":\"DIVISI 5\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":292006,\"name\":\"DIVISI 6\",\"desc\":\"DIVISI 6\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":292007,\"name\":\"DIVISI 7\",\"desc\":\"DIVISI 7\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":292008,\"name\":\"DIVISI 8\",\"desc\":\"DIVISI 8\",\"category\":\"DIVISION\",\"children\":[]}]},{\"id\":2921,\"name\":\"TRSE\",\"category\":\"ESTATE\",\"desc\":\"Tanjung Rusa Estate\",\"children\":[{\"id\":292101,\"name\":\"DIVISI 1\",\"desc\":\"DIVISI 1\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":292102,\"name\":\"DIVISI 2\",\"desc\":\"DIVISI 2\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":292103,\"name\":\"DIVISI 3\",\"desc\":\"DIVISI 3\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":292104,\"name\":\"DIVISI 4\",\"desc\":\"DIVISI 4\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":292105,\"name\":\"DIVISI 5\",\"desc\":\"DIVISI 5\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":292106,\"name\":\"DIVISI 6\",\"desc\":\"DIVISI 6\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":292107,\"name\":\"DIVISI 7\",\"desc\":\"DIVISI 7\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":292108,\"name\":\"DIVISI 8\",\"desc\":\"DIVISI 8\",\"category\":\"DIVISION\",\"children\":[]}]},{\"id\":2950,\"name\":\"TKMM\",\"category\":\"MILL\",\"desc\":\"Tanjung Kembiri Mill\",\"children\":[]},{\"id\":2951,\"name\":\"BLTB\",\"category\":\"BULKING\",\"desc\":\"Belitung Bulking Station\",\"children\":[]},{\"id\":6120,\"name\":\"SBGE\",\"category\":\"ESTATE\",\"desc\":\"Sungai Bungur Estate\",\"children\":[{\"id\":612001,\"name\":\"DIVISI 1\",\"desc\":\"DIVISI 1\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":612002,\"name\":\"DIVISI 2\",\"desc\":\"DIVISI 2\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":612003,\"name\":\"DIVISI 3\",\"desc\":\"DIVISI 3\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":612004,\"name\":\"DIVISI 4\",\"desc\":\"DIVISI 4\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":612005,\"name\":\"DIVISI 5\",\"desc\":\"DIVISI 5\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":612006,\"name\":\"DIVISI 6\",\"desc\":\"DIVISI 6\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":612007,\"name\":\"DIVISI 7\",\"desc\":\"DIVISI 7\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":612008,\"name\":\"DIVISI 8\",\"desc\":\"DIVISI 8\",\"category\":\"DIVISION\",\"children\":[]}]},{\"id\":6121,\"name\":\"SLGE\",\"category\":\"ESTATE\",\"desc\":\"Sungai Lingsing Estate\",\"children\":[{\"id\":612101,\"name\":\"DIVISI 1\",\"desc\":\"DIVISI 1\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":612102,\"name\":\"DIVISI 2\",\"desc\":\"DIVISI 2\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":612103,\"name\":\"DIVISI 3\",\"desc\":\"DIVISI 3\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":612104,\"name\":\"DIVISI 4\",\"desc\":\"DIVISI 4\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":612105,\"name\":\"DIVISI 5\",\"desc\":\"DIVISI 5\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":612106,\"name\":\"DIVISI 6\",\"desc\":\"DIVISI 6\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":612107,\"name\":\"DIVISI 7\",\"desc\":\"DIVISI 7\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":612108,\"name\":\"DIVISI 8\",\"desc\":\"DIVISI 8\",\"category\":\"DIVISION\",\"children\":[]}]},{\"id\":6220,\"name\":\"BPAE\",\"category\":\"Estate\",\"desc\":\"Bukit Permai Estate\",\"children\":[]},{\"id\":6320,\"name\":\"BLSE\",\"category\":\"Estate\",\"desc\":\"Bukit Lestari Estate\",\"children\":[]},{\"id\":6520,\"name\":\"TSWE\",\"category\":\"ESTATE\",\"desc\":\"Tanjung Sawit Estate\",\"children\":[{\"id\":652001,\"name\":\"DIVISI 1\",\"desc\":\"DIVISI 1\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":652002,\"name\":\"DIVISI 2\",\"desc\":\"DIVISI 2\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":652003,\"name\":\"DIVISI 3\",\"desc\":\"DIVISI 3\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":652004,\"name\":\"DIVISI 4\",\"desc\":\"DIVISI 4\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":652005,\"name\":\"DIVISI 5\",\"desc\":\"DIVISI 5\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":652006,\"name\":\"DIVISI 6\",\"desc\":\"DIVISI 6\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":652007,\"name\":\"DIVISI 7\",\"desc\":\"DIVISI 7\",\"category\":\"DIVISION\",\"children\":[]},{\"id\":652008,\"name\":\"DIVISI 8\",\"desc\":\"DIVISI 8\",\"category\":\"DIVISION\",\"children\":[]}]}]",
+        "payloadType": "json",
+        "x": 110,
+        "y": 1160,
+        "wires": [
+            [
+                "1c392b43757817fa"
+            ]
+        ]
+    },
+    {
+        "id": "1c392b43757817fa",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "function 67",
+        "func": "msg.payload = {\n    selector: {\n        \"geoType\": {\n            \"$eq\": \"road\"\n        }\n    },\n    limit: 100000\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 130,
+        "y": 1200,
+        "wires": [
+            [
+                "0edf99770e05179c"
+            ]
+        ]
+    },
+    {
+        "id": "b4f332a6cb86e3e9",
+        "type": "debug",
+        "z": "c5b9039a5fc48f97",
+        "name": "debug 81",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 520,
+        "y": 1280,
+        "wires": []
+    },
+    {
+        "id": "0edf99770e05179c",
+        "type": "cloudantplus in",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-geojson",
+        "service": "_ext_",
+        "search": "_query_",
+        "design": "",
+        "index": "",
+        "x": 340,
+        "y": 1200,
+        "wires": [
+            [
+                "118960d79920a774"
+            ]
+        ]
+    },
+    {
+        "id": "118960d79920a774",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "function 68",
+        "func": "msg.payload = {\n    docs: msg.payload.docs.map(x => {\n        return { ...x, _deleted: true }\n    })\n};\nmsg.url = `${env.get('DOCKER_COUCHDB_DOMAIN')}/smart-geojson/_bulk_docs`\nmsg.headers = {\n    \"Authorization\": \"Basic \" +\n        Buffer.from(`${env.get('DOCKER_COUCHDB_USER')}:${env.get('DOCKER_COUCHDB_PASSWORD')}`).toString(\"base64\"),\n    \"Content-Type\": \"application/json; charset=utf-8\"\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 330,
+        "y": 1240,
+        "wires": [
+            [
+                "1533d27f160d5de9"
+            ]
+        ]
+    },
+    {
+        "id": "1533d27f160d5de9",
+        "type": "http request",
+        "z": "c5b9039a5fc48f97",
+        "name": "bulk delete",
+        "method": "POST",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "http://localhost:5930/smart-geojson/_bulk_docs",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 330,
+        "y": 1280,
+        "wires": [
+            [
+                "b4f332a6cb86e3e9"
+            ]
+        ]
+    },
+    {
+        "id": "1333e1900f9a4119",
+        "type": "debug",
+        "z": "c5b9039a5fc48f97",
+        "name": "debug 82",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 3040,
+        "y": 880,
+        "wires": []
+    },
+    {
+        "id": "517c0e36530899f0",
+        "type": "http request",
+        "z": "c5b9039a5fc48f97",
+        "name": "renew pnmp token",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "https://digistage.sinarmas-agri.com/api-app-portal-beta/api/pnmp_token",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 150,
+        "y": 560,
+        "wires": [
+            [
+                "c8c7c3c6c0def50b"
+            ]
+        ]
+    },
+    {
+        "id": "c8c7c3c6c0def50b",
+        "type": "switch",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "property": "statusCode",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "gte",
+                "v": "200",
+                "vt": "num"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 190,
+        "y": 600,
+        "wires": [
+            [
+                "f483eb1bd13f2967"
+            ],
+            [
+                "36190989c63f3b0a"
+            ]
+        ]
+    },
+    {
+        "id": "36190989c63f3b0a",
+        "type": "debug",
+        "z": "c5b9039a5fc48f97",
+        "name": "debug 83",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 380,
+        "y": 700,
+        "wires": []
+    },
+    {
+        "id": "00ad3cd5ef7ac15d",
+        "type": "switch",
+        "z": "c5b9039a5fc48f97",
+        "name": "divisions",
+        "property": "divisions.length",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "gt",
+                "v": "0",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 2000,
+        "y": 640,
+        "wires": [
+            [
+                "c0abb73411cfde78"
+            ]
+        ]
+    },
+    {
+        "id": "c0abb73411cfde78",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "split DIVISION",
+        "func": "let divisions = msg.divisions;\nlet counter = 0;\nsplit();\ndelete msg.payload;\nreturn msg;\n\nfunction split() {\n    if (counter < divisions.length) {\n        let data = divisions[counter];\n        msg.payload = data;\n        msg.division = data;\n        node.send({...msg});\n        counter++;\n        setTimeout(split, 1000);\n    }\n}",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2020,
+        "y": 680,
+        "wires": [
+            [
+                "4256cf3e81acc8f8"
+            ]
+        ]
+    },
+    {
+        "id": "4256cf3e81acc8f8",
+        "type": "switch",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "nnull"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 1990,
+        "y": 720,
+        "wires": [
+            [
+                "d4328058b56fd136"
+            ]
+        ]
     },
     {
         "id": "2158300e6fc8788f",
@@ -10468,5 +11653,208 @@
         "x": 1060,
         "y": 420,
         "wires": []
+    },
+    {
+        "id": "8efccc8d05b6fe56",
+        "type": "inject",
+        "z": "f26db8e574ea05fe",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 100,
+        "y": 300,
+        "wires": [
+            [
+                "c9c2453148bdfc12",
+                "e2c99eb330145b88",
+                "cf1e1a0d463bed61",
+                "3b5bc8806a3d1ec4",
+                "ae26d2015ff0642e",
+                "dba3ad00c6cac57d",
+                "4db34af319d3bcaf"
+            ]
+        ]
+    },
+    {
+        "id": "c9c2453148bdfc12",
+        "type": "template",
+        "z": "f26db8e574ea05fe",
+        "name": "_design/road",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "{\n  \"_id\": \"_design/road\",\n  \"views\": {\n    \"geometry\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.estate && doc.division && doc.road && (!doc.block)) emit([doc.psm, doc.estate, doc.division, doc.road], {\\n    type: doc.type,\\n    properties: {\\n      psm: doc.psm, \\n      pt: doc.pt, \\n      estate: doc.estate, \\n      division: doc.division,\\n      road: doc.road,\\n      roadType: doc.roadType,\\n    },\\n    geometry: doc.geometry\\n  });\\n}\"\n    },\n    \"geo-by-division\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.estate && doc.division && doc.road && (!doc.block)) emit([doc.psm, doc.estate, doc.division], {\\n    type: doc.type,\\n    properties: {\\n      psm: doc.psm, \\n      pt: doc.pt, \\n      estate: doc.estate, \\n      division: doc.division,\\n      road: doc.road,\\n      roadType: doc.roadType,\\n    },\\n    geometry: doc.geometry\\n    \\n  });\\n}\"\n    },\n    \"geo-by-psm\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.estate && doc.division && doc.road && (!doc.block)) emit(doc.psm, {\\n    type: doc.type,\\n    properties: {\\n      psm: doc.psm, \\n      pt: doc.pt, \\n      estate: doc.estate, \\n      division: doc.division,\\n      road: doc.road,\\n      roadType: doc.roadType,\\n    },\\n    geometry: doc.geometry\\n  });\\n}\"\n    },\n    \"geo-by-estate\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.estate && doc.division && doc.road && (!doc.block)) emit([doc.psm, doc.estate], {\\n    type: doc.type,\\n    properties: {\\n      psm: doc.psm, \\n      pt: doc.pt, \\n      estate: doc.estate, \\n      division: doc.division,\\n      road: doc.road,\\n      roadType: doc.roadType,\\n    },\\n    geometry: doc.geometry\\n    \\n  });\\n}\"\n    }\n  },\n  \"language\": \"javascript\"\n}",
+        "output": "str",
+        "x": 310,
+        "y": 180,
+        "wires": [
+            [
+                "12112cb4a3a5cf25"
+            ]
+        ]
+    },
+    {
+        "id": "d985ddc993b89f53",
+        "type": "debug",
+        "z": "f26db8e574ea05fe",
+        "name": "debug 69",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 780,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "12112cb4a3a5cf25",
+        "type": "cloudantplus out",
+        "z": "f26db8e574ea05fe",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-geojson",
+        "service": "_ext_",
+        "payonly": true,
+        "operation": "insert",
+        "x": 580,
+        "y": 300,
+        "wires": [
+            [
+                "d985ddc993b89f53"
+            ]
+        ]
+    },
+    {
+        "id": "e2c99eb330145b88",
+        "type": "template",
+        "z": "f26db8e574ea05fe",
+        "name": "_design/block",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "{\n  \"_id\": \"_design/block\",\n  \"views\": {\n    \"geometry\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.estate && doc.division && doc.block) emit([doc.psm, doc.estate, doc.division, doc.block], {\\n    type: doc.type,\\n    properties: {\\n      psm: doc.estate, \\n      pt: doc.estate, \\n      estate: doc.estate, \\n      division: doc.division,\\n      block: doc.block,\\n    },\\n    geometry: doc.geometry\\n  });\\n}\"\n    },\n    \"geo-by-psm\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.estate && doc.division && doc.block) emit(doc.psm, {\\n    type: doc.type,\\n    properties: {\\n      psm: doc.estate, \\n      pt: doc.estate, \\n      estate: doc.estate, \\n      division: doc.division,\\n      block: doc.block,\\n    },\\n    geometry: doc.geometry\\n  });\\n}\"\n    },\n    \"geo-by-division\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.estate && doc.division && doc.block) emit([doc.psm, doc.estate, doc.division], {\\n    type: doc.type,\\n    properties: {\\n      psm: doc.estate, \\n      pt: doc.estate, \\n      estate: doc.estate, \\n      division: doc.division,\\n      block: doc.block,\\n    },\\n    geometry: doc.geometry\\n  });\\n}\"\n    },\n    \"geo-by-estate\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.estate && doc.division && doc.block) emit([doc.psm, doc.estate], {\\n    type: doc.type,\\n    properties: {\\n      psm: doc.estate, \\n      pt: doc.estate, \\n      estate: doc.estate, \\n      division: doc.division,\\n      block: doc.block,\\n    },\\n    geometry: doc.geometry});\\n}\"\n    },\n    \"list-by-division\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.estate && doc.division && doc.block) emit([doc.psm, doc.estate, doc.division], doc.block);\\n}\"\n    }\n  },\n  \"language\": \"javascript\"\n}",
+        "output": "str",
+        "x": 320,
+        "y": 220,
+        "wires": [
+            [
+                "12112cb4a3a5cf25"
+            ]
+        ]
+    },
+    {
+        "id": "cf1e1a0d463bed61",
+        "type": "template",
+        "z": "f26db8e574ea05fe",
+        "name": "_design/division",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "{\n  \"_id\": \"_design/division\",\n  \"views\": {\n    \"geometry\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.estate && doc.division && (!doc.block) && (!doc.roadID)) emit([doc.psm, doc.estate, doc.division], {\\n    type: doc.type,\\n    properties: {\\n      psm: doc.psm,\\n      pt: doc.pt,\\n      estate: doc.estate,\\n      division: doc.division\\n    },\\n    geometry: doc.geometry\\n  });\\n}\"\n    },\n    \"geo-by-estate\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.estate && doc.division && (!doc.block) && (!doc.roadID)) emit([doc.psm, doc.estate], {\\n    type: doc.type,\\n    properties: {\\n      psm: doc.psm,\\n      pt: doc.pt,\\n      estate: doc.estate,\\n      division: doc.division\\n    },\\n    geometry: doc.geometry});\\n}\"\n    },\n    \"geo-by-psm\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.estate && doc.division && (!doc.block) && (!doc.roadID)) emit(doc.psm, {\\n    type: doc.type,\\n    properties: {\\n      psm: doc.psm,\\n      pt: doc.pt,\\n      estate: doc.estate,\\n      division: doc.division\\n    },\\n    geometry: doc.geometry});\\n}\"\n    },\n    \"list-by-estate\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.estate && doc.division && (!doc.block) && (!doc.roadID)) emit([doc.psm, doc.estate], doc.division);\\n}\"\n    }\n  },\n  \"language\": \"javascript\"\n}",
+        "output": "str",
+        "x": 320,
+        "y": 260,
+        "wires": [
+            [
+                "12112cb4a3a5cf25"
+            ]
+        ]
+    },
+    {
+        "id": "3b5bc8806a3d1ec4",
+        "type": "template",
+        "z": "f26db8e574ea05fe",
+        "name": "_design/estate",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "{\n  \"_id\": \"_design/estate\",\n  \"views\": {\n    \"geometry\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.estate && (!doc.division) && (!doc.block)) emit([doc.psm, doc.estate], {\\n    type: doc.type,\\n    properties: {\\n      psm: doc.psm,\\n      pt: doc.pt,\\n      estate: doc.estate\\n    },\\n    geometry: doc.geometry});\\n}\"\n    },\n    \"geo-by-psm\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.estate && (!doc.division) && (!doc.block)) emit(doc.psm, {\\n    type: doc.type,\\n    properties: {\\n      psm: doc.psm,\\n      pt: doc.pt,\\n      estate: doc.estate\\n    },\\n    geometry: doc.geometry});\\n}\"\n    }\n  },\n  \"language\": \"javascript\"\n}",
+        "output": "str",
+        "x": 320,
+        "y": 300,
+        "wires": [
+            [
+                "12112cb4a3a5cf25"
+            ]
+        ]
+    },
+    {
+        "id": "ae26d2015ff0642e",
+        "type": "template",
+        "z": "f26db8e574ea05fe",
+        "name": "_design/filter",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "{\n  \"_id\": \"_design/filter\",\n  \"views\": {\n    \"block\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.pt && doc.estate && doc.division && doc.block) emit([doc.psm, doc.pt, doc.estate, doc.division, doc.block], {_id: doc._id, _rev: doc._rev});\\n}\"\n    },\n    \"road\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.pt && doc.division && doc.road && (!doc.block)) emit([doc.psm, doc.pt, doc.division, doc.road], {_id: doc._id, _rev: doc._rev});\\n}\"\n    },\n    \"division\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.pt && doc.estate && doc.division && (!doc.roadID) && (!doc.block)) emit([doc.psm, doc.pt, doc.estate, doc.division], {_id: doc._id, _rev: doc._rev});\\n}\"\n    },\n    \"psm\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.pt && (!doc.estate) && (!doc.division) && (!doc.roadID) && (!doc.block)) emit([doc.psm, doc.pt], {_id: doc._id, _rev: doc._rev});\\n}\"\n    },\n    \"estate\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.pt && doc.estate && (!doc.division) && (!doc.roadID) && (!doc.block)) emit([doc.psm, doc.pt, doc.estate], {_id: doc._id, _rev: doc._rev});\\n}\"\n    }\n  },\n  \"language\": \"javascript\"\n}",
+        "output": "str",
+        "x": 310,
+        "y": 340,
+        "wires": [
+            [
+                "12112cb4a3a5cf25"
+            ]
+        ]
+    },
+    {
+        "id": "dba3ad00c6cac57d",
+        "type": "template",
+        "z": "f26db8e574ea05fe",
+        "name": "_design/psm",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "{\n  \"_id\": \"_design/psm\",\n  \"views\": {\n    \"geometry\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && (!doc.estate) && (!doc.division) && (!doc.block)) emit(doc.psm, {\\n    type: doc.type,\\n    properties: {\\n      psm: doc.psm,\\n      pt: doc.pt\\n    },\\n    geometry: doc.geometry\\n  });\\n}\"\n    }\n  },\n  \"language\": \"javascript\"\n}",
+        "output": "str",
+        "x": 310,
+        "y": 380,
+        "wires": [
+            [
+                "12112cb4a3a5cf25"
+            ]
+        ]
+    },
+    {
+        "id": "4db34af319d3bcaf",
+        "type": "template",
+        "z": "f26db8e574ea05fe",
+        "name": "_design/reduce",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "{\n  \"_id\": \"_design/reduce\",\n  \"views\": {\n    \"list-division\": {\n      \"reduce\": \"function (keys, values, rereduce) {\\n  if (rereduce) {\\n    return sum(values);\\n  } else {\\n    return values.length;\\n  }\\n}\",\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.pt && doc.estate && doc.division && (!doc.block) && (!doc.road)) emit([doc.estate, doc.division], 1);\\n}\"\n    },\n    \"list-psm\": {\n      \"reduce\": \"function (keys, values, rereduce) {\\n  if (rereduce) {\\n    return sum(values);\\n  } else {\\n    return values.length;\\n  }\\n}\",\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.pt && (!doc.estate) && (!doc.division) && (!doc.block) && (!doc.road)) emit(doc.psm, 1);\\n}\"\n    },\n    \"list-estate\": {\n      \"reduce\": \"function (keys, values, rereduce) {\\n  if (rereduce) {\\n    return sum(values);\\n  } else {\\n    return values.length;\\n  }\\n}\",\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.pt && doc.estate && (!doc.division) && (!doc.block) && (!doc.road)) emit([doc.psm, doc.estate], 1);\\n}\"\n    },\n    \"list-block\": {\n      \"reduce\": \"function (keys, values, rereduce) {\\n  if (rereduce) {\\n    return sum(values);\\n  } else {\\n    return values.length;\\n  }\\n}\",\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.pt && doc.estate && doc.division && doc.block && (!doc.road)) emit([doc.estate, doc.division, doc.block], 1);\\n}\"\n    },\n    \"list-road\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.pt && doc.estate && doc.division && (!doc.block) && doc.road) emit([doc.estate, doc.division, doc.road], 1);\\n}\",\n      \"reduce\": \"function (keys, values, rereduce) {\\n  if (rereduce) {\\n    return sum(values);\\n  } else {\\n    return values.length;\\n  }\\n}\"\n    }\n  },\n  \"language\": \"javascript\"\n}",
+        "output": "str",
+        "x": 320,
+        "y": 420,
+        "wires": [
+            [
+                "12112cb4a3a5cf25"
+            ]
+        ]
     }
 ]
