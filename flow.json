@@ -9371,8 +9371,8 @@
         "method": "post",
         "upload": false,
         "swaggerDoc": "",
-        "x": 140,
-        "y": 120,
+        "x": 120,
+        "y": 180,
         "wires": [
             [
                 "3cdc106f1f3ace69"
@@ -9384,15 +9384,15 @@
         "type": "function",
         "z": "c5b9039a5fc48f97",
         "name": "validate",
-        "func": "msg.ori = msg.payload;\n\n/**validate */\nlet { geoType, keys, group } = msg.payload;\nlet { valid, message } = validate(geoType, keys, group);\nif (!valid) msg.payload = message;\nmsg.valid = valid;\nreturn msg;\n\nfunction validate(type, keys, group) {\n    let valid = false;\n    if(!type || !keys || keys.length == 0 || group === undefined){\n        return{\n            valid,\n            message: 'invalid parameters !'\n        }\n    }\n    if (!group) {\n        if (!Array.isArray(keys) || keys.length == 0) {\n            return {\n                valid,\n                message: 'at least provide psm on keys'\n            }\n        }\n        return {\n            valid: true\n        }\n    } else {        \n        switch (type) {\n            case 'division':\n                if (keys.length > 2) {\n                    return {\n                        valid,\n                        message: 'set psm, and estate on keys'\n                    }\n                }\n                return {\n                    valid: true\n                }\n            case 'estate':\n                if (keys.length > 1) {\n                    return {\n                        valid,\n                        message: 'set only psm on keys'\n                    }\n                }\n                return {\n                    valid: true\n                }\n            default:\n                if (keys.length == 0) {\n                    return {\n                        valid,\n                        message: 'cannot group on psm'\n                    }\n                }\n                return {\n                    valid: true\n                }\n        }\n    }\n}",
+        "func": "msg.ori = msg.payload;\n\n/**validate */\nlet { geoType, keys, group } = msg.payload;\nlet { valid, message } = validate(geoType, keys, group);\nif (!valid) msg.payload = message;\nmsg.valid = valid;\nreturn msg;\n\nfunction validate(type, keys, group) {\n    let valid = false;\n    if(!type || !keys || keys.length == 0 || group === undefined){\n        return{\n            valid,\n            message: 'invalid parameters !'\n        }\n    }\n    if (!group) {\n        if (!Array.isArray(keys) || keys.length == 0) {\n            return {\n                valid,\n                message: 'at least provide psm on keys'\n            }\n        }\n        return {\n            valid: true\n        }\n    } else {    \n        switch (type) {\n            case 'division':\n                if (keys.length > 2) {\n                    return {\n                        valid,\n                        message: 'set psm, and estate on keys'\n                    }\n                }\n                return {\n                    valid: true\n                }\n            case 'estate':\n                if (keys.length > 1) {\n                    return {\n                        valid,\n                        message: 'set only psm on keys'\n                    }\n                }\n                return {\n                    valid: true\n                }\n            default:\n                if (keys.length == 0 || keys.length == 1) {\n                    return {\n                        valid,\n                        message: 'cannot group on psm'\n                    }\n                }\n                return {\n                    valid: true\n                }\n        }\n    }\n}",
         "outputs": 1,
         "timeout": "",
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 340,
-        "y": 120,
+        "x": 320,
+        "y": 180,
         "wires": [
             [
                 "851f7f85faba6429"
@@ -9417,8 +9417,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 360,
-        "y": 160,
+        "x": 340,
+        "y": 220,
         "wires": [
             [
                 "ac196b081e86d3b1"
@@ -9435,8 +9435,8 @@
         "name": "",
         "statusCode": "400",
         "headers": {},
-        "x": 380,
-        "y": 200,
+        "x": 360,
+        "y": 260,
         "wires": []
     },
     {
@@ -9560,34 +9560,14 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 560,
-        "y": 120,
+        "x": 540,
+        "y": 200,
         "wires": [
             [
                 "075f9950ee7187eb"
             ],
             [
-                "b2eada42f9e5af3a"
-            ]
-        ]
-    },
-    {
-        "id": "b2eada42f9e5af3a",
-        "type": "function",
-        "z": "c5b9039a5fc48f97",
-        "name": "function 60",
-        "func": "let { geoType, keys } = msg.ori;\nlet [psm, estate, division, other] = keys;\nmsg.payload = [`geo:${geoType}:${psm}${(estate) ? ':' + estate : ''}${(division) ? ':' + division : ''}${(other) ? ':' + other : ''}`];\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 770,
-        "y": 320,
-        "wires": [
-            [
-                "7330dececec1df2b"
+                "20949d4b7e7a63d6"
             ]
         ]
     },
@@ -9598,8 +9578,8 @@
         "name": "",
         "statusCode": "200",
         "headers": {},
-        "x": 960,
-        "y": 320,
+        "x": 980,
+        "y": 360,
         "wires": []
     },
     {
@@ -9940,7 +9920,7 @@
         "type": "function",
         "z": "c5b9039a5fc48f97",
         "name": "groupBy ?",
-        "func": "let { keys } = msg.ori;\nlet groupBy = 'psm';\nif (keys.length == 2) groupBy = 'estate';\nif (keys.length == 3) groupBy = 'division';\nmsg.groupBy = groupBy;\nreturn msg;",
+        "func": "let { geoType, keys } = msg.payload;\nlet {psm, estate, division, other} = keys;\nlet view;\nswitch(keys.length){\n    case 1: view = 'geo-by-psm';\n    break;\n    case 2: view = 'geo-by-estate';\n    break;\n    case 3: view = 'geo-by-division';\n    break;\n}\nmsg.sub = {\n    database: 'smart-geojson',\n    design: geoType,\n    view,\n    key: keys\n}\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -9948,46 +9928,11 @@
         "finalize": "",
         "libs": [],
         "x": 750,
-        "y": 80,
+        "y": 140,
         "wires": [
             [
-                "063e67538e8eb93c"
+                "776ee25c650af0a3"
             ]
-        ]
-    },
-    {
-        "id": "063e67538e8eb93c",
-        "type": "switch",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "property": "payload",
-        "propertyType": "msg",
-        "rules": [
-            {
-                "t": "eq",
-                "v": "psm",
-                "vt": "str"
-            },
-            {
-                "t": "eq",
-                "v": "estate",
-                "vt": "str"
-            },
-            {
-                "t": "eq",
-                "v": "division",
-                "vt": "str"
-            }
-        ],
-        "checkall": "true",
-        "repair": false,
-        "outputs": 3,
-        "x": 930,
-        "y": 80,
-        "wires": [
-            [],
-            [],
-            []
         ]
     },
     {
@@ -10044,7 +9989,7 @@
         "type": "function",
         "z": "c5b9039a5fc48f97",
         "name": "split PSM",
-        "func": "let payload = msg.sub.rows[0].value;\nlet counter = 0;\nsplit();\ndelete msg.payload;\nreturn msg;\n\nfunction split() {\n    if (counter < payload.length) {\n        let data = payload[counter];\n        msg.payload = data;\n        msg.psm = data;\n        node.send({...msg});\n        counter++;\n        setTimeout(split, 20000);\n    }\n}",
+        "func": "let payload = msg.sub.rows[0].value;\nlet counter = 0;\nsplit();\ndelete msg.payload;\nreturn null;\n\nfunction split() {\n    if (counter < payload.length) {\n        let data = payload[counter];\n        msg.payload = data;\n        msg.psm = data;\n        node.send({...msg});\n        counter++;\n        setTimeout(split, 20000);\n    }\n}",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -10089,59 +10034,6 @@
         "wires": [
             [
                 "14a6046b267b96d9"
-            ]
-        ]
-    },
-    {
-        "id": "ce819e1626359b57",
-        "type": "http request",
-        "z": "c5b9039a5fc48f97",
-        "name": "renew pnmp token",
-        "method": "GET",
-        "ret": "txt",
-        "paytoqs": "ignore",
-        "url": "https://digistage.sinarmas-agri.com/api-app-portal-beta/api/pnmp_token",
-        "tls": "",
-        "persist": false,
-        "proxy": "",
-        "insecureHTTPParser": false,
-        "authType": "",
-        "senderr": false,
-        "headers": [],
-        "x": 150,
-        "y": 1040,
-        "wires": [
-            [
-                "de1fa05287b24b64"
-            ]
-        ]
-    },
-    {
-        "id": "3586fca78e3e4b49",
-        "type": "inject",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 120,
-        "y": 1000,
-        "wires": [
-            [
-                "ce819e1626359b57"
             ]
         ]
     },
@@ -10193,23 +10085,6 @@
                 "e961c76d8d1785a3"
             ]
         ]
-    },
-    {
-        "id": "de1fa05287b24b64",
-        "type": "debug",
-        "z": "c5b9039a5fc48f97",
-        "name": "debug 71",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 400,
-        "y": 1040,
-        "wires": []
     },
     {
         "id": "1717c12f22121ab2",
@@ -10278,7 +10153,7 @@
         "type": "debug",
         "z": "c5b9039a5fc48f97",
         "name": "debug 75",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -10377,7 +10252,7 @@
         "type": "function",
         "z": "c5b9039a5fc48f97",
         "name": "split ESTATE",
-        "func": "let estates = msg.psm.children;\nlet counter = 0;\nsplit();\ndelete msg.payload;\nreturn msg;\n\nfunction split() {\n    if (counter < estates.length) {\n        let data = estates[counter];\n        msg.payload = data;\n        msg.estate = data;\n        node.send({...msg});\n        counter++;\n        setTimeout(split, 5000);\n    }\n}",
+        "func": "let estates = msg.psm.children;\nlet counter = 0;\nsplit();\ndelete msg.payload;\nreturn null;\n\nfunction split() {\n    if (counter < estates.length) {\n        let data = estates[counter];\n        msg.payload = data;\n        msg.estate = data;\n        node.send({...msg});\n        counter++;\n        setTimeout(split, 5000);\n    }\n}",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -10449,7 +10324,7 @@
         "type": "debug",
         "z": "c5b9039a5fc48f97",
         "name": "debug 76",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -10816,7 +10691,7 @@
         "type": "debug",
         "z": "c5b9039a5fc48f97",
         "name": "debug 79",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -10958,7 +10833,7 @@
         "type": "debug",
         "z": "c5b9039a5fc48f97",
         "name": "debug 82",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -11030,7 +10905,7 @@
         "type": "debug",
         "z": "c5b9039a5fc48f97",
         "name": "debug 83",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -11072,7 +10947,7 @@
         "type": "function",
         "z": "c5b9039a5fc48f97",
         "name": "split DIVISION",
-        "func": "let divisions = msg.divisions;\nlet counter = 0;\nsplit();\ndelete msg.payload;\nreturn msg;\n\nfunction split() {\n    if (counter < divisions.length) {\n        let data = divisions[counter];\n        msg.payload = data;\n        msg.division = data;\n        node.send({...msg});\n        counter++;\n        setTimeout(split, 1000);\n    }\n}",
+        "func": "let divisions = msg.divisions;\nlet counter = 0;\nsplit();\ndelete msg.payload;\nreturn null;\n\nfunction split() {\n    if (counter < divisions.length) {\n        let data = divisions[counter];\n        msg.payload = data;\n        msg.division = data;\n        node.send({...msg});\n        counter++;\n        setTimeout(split, 1000);\n    }\n}",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -11109,6 +10984,784 @@
                 "d4328058b56fd136"
             ]
         ]
+    },
+    {
+        "id": "776ee25c650af0a3",
+        "type": "subflow:d7ccf53b2b9fe097",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "x": 780,
+        "y": 180,
+        "wires": [
+            [
+                "1a29613acc7afbdd"
+            ]
+        ]
+    },
+    {
+        "id": "b65dd7ab52d2acab",
+        "type": "http response",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 1000,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "1a29613acc7afbdd",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "function 69",
+        "func": "msg.payload = msg.sub.rows?.map(x => x.value);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1010,
+        "y": 180,
+        "wires": [
+            [
+                "b65dd7ab52d2acab"
+            ]
+        ]
+    },
+    {
+        "id": "b2eada42f9e5af3a",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "function 60",
+        "func": "let { geoType, keys } = msg.ori;\nlet [psm, estate, division, other] = keys;\nmsg.payload = [`geo:${geoType}:${psm}${(estate) ? ':' + estate : ''}${(division) ? ':' + division : ''}${(other) ? ':' + other : ''}`];\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 330,
+        "y": 360,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "20949d4b7e7a63d6",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "groupBy ?",
+        "func": "let { geoType, keys } = msg.payload;\nlet {psm, estate, division, other} = keys;\nmsg.sub = {\n    database: 'smart-geojson',\n    design: geoType,\n    view: 'geometry',\n    key: keys\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 750,
+        "y": 280,
+        "wires": [
+            [
+                "bce3b2f489190dd8"
+            ]
+        ]
+    },
+    {
+        "id": "bce3b2f489190dd8",
+        "type": "subflow:d7ccf53b2b9fe097",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "x": 780,
+        "y": 320,
+        "wires": [
+            [
+                "f180a25634704473"
+            ]
+        ]
+    },
+    {
+        "id": "f180a25634704473",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "function 70",
+        "func": "msg.payload = msg.sub.rows?.map(x => x.value);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 990,
+        "y": 320,
+        "wires": [
+            [
+                "7330dececec1df2b"
+            ]
+        ]
+    },
+    {
+        "id": "db136c5d713d3cd0",
+        "type": "inject",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 1680,
+        "wires": [
+            [
+                "5f41ce33e1d008a9"
+            ]
+        ]
+    },
+    {
+        "id": "4948edd4b85e148f",
+        "type": "inject",
+        "z": "c5b9039a5fc48f97",
+        "name": "zadd 1",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[\"device:96a4:1a87:04\", 1, \"{\\\"test\\\":1,\\\"hello\\\":\\\"world1\\\", \\\"hexstr\\\": \\\"000102\\\"}\"]",
+        "payloadType": "json",
+        "x": 110,
+        "y": 1860,
+        "wires": [
+            [
+                "f9ccc3e1983f8ec7"
+            ]
+        ]
+    },
+    {
+        "id": "89734db2e2b504d9",
+        "type": "inject",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 2060,
+        "wires": [
+            [
+                "ad21bea98339b79e"
+            ]
+        ]
+    },
+    {
+        "id": "5f41ce33e1d008a9",
+        "type": "redis-lua-script",
+        "z": "c5b9039a5fc48f97",
+        "server": "0fb96b870afb5c15",
+        "name": "redis lua: hello world",
+        "keyval": 0,
+        "func": "\nreturn \"hello world\"",
+        "stored": false,
+        "block": false,
+        "x": 500,
+        "y": 1680,
+        "wires": [
+            [
+                "44f2c4e99a1e521d"
+            ]
+        ]
+    },
+    {
+        "id": "44f2c4e99a1e521d",
+        "type": "debug",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 770,
+        "y": 2000,
+        "wires": []
+    },
+    {
+        "id": "29035e2612073aa9",
+        "type": "redis-lua-script",
+        "z": "c5b9039a5fc48f97",
+        "server": "0fb96b870afb5c15",
+        "name": "redis lua: ping pong",
+        "keyval": 0,
+        "func": "local foo = redis.call('ping')\nreturn foo",
+        "stored": false,
+        "block": false,
+        "x": 490,
+        "y": 1740,
+        "wires": [
+            [
+                "44f2c4e99a1e521d"
+            ]
+        ]
+    },
+    {
+        "id": "b9f91d2f3fceb024",
+        "type": "redis-lua-script",
+        "z": "c5b9039a5fc48f97",
+        "server": "0fb96b870afb5c15",
+        "name": "redis lua: set",
+        "keyval": "1",
+        "func": "local foo = redis.call('SET', KEYS[1], cjson.encode({KEYS, ARGV}))\nreturn foo",
+        "stored": false,
+        "block": false,
+        "x": 470,
+        "y": 1800,
+        "wires": [
+            [
+                "44f2c4e99a1e521d"
+            ]
+        ]
+    },
+    {
+        "id": "cfb9a1d9d6235c96",
+        "type": "inject",
+        "z": "c5b9039a5fc48f97",
+        "name": "set key value",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[\"xx\", \"sss\"]",
+        "payloadType": "json",
+        "x": 130,
+        "y": 1800,
+        "wires": [
+            [
+                "b9f91d2f3fceb024"
+            ]
+        ]
+    },
+    {
+        "id": "f9ccc3e1983f8ec7",
+        "type": "redis-lua-script",
+        "z": "c5b9039a5fc48f97",
+        "server": "0fb96b870afb5c15",
+        "name": "redis lua: zadd",
+        "keyval": "1",
+        "func": "local foo = redis.call('ZADD', KEYS[1], ARGV[1], ARGV[2])\nreturn foo",
+        "stored": false,
+        "block": false,
+        "x": 480,
+        "y": 1860,
+        "wires": [
+            [
+                "44f2c4e99a1e521d"
+            ]
+        ]
+    },
+    {
+        "id": "75a5d81a80da3959",
+        "type": "inject",
+        "z": "c5b9039a5fc48f97",
+        "name": "zadd 2",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[\"device:96a4:1a87:04\", 2, \"{\\\"test\\\":2,\\\"hello\\\":\\\"world2\\\", \\\"hexstr\\\": \\\"030405\\\"}\"]",
+        "payloadType": "json",
+        "x": 110,
+        "y": 1900,
+        "wires": [
+            [
+                "f9ccc3e1983f8ec7"
+            ]
+        ]
+    },
+    {
+        "id": "c32955b956a9c79a",
+        "type": "redis-lua-script",
+        "z": "c5b9039a5fc48f97",
+        "server": "0fb96b870afb5c15",
+        "name": "redis lua: cjson decode",
+        "keyval": "1",
+        "func": "local foo = cjson.decode(ARGV[2])\n\nreturn foo.test",
+        "stored": false,
+        "block": false,
+        "x": 500,
+        "y": 2000,
+        "wires": [
+            [
+                "44f2c4e99a1e521d"
+            ]
+        ]
+    },
+    {
+        "id": "84bd8bb2222e0517",
+        "type": "inject",
+        "z": "c5b9039a5fc48f97",
+        "name": "cjson",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[\"device:96a4:1a87:04\",3,\"{\\\"test\\\":3,\\\"hello\\\":\\\"world3\\\", \\\"hexstr\\\": \\\"060708\\\"}\"]",
+        "payloadType": "json",
+        "x": 110,
+        "y": 2000,
+        "wires": [
+            [
+                "c32955b956a9c79a"
+            ]
+        ]
+    },
+    {
+        "id": "8d8b9d844348773c",
+        "type": "inject",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 1740,
+        "wires": [
+            [
+                "29035e2612073aa9"
+            ]
+        ]
+    },
+    {
+        "id": "15959eedb0e32c26",
+        "type": "redis-lua-script",
+        "z": "c5b9039a5fc48f97",
+        "server": "0fb96b870afb5c15",
+        "name": "redis lua: substring",
+        "keyval": "1",
+        "func": "local foo = tonumber(string.sub(KEYS[1], -2, -1))\n\nreturn foo",
+        "stored": false,
+        "block": false,
+        "x": 490,
+        "y": 2120,
+        "wires": [
+            [
+                "44f2c4e99a1e521d"
+            ]
+        ]
+    },
+    {
+        "id": "b66f5d8e92e9fbbf",
+        "type": "inject",
+        "z": "c5b9039a5fc48f97",
+        "name": "substring",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[\"device:96a4:1a87:04\", 3, \"{\\\"test\\\":3,\\\"hello\\\":\\\"world3\\\", \\\"hexstr\\\": \\\"060708\\\"}\"]",
+        "payloadType": "json",
+        "x": 120,
+        "y": 2120,
+        "wires": [
+            [
+                "15959eedb0e32c26"
+            ]
+        ]
+    },
+    {
+        "id": "2a7fac1573b38b98",
+        "type": "inject",
+        "z": "c5b9039a5fc48f97",
+        "name": "zadd 3",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[\"device:96a4:1a87:04\", 3, \"{\\\"test\\\":3,\\\"hello\\\":\\\"world3\\\", \\\"hexstr\\\": \\\"060708\\\"}\"]",
+        "payloadType": "json",
+        "x": 110,
+        "y": 1940,
+        "wires": [
+            [
+                "f9ccc3e1983f8ec7"
+            ]
+        ]
+    },
+    {
+        "id": "ad21bea98339b79e",
+        "type": "redis-lua-script",
+        "z": "c5b9039a5fc48f97",
+        "server": "0fb96b870afb5c15",
+        "name": "redis lua: cjson encode",
+        "keyval": "0",
+        "func": "local foo = {}\n\nfoo.field1 = 1\nfoo.field2 = \"hello world\"\nfoo.field3 = {}\nfoo.field3.name = \"paul\"\n\nreturn cjson.encode(foo)",
+        "stored": false,
+        "block": false,
+        "x": 500,
+        "y": 2060,
+        "wires": [
+            [
+                "41d9477be860b123"
+            ]
+        ]
+    },
+    {
+        "id": "41d9477be860b123",
+        "type": "json",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 690,
+        "y": 2060,
+        "wires": [
+            [
+                "44f2c4e99a1e521d"
+            ]
+        ]
+    },
+    {
+        "id": "b6378268209d3f41",
+        "type": "redis-lua-script",
+        "z": "c5b9039a5fc48f97",
+        "server": "0fb96b870afb5c15",
+        "name": "redis lua: zcount",
+        "keyval": "1",
+        "func": "local elementCount = redis.call('ZCOUNT', KEYS[1], \"-inf\", \"+inf\")\n\nreturn elementCount",
+        "stored": false,
+        "block": false,
+        "x": 480,
+        "y": 2180,
+        "wires": [
+            [
+                "44f2c4e99a1e521d"
+            ]
+        ]
+    },
+    {
+        "id": "1efddadd63d15077",
+        "type": "inject",
+        "z": "c5b9039a5fc48f97",
+        "name": "zcount",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[\"device:96a4:1a87:04\", 4, \"{\\\"test\\\":4,\\\"hello\\\":\\\"world4\\\", \\\"hexstr\\\": \\\"090a0b\\\"}\"]",
+        "payloadType": "json",
+        "x": 110,
+        "y": 2180,
+        "wires": [
+            [
+                "b6378268209d3f41"
+            ]
+        ]
+    },
+    {
+        "id": "e49699a6dde3b6de",
+        "type": "redis-lua-script",
+        "z": "c5b9039a5fc48f97",
+        "server": "0fb96b870afb5c15",
+        "name": "redis lua: zrange",
+        "keyval": "1",
+        "func": "local elementCount = redis.call('ZRANGE', KEYS[1], 0, 3)\n\nreturn elementCount",
+        "stored": false,
+        "block": false,
+        "x": 480,
+        "y": 2240,
+        "wires": [
+            [
+                "44f2c4e99a1e521d"
+            ]
+        ]
+    },
+    {
+        "id": "5da7c2d8aea3b596",
+        "type": "inject",
+        "z": "c5b9039a5fc48f97",
+        "name": "zrange",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[\"device:96a4:1a87:04\", 4, \"{\\\"test\\\":4,\\\"hello\\\":\\\"world4\\\", \\\"hexstr\\\": \\\"090a0b\\\"}\"]",
+        "payloadType": "json",
+        "x": 110,
+        "y": 2240,
+        "wires": [
+            [
+                "e49699a6dde3b6de"
+            ]
+        ]
+    },
+    {
+        "id": "e9aa29233106c2c8",
+        "type": "inject",
+        "z": "c5b9039a5fc48f97",
+        "name": "concat",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[\"device:96a4:1a87:04\", 4, \"{\\\"test\\\":4,\\\"hello\\\":\\\"world4\\\", \\\"hexstr\\\": \\\"090a0b\\\"}\"]",
+        "payloadType": "json",
+        "x": 110,
+        "y": 2300,
+        "wires": [
+            [
+                "f513666fe9a2c2ca"
+            ]
+        ]
+    },
+    {
+        "id": "f513666fe9a2c2ca",
+        "type": "redis-lua-script",
+        "z": "c5b9039a5fc48f97",
+        "server": "0fb96b870afb5c15",
+        "name": "redis lua: complex",
+        "keyval": "1",
+        "func": "local response = \"\"\nlocal elementCount = redis.call('ZRANGE', KEYS[1], 0, 3)\n\nfor i=1,3,1\ndo\n  response = response .. cjson.decode(elementCount[i]).hexstr\nend\n\nreturn response",
+        "stored": false,
+        "block": false,
+        "x": 490,
+        "y": 2300,
+        "wires": [
+            [
+                "44f2c4e99a1e521d"
+            ]
+        ]
+    },
+    {
+        "id": "923697f71cbe64b9",
+        "type": "inject",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[{\"name\":\"mnazirp\",\"age\":45}]",
+        "payloadType": "json",
+        "x": 110,
+        "y": 960,
+        "wires": [
+            [
+                "6984e7c0cce94363"
+            ]
+        ]
+    },
+    {
+        "id": "6984e7c0cce94363",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "function 73",
+        "func": "let payload = [\n    { key: 'key1', value: 'value1' },\n    { key: 'key2', value: 'value2' },\n    { key: 'key3', value: 'value3' }\n];\nfor (const item of payload) {\n    // Set each key-value pair in Redis\n    node.send({\n        command: 'set',\n        payload: item.value,\n        topic: item.key,\n        ex: 3600\n    });\n}\nreturn null; // This prevents duplicate output messages\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 310,
+        "y": 960,
+        "wires": [
+            [
+                "e95947568bea11ae"
+            ]
+        ]
+    },
+    {
+        "id": "e95947568bea11ae",
+        "type": "redis-out",
+        "z": "c5b9039a5fc48f97",
+        "server": "0fb96b870afb5c15",
+        "command": "rpush",
+        "name": "",
+        "topic": "",
+        "obj": true,
+        "x": 480,
+        "y": 960,
+        "wires": []
+    },
+    {
+        "id": "3586fca78e3e4b49",
+        "type": "inject",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[{\"name\":\"mnazirp\",\"age\":45}]",
+        "payloadType": "json",
+        "x": 110,
+        "y": 820,
+        "wires": [
+            [
+                "dc1d7ca18003973b"
+            ]
+        ]
+    },
+    {
+        "id": "dc1d7ca18003973b",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "function 71",
+        "func": "msg.payload = [\n  {\n    \"type\": \"psm\",\n    \"properties\": [],\n    \"geometry\": {}\n  },\n  {\n    \"type\": \"estate\",\n    \"properties\": [],\n    \"geometry\": {}\n  },\n  {\n    \"type\": \"division\",\n    \"properties\": [],\n    \"geometry\": {}\n  }\n].map(x => {\n  return JSON.stringify(x)\n})\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 310,
+        "y": 820,
+        "wires": [
+            [
+                "75a05186293380f0"
+            ]
+        ]
+    },
+    {
+        "id": "75a05186293380f0",
+        "type": "redis-lua-script",
+        "z": "c5b9039a5fc48f97",
+        "server": "0fb96b870afb5c15",
+        "name": "",
+        "keyval": 0,
+        "func": "local data = ARGV\n\nredis.call('SET', 'xxx', cjson.encode(data))\n",
+        "stored": false,
+        "block": false,
+        "x": 300,
+        "y": 860,
+        "wires": [
+            [
+                "de1fa05287b24b64"
+            ]
+        ]
+    },
+    {
+        "id": "de1fa05287b24b64",
+        "type": "debug",
+        "z": "c5b9039a5fc48f97",
+        "name": "debug 71",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 480,
+        "y": 860,
+        "wires": []
     },
     {
         "id": "2158300e6fc8788f",
