@@ -1757,6 +1757,7 @@
         "name": "prepare payload",
         "func": "msg.payload = [`page:${msg.payload._id}`, JSON.stringify(msg.payload.data), 'EX', Number(env.get('NODERED_TTL')) * 60];\nmsg.topic = null;\nreturn msg;",
         "outputs": 1,
+        "timeout": "",
         "noerr": 0,
         "initialize": "",
         "finalize": "",
@@ -9384,7 +9385,7 @@
         "type": "function",
         "z": "c5b9039a5fc48f97",
         "name": "validate",
-        "func": "msg.ori = msg.payload;\n\n/**validate */\nlet { geoType, keys, group } = msg.payload;\nlet { valid, message } = validate(geoType, keys, group);\nif (!valid) msg.payload = message;\nmsg.valid = valid;\nreturn msg;\n\nfunction validate(type, keys, group) {\n    let valid = false;\n    if(!type || !keys || keys.length == 0 || group === undefined){\n        return{\n            valid,\n            message: 'invalid parameters !'\n        }\n    }\n    if (!group) {\n        if (!Array.isArray(keys) || keys.length == 0) {\n            return {\n                valid,\n                message: 'at least provide psm on keys'\n            }\n        }\n        return {\n            valid: true\n        }\n    } else {    \n        switch (type) {\n            case 'division':\n                if (keys.length > 2) {\n                    return {\n                        valid,\n                        message: 'set psm, and estate on keys'\n                    }\n                }\n                return {\n                    valid: true\n                }\n            case 'estate':\n                if (keys.length > 1) {\n                    return {\n                        valid,\n                        message: 'set only psm on keys'\n                    }\n                }\n                return {\n                    valid: true\n                }\n            default:\n                if (keys.length == 0 || keys.length == 1) {\n                    return {\n                        valid,\n                        message: 'cannot group on psm'\n                    }\n                }\n                return {\n                    valid: true\n                }\n        }\n    }\n}",
+        "func": "msg.ori = msg.payload;\n\n/**validate */\nlet { geoType, keys, group } = msg.payload;\nlet { valid, message } = validate(geoType, keys, group);\nif (!valid) msg.payload = message;\nmsg.valid = valid;\nreturn msg;\n\nfunction validate(type, keys, group) {\n    let valid = false;\n    if (!type || !keys || keys.length == 0 || group === undefined) {\n        return {\n            valid,\n            message: 'invalid parameters !'\n        }\n    }\n    if (!group) {\n        if (!Array.isArray(keys) || keys.length == 0) {\n            return {\n                valid,\n                message: 'at least provide psm on keys'\n            }\n        }\n        return {\n            valid: true\n        }\n    } else {\n        switch (type) {\n            case 'road':\n                if (keys.length == 0 || keys.length > 3) {\n                    return {\n                        valid,\n                        message: 'set minimal psm in keys and max grup by division'\n                    }\n                }\n                return {\n                    valid: true\n                }\n            case 'block':\n                if (keys.length == 0 || keys.length > 3) {\n                    return {\n                        valid,\n                        message: 'set minimal psm in keys and max grup by division'\n                    }\n                }\n                return {\n                    valid: true\n                }\n            case 'division':\n                if (keys.length > 2) {\n                    return {\n                        valid,\n                        message: 'set psm, and estate on keys'\n                    }\n                }\n                return {\n                    valid: true\n                }\n            case 'estate':\n                if (keys.length > 1) {\n                    return {\n                        valid,\n                        message: 'set only psm on keys'\n                    }\n                }\n                return {\n                    valid: true\n                }\n            case 'psm':\n                return {\n                    valid,\n                    message: 'cannot group on psm'\n                }\n        }\n    }\n}",
         "outputs": 1,
         "timeout": "",
         "noerr": 0,
@@ -9475,8 +9476,8 @@
         "name": "",
         "statusCode": "200",
         "headers": {},
-        "x": 980,
-        "y": 360,
+        "x": 1220,
+        "y": 320,
         "wires": []
     },
     {
@@ -10371,7 +10372,8 @@
         "y": 180,
         "wires": [
             [
-                "1a29613acc7afbdd"
+                "1a29613acc7afbdd",
+                "41b4656d72704eb9"
             ]
         ]
     },
@@ -10382,15 +10384,15 @@
         "name": "",
         "statusCode": "200",
         "headers": {},
-        "x": 1000,
-        "y": 220,
+        "x": 1220,
+        "y": 180,
         "wires": []
     },
     {
         "id": "1a29613acc7afbdd",
         "type": "function",
         "z": "c5b9039a5fc48f97",
-        "name": "function 69",
+        "name": "result",
         "func": "msg.payload = msg.sub.rows?.map(x => x.value);\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
@@ -10435,7 +10437,8 @@
         "y": 320,
         "wires": [
             [
-                "f180a25634704473"
+                "f180a25634704473",
+                "47440a37edf2999a"
             ]
         ]
     },
@@ -10443,7 +10446,7 @@
         "id": "f180a25634704473",
         "type": "function",
         "z": "c5b9039a5fc48f97",
-        "name": "function 70",
+        "name": "result",
         "func": "msg.payload = msg.sub.rows?.map(x => x.value);\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
@@ -10451,13 +10454,175 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 990,
+        "x": 1010,
         "y": 320,
         "wires": [
             [
                 "7330dececec1df2b"
             ]
         ]
+    },
+    {
+        "id": "b80e76438743501b",
+        "type": "inject",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 380,
+        "wires": [
+            [
+                "db1c6675bb289531"
+            ]
+        ]
+    },
+    {
+        "id": "db1c6675bb289531",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "function 71",
+        "func": "msg.payload = null;\nmsg.topic = 'geo:block:PSM 5:KJGE:DIVISI 2:I-44';\nmsg.command = 'GET';\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 290,
+        "y": 380,
+        "wires": [
+            [
+                "76074694b00a11f0"
+            ]
+        ]
+    },
+    {
+        "id": "41b4656d72704eb9",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "send to redis",
+        "func": "let { geoType} = msg.payload;\nlet payload = msg.sub.rows;\n\nif (Array.isArray(payload) && payload.length) {\n    payload.forEach(x => {\n        if(x.value){\n            let data = x.value;\n            let { psm, estate, division, block, road } = data.properties;\n            let key = `geo:${geoType}`;\n            if (psm) key = `${key}:${psm}`;\n            if (estate) key = `${key}:${estate}`;\n            if (division) key = `${key}:${division}`;\n            if (block && !road) key = `${key}:${block}`;\n            if (!block && road) key = `${key}:${road}`;\n            let ttl = Number(env.get('NODERED_TTL')) * 60;\n            node.send({\n                payload: [key, JSON.stringify(data), 'EX', ttl],\n                topic: null\n            });\n        }\n    })\n}\nreturn null;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1030,
+        "y": 220,
+        "wires": [
+            [
+                "43026da73cab453c"
+            ]
+        ]
+    },
+    {
+        "id": "43026da73cab453c",
+        "type": "redis-command",
+        "z": "c5b9039a5fc48f97",
+        "server": "0fb96b870afb5c15",
+        "command": "set",
+        "name": "",
+        "topic": "",
+        "params": "[]",
+        "paramsType": "json",
+        "payloadType": "json",
+        "block": false,
+        "x": 1220,
+        "y": 220,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "47440a37edf2999a",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "send to redis",
+        "func": "let { geoType} = msg.payload;\nlet payload = msg.sub.rows;\n\nif (Array.isArray(payload) && payload.length) {\n    payload.forEach(x => {\n        if(x.value){\n            let data = x.value;\n            let { psm, estate, division, block, road } = data.properties;\n            let key = `geo:${geoType}`;\n            if (psm) key = `${key}:${psm}`;\n            if (estate) key = `${key}:${estate}`;\n            if (division) key = `${key}:${division}`;\n            if (block && !road) key = `${key}:${block}`;\n            if (!block && road) key = `${key}:${road}`;\n            let ttl = Number(env.get('NODERED_TTL')) * 60;\n            node.send({\n                payload: [key, JSON.stringify(data), 'EX', ttl],\n                topic: null\n            });\n        }\n    })\n}\nreturn null;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1030,
+        "y": 360,
+        "wires": [
+            [
+                "e9f893334e77352f"
+            ]
+        ]
+    },
+    {
+        "id": "e9f893334e77352f",
+        "type": "redis-command",
+        "z": "c5b9039a5fc48f97",
+        "server": "0fb96b870afb5c15",
+        "command": "set",
+        "name": "",
+        "topic": "",
+        "params": "[]",
+        "paramsType": "json",
+        "payloadType": "json",
+        "block": false,
+        "x": 1220,
+        "y": 360,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "76074694b00a11f0",
+        "type": "redis-command",
+        "z": "c5b9039a5fc48f97",
+        "server": "0fb96b870afb5c15",
+        "command": "GET",
+        "name": "",
+        "topic": "",
+        "params": "[]",
+        "paramsType": "json",
+        "payloadType": "json",
+        "block": false,
+        "x": 500,
+        "y": 380,
+        "wires": [
+            [
+                "e21d24c7c0b09579"
+            ]
+        ]
+    },
+    {
+        "id": "e21d24c7c0b09579",
+        "type": "debug",
+        "z": "c5b9039a5fc48f97",
+        "name": "debug 84",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 500,
+        "y": 420,
+        "wires": []
     },
     {
         "id": "2158300e6fc8788f",
@@ -11047,10 +11212,10 @@
         "fieldType": "msg",
         "format": "handlebars",
         "syntax": "mustache",
-        "template": "{\n  \"_id\": \"_design/road\",\n  \"views\": {\n    \"geometry\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.estate && doc.division && doc.road && (!doc.block)) emit([doc.psm, doc.estate, doc.division, doc.road], {\\n    type: doc.type,\\n    properties: {\\n      psm: doc.psm, \\n      pt: doc.pt, \\n      estate: doc.estate, \\n      division: doc.division,\\n      road: doc.road,\\n      roadType: doc.roadType,\\n    },\\n    geometry: doc.geometry\\n  });\\n}\"\n    },\n    \"geo-by-division\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.estate && doc.division && doc.road && (!doc.block)) emit([doc.psm, doc.estate, doc.division], {\\n    type: doc.type,\\n    properties: {\\n      psm: doc.psm, \\n      pt: doc.pt, \\n      estate: doc.estate, \\n      division: doc.division,\\n      road: doc.road,\\n      roadType: doc.roadType,\\n    },\\n    geometry: doc.geometry\\n    \\n  });\\n}\"\n    },\n    \"geo-by-psm\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.estate && doc.division && doc.road && (!doc.block)) emit(doc.psm, {\\n    type: doc.type,\\n    properties: {\\n      psm: doc.psm, \\n      pt: doc.pt, \\n      estate: doc.estate, \\n      division: doc.division,\\n      road: doc.road,\\n      roadType: doc.roadType,\\n    },\\n    geometry: doc.geometry\\n  });\\n}\"\n    },\n    \"geo-by-estate\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.estate && doc.division && doc.road && (!doc.block)) emit([doc.psm, doc.estate], {\\n    type: doc.type,\\n    properties: {\\n      psm: doc.psm, \\n      pt: doc.pt, \\n      estate: doc.estate, \\n      division: doc.division,\\n      road: doc.road,\\n      roadType: doc.roadType,\\n    },\\n    geometry: doc.geometry\\n    \\n  });\\n}\"\n    }\n  },\n  \"language\": \"javascript\"\n}",
+        "template": "{\n  \"_id\": \"_design/road\",\n  \"views\": {\n    \"geometry\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.estate && doc.division && doc.road && (!doc.block)) emit([doc.psm, doc.estate, doc.division, doc.road], {\\n    type: doc.type,\\n    properties: {\\n      psm: doc.psm, \\n      pt: doc.pt, \\n      estate: doc.estate, \\n      division: doc.division,\\n      road: doc.road,\\n      roadType: doc.roadType,\\n    },\\n    geometry: doc.geometry\\n  });\\n}\"\n    },\n    \"geo-by-division\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.estate && doc.division && doc.road && (!doc.block)) emit([doc.psm, doc.estate, doc.division], {\\n    type: doc.type,\\n    properties: {\\n      psm: doc.psm, \\n      pt: doc.pt, \\n      estate: doc.estate, \\n      division: doc.division,\\n      road: doc.road,\\n      roadType: doc.roadType,\\n    },\\n    geometry: doc.geometry\\n    \\n  });\\n}\"\n    },\n    \"geo-by-psm\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.estate && doc.division && doc.road && (!doc.block)) emit([doc.psm], {\\n    type: doc.type,\\n    properties: {\\n      psm: doc.psm, \\n      pt: doc.pt, \\n      estate: doc.estate, \\n      division: doc.division,\\n      road: doc.road,\\n      roadType: doc.roadType,\\n    },\\n    geometry: doc.geometry\\n  });\\n}\"\n    },\n    \"geo-by-estate\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.estate && doc.division && doc.road && (!doc.block)) emit([doc.psm, doc.estate], {\\n    type: doc.type,\\n    properties: {\\n      psm: doc.psm, \\n      pt: doc.pt, \\n      estate: doc.estate, \\n      division: doc.division,\\n      road: doc.road,\\n      roadType: doc.roadType,\\n    },\\n    geometry: doc.geometry\\n    \\n  });\\n}\"\n    }\n  },\n  \"language\": \"javascript\"\n}",
         "output": "str",
-        "x": 310,
-        "y": 180,
+        "x": 330,
+        "y": 340,
         "wires": [
             [
                 "12112cb4a3a5cf25"
@@ -11070,7 +11235,7 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 780,
+        "x": 820,
         "y": 300,
         "wires": []
     },
@@ -11084,7 +11249,7 @@
         "service": "_ext_",
         "payonly": true,
         "operation": "insert",
-        "x": 580,
+        "x": 600,
         "y": 300,
         "wires": [
             [
@@ -11101,10 +11266,10 @@
         "fieldType": "msg",
         "format": "handlebars",
         "syntax": "mustache",
-        "template": "{\n  \"_id\": \"_design/block\",\n  \"views\": {\n    \"geometry\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.estate && doc.division && doc.block) emit([doc.psm, doc.estate, doc.division, doc.block], {\\n    type: doc.type,\\n    properties: {\\n      psm: doc.estate, \\n      pt: doc.estate, \\n      estate: doc.estate, \\n      division: doc.division,\\n      block: doc.block,\\n    },\\n    geometry: doc.geometry\\n  });\\n}\"\n    },\n    \"geo-by-psm\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.estate && doc.division && doc.block) emit(doc.psm, {\\n    type: doc.type,\\n    properties: {\\n      psm: doc.estate, \\n      pt: doc.estate, \\n      estate: doc.estate, \\n      division: doc.division,\\n      block: doc.block,\\n    },\\n    geometry: doc.geometry\\n  });\\n}\"\n    },\n    \"geo-by-division\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.estate && doc.division && doc.block) emit([doc.psm, doc.estate, doc.division], {\\n    type: doc.type,\\n    properties: {\\n      psm: doc.estate, \\n      pt: doc.estate, \\n      estate: doc.estate, \\n      division: doc.division,\\n      block: doc.block,\\n    },\\n    geometry: doc.geometry\\n  });\\n}\"\n    },\n    \"geo-by-estate\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.estate && doc.division && doc.block) emit([doc.psm, doc.estate], {\\n    type: doc.type,\\n    properties: {\\n      psm: doc.estate, \\n      pt: doc.estate, \\n      estate: doc.estate, \\n      division: doc.division,\\n      block: doc.block,\\n    },\\n    geometry: doc.geometry});\\n}\"\n    },\n    \"list-by-division\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.estate && doc.division && doc.block) emit([doc.psm, doc.estate, doc.division], doc.block);\\n}\"\n    }\n  },\n  \"language\": \"javascript\"\n}",
+        "template": "{\n  \"_id\": \"_design/block\",\n  \"views\": {\n    \"geometry\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.estate && doc.division && doc.block) emit([doc.psm, doc.estate, doc.division, doc.block], {\\n    type: doc.type,\\n    properties: {\\n      psm: doc.psm, \\n      pt: doc.estate, \\n      estate: doc.estate, \\n      division: doc.division,\\n      block: doc.block,\\n    },\\n    geometry: doc.geometry\\n  });\\n}\"\n    },\n    \"geo-by-psm\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.estate && doc.division && doc.block) emit([doc.psm], {\\n    type: doc.type,\\n    properties: {\\n      psm: doc.psm, \\n      pt: doc.estate, \\n      estate: doc.estate, \\n      division: doc.division,\\n      block: doc.block,\\n    },\\n    geometry: doc.geometry\\n  });\\n}\"\n    },\n    \"geo-by-division\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.estate && doc.division && doc.block) emit([doc.psm, doc.estate, doc.division], {\\n    type: doc.type,\\n    properties: {\\n      psm: doc.psm, \\n      pt: doc.estate, \\n      estate: doc.estate, \\n      division: doc.division,\\n      block: doc.block,\\n    },\\n    geometry: doc.geometry\\n  });\\n}\"\n    },\n    \"geo-by-estate\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.estate && doc.division && doc.block) emit([doc.psm, doc.estate], {\\n    type: doc.type,\\n    properties: {\\n      psm: doc.psm, \\n      pt: doc.estate, \\n      estate: doc.estate, \\n      division: doc.division,\\n      block: doc.block,\\n    },\\n    geometry: doc.geometry});\\n}\"\n    },\n    \"list-by-division\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.estate && doc.division && doc.block) emit([doc.psm, doc.estate, doc.division], doc.block);\\n}\"\n    }\n  },\n  \"language\": \"javascript\"\n}",
         "output": "str",
-        "x": 320,
-        "y": 220,
+        "x": 340,
+        "y": 300,
         "wires": [
             [
                 "12112cb4a3a5cf25"
@@ -11120,9 +11285,9 @@
         "fieldType": "msg",
         "format": "handlebars",
         "syntax": "mustache",
-        "template": "{\n  \"_id\": \"_design/division\",\n  \"views\": {\n    \"geometry\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.estate && doc.division && (!doc.block) && (!doc.roadID)) emit([doc.psm, doc.estate, doc.division], {\\n    type: doc.type,\\n    properties: {\\n      psm: doc.psm,\\n      pt: doc.pt,\\n      estate: doc.estate,\\n      division: doc.division\\n    },\\n    geometry: doc.geometry\\n  });\\n}\"\n    },\n    \"geo-by-estate\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.estate && doc.division && (!doc.block) && (!doc.roadID)) emit([doc.psm, doc.estate], {\\n    type: doc.type,\\n    properties: {\\n      psm: doc.psm,\\n      pt: doc.pt,\\n      estate: doc.estate,\\n      division: doc.division\\n    },\\n    geometry: doc.geometry});\\n}\"\n    },\n    \"geo-by-psm\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.estate && doc.division && (!doc.block) && (!doc.roadID)) emit(doc.psm, {\\n    type: doc.type,\\n    properties: {\\n      psm: doc.psm,\\n      pt: doc.pt,\\n      estate: doc.estate,\\n      division: doc.division\\n    },\\n    geometry: doc.geometry});\\n}\"\n    },\n    \"list-by-estate\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.estate && doc.division && (!doc.block) && (!doc.roadID)) emit([doc.psm, doc.estate], doc.division);\\n}\"\n    }\n  },\n  \"language\": \"javascript\"\n}",
+        "template": "{\n  \"_id\": \"_design/division\",\n  \"views\": {\n    \"geometry\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.estate && doc.division && (!doc.block) && (!doc.roadID)) emit([doc.psm, doc.estate, doc.division], {\\n    type: doc.type,\\n    properties: {\\n      psm: doc.psm,\\n      pt: doc.pt,\\n      estate: doc.estate,\\n      division: doc.division\\n    },\\n    geometry: doc.geometry\\n  });\\n}\"\n    },\n    \"geo-by-estate\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.estate && doc.division && (!doc.block) && (!doc.roadID)) emit([doc.psm, doc.estate], {\\n    type: doc.type,\\n    properties: {\\n      psm: doc.psm,\\n      pt: doc.pt,\\n      estate: doc.estate,\\n      division: doc.division\\n    },\\n    geometry: doc.geometry});\\n}\"\n    },\n    \"geo-by-psm\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.estate && doc.division && (!doc.block) && (!doc.roadID)) emit([doc.psm], {\\n    type: doc.type,\\n    properties: {\\n      psm: doc.psm,\\n      pt: doc.pt,\\n      estate: doc.estate,\\n      division: doc.division\\n    },\\n    geometry: doc.geometry});\\n}\"\n    },\n    \"list-by-estate\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.estate && doc.division && (!doc.block) && (!doc.roadID)) emit([doc.psm, doc.estate], doc.division);\\n}\"\n    }\n  },\n  \"language\": \"javascript\"\n}",
         "output": "str",
-        "x": 320,
+        "x": 340,
         "y": 260,
         "wires": [
             [
@@ -11139,10 +11304,10 @@
         "fieldType": "msg",
         "format": "handlebars",
         "syntax": "mustache",
-        "template": "{\n  \"_id\": \"_design/estate\",\n  \"views\": {\n    \"geometry\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.estate && (!doc.division) && (!doc.block)) emit([doc.psm, doc.estate], {\\n    type: doc.type,\\n    properties: {\\n      psm: doc.psm,\\n      pt: doc.pt,\\n      estate: doc.estate\\n    },\\n    geometry: doc.geometry});\\n}\"\n    },\n    \"geo-by-psm\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.estate && (!doc.division) && (!doc.block)) emit(doc.psm, {\\n    type: doc.type,\\n    properties: {\\n      psm: doc.psm,\\n      pt: doc.pt,\\n      estate: doc.estate\\n    },\\n    geometry: doc.geometry});\\n}\"\n    }\n  },\n  \"language\": \"javascript\"\n}",
+        "template": "{\n  \"_id\": \"_design/estate\",\n  \"views\": {\n    \"geometry\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.estate && (!doc.division) && (!doc.block)) emit([doc.psm, doc.estate], {\\n    type: doc.type,\\n    properties: {\\n      psm: doc.psm,\\n      pt: doc.pt,\\n      estate: doc.estate\\n    },\\n    geometry: doc.geometry});\\n}\"\n    },\n    \"geo-by-psm\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.estate && (!doc.division) && (!doc.block)) emit([doc.psm], {\\n    type: doc.type,\\n    properties: {\\n      psm: doc.psm,\\n      pt: doc.pt,\\n      estate: doc.estate\\n    },\\n    geometry: doc.geometry});\\n}\"\n    }\n  },\n  \"language\": \"javascript\"\n}",
         "output": "str",
-        "x": 320,
-        "y": 300,
+        "x": 340,
+        "y": 220,
         "wires": [
             [
                 "12112cb4a3a5cf25"
@@ -11158,10 +11323,10 @@
         "fieldType": "msg",
         "format": "handlebars",
         "syntax": "mustache",
-        "template": "{\n  \"_id\": \"_design/filter\",\n  \"views\": {\n    \"block\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.pt && doc.estate && doc.division && doc.block) emit([doc.psm, doc.pt, doc.estate, doc.division, doc.block], {_id: doc._id, _rev: doc._rev});\\n}\"\n    },\n    \"road\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.pt && doc.division && doc.road && (!doc.block)) emit([doc.psm, doc.pt, doc.division, doc.road], {_id: doc._id, _rev: doc._rev});\\n}\"\n    },\n    \"division\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.pt && doc.estate && doc.division && (!doc.roadID) && (!doc.block)) emit([doc.psm, doc.pt, doc.estate, doc.division], {_id: doc._id, _rev: doc._rev});\\n}\"\n    },\n    \"psm\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.pt && (!doc.estate) && (!doc.division) && (!doc.roadID) && (!doc.block)) emit([doc.psm, doc.pt], {_id: doc._id, _rev: doc._rev});\\n}\"\n    },\n    \"estate\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.pt && doc.estate && (!doc.division) && (!doc.roadID) && (!doc.block)) emit([doc.psm, doc.pt, doc.estate], {_id: doc._id, _rev: doc._rev});\\n}\"\n    }\n  },\n  \"language\": \"javascript\"\n}",
+        "template": "{\n  \"_id\": \"_design/filter\",\n  \"views\": {\n    \"block\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.pt && doc.estate && doc.division && doc.block) emit([doc.psm, doc.pt, doc.estate, doc.division, doc.block], {_id: doc._id, _rev: doc._rev});\\n}\"\n    },\n    \"road\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.pt && doc.estate && doc.division && doc.road && (!doc.block)) emit([doc.psm, doc.pt, doc.estate, doc.division, doc.road], {_id: doc._id, _rev: doc._rev});\\n}\"\n    },\n    \"division\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.pt && doc.estate && doc.division && (!doc.roadID) && (!doc.block)) emit([doc.psm, doc.pt, doc.estate, doc.division], {_id: doc._id, _rev: doc._rev});\\n}\"\n    },\n    \"psm\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.pt && (!doc.estate) && (!doc.division) && (!doc.roadID) && (!doc.block)) emit([doc.psm, doc.pt], {_id: doc._id, _rev: doc._rev});\\n}\"\n    },\n    \"estate\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.pt && doc.estate && (!doc.division) && (!doc.roadID) && (!doc.block)) emit([doc.psm, doc.pt, doc.estate], {_id: doc._id, _rev: doc._rev});\\n}\"\n    }\n  },\n  \"language\": \"javascript\"\n}",
         "output": "str",
-        "x": 310,
-        "y": 340,
+        "x": 330,
+        "y": 380,
         "wires": [
             [
                 "12112cb4a3a5cf25"
@@ -11177,10 +11342,10 @@
         "fieldType": "msg",
         "format": "handlebars",
         "syntax": "mustache",
-        "template": "{\n  \"_id\": \"_design/psm\",\n  \"views\": {\n    \"geometry\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && (!doc.estate) && (!doc.division) && (!doc.block)) emit(doc.psm, {\\n    type: doc.type,\\n    properties: {\\n      psm: doc.psm,\\n      pt: doc.pt\\n    },\\n    geometry: doc.geometry\\n  });\\n}\"\n    }\n  },\n  \"language\": \"javascript\"\n}",
+        "template": "{\n  \"_id\": \"_design/psm\",\n  \"views\": {\n    \"geometry\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && (!doc.estate) && (!doc.division) && (!doc.block)) emit([doc.psm], {\\n    type: doc.type,\\n    properties: {\\n      psm: doc.psm,\\n      pt: doc.pt\\n    },\\n    geometry: doc.geometry\\n  });\\n}\"\n    }\n  },\n  \"language\": \"javascript\"\n}",
         "output": "str",
-        "x": 310,
-        "y": 380,
+        "x": 330,
+        "y": 180,
         "wires": [
             [
                 "12112cb4a3a5cf25"
@@ -11196,9 +11361,9 @@
         "fieldType": "msg",
         "format": "handlebars",
         "syntax": "mustache",
-        "template": "{\n  \"_id\": \"_design/reduce\",\n  \"views\": {\n    \"list-division\": {\n      \"reduce\": \"function (keys, values, rereduce) {\\n  if (rereduce) {\\n    return sum(values);\\n  } else {\\n    return values.length;\\n  }\\n}\",\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.pt && doc.estate && doc.division && (!doc.block) && (!doc.road)) emit([doc.estate, doc.division], 1);\\n}\"\n    },\n    \"list-psm\": {\n      \"reduce\": \"function (keys, values, rereduce) {\\n  if (rereduce) {\\n    return sum(values);\\n  } else {\\n    return values.length;\\n  }\\n}\",\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.pt && (!doc.estate) && (!doc.division) && (!doc.block) && (!doc.road)) emit(doc.psm, 1);\\n}\"\n    },\n    \"list-estate\": {\n      \"reduce\": \"function (keys, values, rereduce) {\\n  if (rereduce) {\\n    return sum(values);\\n  } else {\\n    return values.length;\\n  }\\n}\",\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.pt && doc.estate && (!doc.division) && (!doc.block) && (!doc.road)) emit([doc.psm, doc.estate], 1);\\n}\"\n    },\n    \"list-block\": {\n      \"reduce\": \"function (keys, values, rereduce) {\\n  if (rereduce) {\\n    return sum(values);\\n  } else {\\n    return values.length;\\n  }\\n}\",\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.pt && doc.estate && doc.division && doc.block && (!doc.road)) emit([doc.estate, doc.division, doc.block], 1);\\n}\"\n    },\n    \"list-road\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.pt && doc.estate && doc.division && (!doc.block) && doc.road) emit([doc.estate, doc.division, doc.road], 1);\\n}\",\n      \"reduce\": \"function (keys, values, rereduce) {\\n  if (rereduce) {\\n    return sum(values);\\n  } else {\\n    return values.length;\\n  }\\n}\"\n    }\n  },\n  \"language\": \"javascript\"\n}",
+        "template": "{\n  \"_id\": \"_design/reduce\",\n  \"views\": {\n    \"list-division\": {\n      \"reduce\": \"function (keys, values, rereduce) {\\n  if (rereduce) {\\n    return sum(values);\\n  } else {\\n    return values.length;\\n  }\\n}\",\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.pt && doc.estate && doc.division && (!doc.block) && (!doc.road)) emit([doc.estate, doc.division], 1);\\n}\"\n    },\n    \"list-psm\": {\n      \"reduce\": \"function (keys, values, rereduce) {\\n  if (rereduce) {\\n    return sum(values);\\n  } else {\\n    return values.length;\\n  }\\n}\",\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.pt && (!doc.estate) && (!doc.division) && (!doc.block) && (!doc.road)) emit([doc.psm], 1);\\n}\"\n    },\n    \"list-estate\": {\n      \"reduce\": \"function (keys, values, rereduce) {\\n  if (rereduce) {\\n    return sum(values);\\n  } else {\\n    return values.length;\\n  }\\n}\",\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.pt && doc.estate && (!doc.division) && (!doc.block) && (!doc.road)) emit([doc.psm, doc.estate], 1);\\n}\"\n    },\n    \"list-block\": {\n      \"reduce\": \"function (keys, values, rereduce) {\\n  if (rereduce) {\\n    return sum(values);\\n  } else {\\n    return values.length;\\n  }\\n}\",\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.pt && doc.estate && doc.division && doc.block && (!doc.road)) emit([doc.estate, doc.division, doc.block], 1);\\n}\"\n    },\n    \"list-road\": {\n      \"map\": \"function (doc) {\\n  if(doc.psm && doc.pt && doc.estate && doc.division && (!doc.block) && doc.road) emit([doc.estate, doc.division, doc.road], 1);\\n}\",\n      \"reduce\": \"function (keys, values, rereduce) {\\n  if (rereduce) {\\n    return sum(values);\\n  } else {\\n    return values.length;\\n  }\\n}\"\n    }\n  },\n  \"language\": \"javascript\"\n}",
         "output": "str",
-        "x": 320,
+        "x": 340,
         "y": 420,
         "wires": [
             [
