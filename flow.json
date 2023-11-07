@@ -10097,7 +10097,7 @@
         "type": "function",
         "z": "c5b9039a5fc48f97",
         "name": "redis wildcard key",
-        "func": "let { geoType, keys } = msg.payload;\nlet [psm, estate, division] = keys;\nlet key = `geo:${geoType}`;\nif (psm) key = `${key}:${psm}`;\nif (estate) key = `${key}:${estate}`;\nif (division) key = `${key}:${division}`;\nmsg.sub = `${key}:*`;\nnode.warn(msg.sub);\nreturn msg;",
+        "func": "let { geoType, keys } = msg.payload;\nlet [psm, estate, division] = keys;\nlet key = `geo:${geoType}`;\nif (psm) key = `${key}:${psm}`;\nif (estate) key = `${key}:${estate}`;\nif (division) key = `${key}:${division}`;\nmsg.sub = `${key}:*`;\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
