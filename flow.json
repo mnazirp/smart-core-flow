@@ -9521,8 +9521,8 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 150,
-        "y": 520,
+        "x": 130,
+        "y": 880,
         "wires": [
             [
                 "517c0e36530899f0"
@@ -9541,8 +9541,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 430,
-        "y": 520,
+        "x": 410,
+        "y": 880,
         "wires": [
             [
                 "456b39ddc47c6bda"
@@ -9561,8 +9561,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 480,
-        "y": 600,
+        "x": 460,
+        "y": 960,
         "wires": [
             [
                 "795e928c18816c82"
@@ -9574,8 +9574,8 @@
         "type": "subflow:d7ccf53b2b9fe097",
         "z": "c5b9039a5fc48f97",
         "name": "",
-        "x": 440,
-        "y": 560,
+        "x": 420,
+        "y": 920,
         "wires": [
             [
                 "e5cac997c4579d08"
@@ -9594,8 +9594,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 700,
-        "y": 560,
+        "x": 680,
+        "y": 920,
         "wires": [
             [
                 "14a6046b267b96d9"
@@ -9620,8 +9620,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 780,
-        "y": 640,
+        "x": 760,
+        "y": 1000,
         "wires": [
             [
                 "2d7f6435fecd86d5"
@@ -9643,8 +9643,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1030,
-        "y": 520,
+        "x": 1010,
+        "y": 880,
         "wires": [
             [
                 "e961c76d8d1785a3"
@@ -9664,8 +9664,8 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 980,
-        "y": 760,
+        "x": 960,
+        "y": 1120,
         "wires": []
     },
     {
@@ -9673,8 +9673,8 @@
         "type": "subflow:188768fc5fe509fd",
         "z": "c5b9039a5fc48f97",
         "name": "",
-        "x": 740,
-        "y": 600,
+        "x": 720,
+        "y": 960,
         "wires": [
             [
                 "e014cd393d12dfc8"
@@ -9686,8 +9686,8 @@
         "type": "subflow:3c790259a2397aef",
         "z": "c5b9039a5fc48f97",
         "name": "",
-        "x": 1050,
-        "y": 560,
+        "x": 1030,
+        "y": 920,
         "wires": [
             [
                 "a155ec0a0c355391"
@@ -9709,8 +9709,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 490,
-        "y": 640,
+        "x": 470,
+        "y": 1000,
         "wires": [
             [
                 "e38ea2e7c5ac9890"
@@ -9722,8 +9722,8 @@
         "type": "subflow:188768fc5fe509fd",
         "z": "c5b9039a5fc48f97",
         "name": "",
-        "x": 1080,
-        "y": 680,
+        "x": 1060,
+        "y": 1040,
         "wires": [
             [
                 "f28c06a47830c563"
@@ -9742,8 +9742,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1120,
-        "y": 640,
+        "x": 1100,
+        "y": 1000,
         "wires": [
             [
                 "20bea84fea9d51e6"
@@ -9762,8 +9762,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 990,
-        "y": 600,
+        "x": 970,
+        "y": 960,
         "wires": [
             [
                 "9daf4f25dea3a99a"
@@ -9785,8 +9785,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 1130,
-        "y": 600,
+        "x": 1110,
+        "y": 960,
         "wires": [
             [
                 "ed1af66838f34b6c"
@@ -9811,8 +9811,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 1120,
-        "y": 720,
+        "x": 1100,
+        "y": 1080,
         "wires": [
             [
                 "49b6dd4283c849c7"
@@ -9835,8 +9835,8 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1320,
-        "y": 800,
+        "x": 1300,
+        "y": 1160,
         "wires": []
     },
     {
@@ -9851,8 +9851,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1370,
-        "y": 600,
+        "x": 1350,
+        "y": 960,
         "wires": [
             [
                 "d0d5b272e6ba046f"
@@ -9864,8 +9864,8 @@
         "type": "subflow:3c790259a2397aef",
         "z": "c5b9039a5fc48f97",
         "name": "",
-        "x": 1390,
-        "y": 640,
+        "x": 1370,
+        "y": 1000,
         "wires": [
             [
                 "83d90a3bc2e23907"
@@ -9884,8 +9884,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1450,
-        "y": 680,
+        "x": 1430,
+        "y": 1040,
         "wires": [
             [
                 "6ac48da85eb49ba8"
@@ -9897,8 +9897,8 @@
         "type": "subflow:188768fc5fe509fd",
         "z": "c5b9039a5fc48f97",
         "name": "",
-        "x": 1420,
-        "y": 720,
+        "x": 1400,
+        "y": 1080,
         "wires": [
             [
                 "ae537177a43c1cd2"
@@ -9923,8 +9923,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 1460,
-        "y": 760,
+        "x": 1440,
+        "y": 1120,
         "wires": [
             [
                 "22bf37bb7ac1deef"
@@ -9947,8 +9947,8 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1660,
-        "y": 820,
+        "x": 1640,
+        "y": 1180,
         "wires": []
     },
     {
@@ -9963,8 +9963,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1720,
-        "y": 720,
+        "x": 1700,
+        "y": 1080,
         "wires": [
             [
                 "c5b50d54f6b998c5",
@@ -9977,8 +9977,8 @@
         "type": "subflow:3c790259a2397aef",
         "z": "c5b9039a5fc48f97",
         "name": "",
-        "x": 1730,
-        "y": 760,
+        "x": 1710,
+        "y": 1120,
         "wires": [
             []
         ]
@@ -9995,8 +9995,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 2000,
-        "y": 760,
+        "x": 1980,
+        "y": 1120,
         "wires": [
             [
                 "37b2efdec8d2dad9"
@@ -10008,8 +10008,8 @@
         "type": "subflow:188768fc5fe509fd",
         "z": "c5b9039a5fc48f97",
         "name": "",
-        "x": 2040,
-        "y": 800,
+        "x": 2020,
+        "y": 1160,
         "wires": [
             [
                 "0115fbb7e949b866",
@@ -10035,8 +10035,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 2290,
-        "y": 760,
+        "x": 2270,
+        "y": 1120,
         "wires": [
             [
                 "5825cba23c72fcf8"
@@ -10058,8 +10058,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 2280,
-        "y": 840,
+        "x": 2260,
+        "y": 1200,
         "wires": [
             [
                 "33e4671cbd5da025"
@@ -10071,8 +10071,8 @@
         "type": "subflow:188768fc5fe509fd",
         "z": "c5b9039a5fc48f97",
         "name": "",
-        "x": 2320,
-        "y": 880,
+        "x": 2300,
+        "y": 1240,
         "wires": [
             [
                 "fe94eebb9a0d99b6"
@@ -10097,8 +10097,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 2550,
-        "y": 880,
+        "x": 2530,
+        "y": 1240,
         "wires": [
             [
                 "9b0e6ae5a1565b9d"
@@ -10120,8 +10120,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 2550,
-        "y": 700,
+        "x": 2530,
+        "y": 1060,
         "wires": [
             [
                 "59597b8cc3477726"
@@ -10133,8 +10133,8 @@
         "type": "subflow:3c790259a2397aef",
         "z": "c5b9039a5fc48f97",
         "name": "",
-        "x": 2570,
-        "y": 740,
+        "x": 2550,
+        "y": 1100,
         "wires": [
             []
         ]
@@ -10151,8 +10151,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 2790,
-        "y": 840,
+        "x": 2770,
+        "y": 1200,
         "wires": [
             [
                 "b1f58278efca7e59"
@@ -10164,8 +10164,8 @@
         "type": "subflow:3c790259a2397aef",
         "z": "c5b9039a5fc48f97",
         "name": "",
-        "x": 2810,
-        "y": 880,
+        "x": 2790,
+        "y": 1240,
         "wires": [
             [
                 "1333e1900f9a4119"
@@ -10185,8 +10185,8 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 2500,
-        "y": 800,
+        "x": 2480,
+        "y": 1160,
         "wires": []
     },
     {
@@ -10202,8 +10202,8 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 2740,
-        "y": 940,
+        "x": 2720,
+        "y": 1300,
         "wires": []
     },
     {
@@ -10219,8 +10219,8 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 3040,
-        "y": 880,
+        "x": 3020,
+        "y": 1240,
         "wires": []
     },
     {
@@ -10239,8 +10239,8 @@
         "authType": "",
         "senderr": false,
         "headers": [],
-        "x": 150,
-        "y": 560,
+        "x": 130,
+        "y": 920,
         "wires": [
             [
                 "c8c7c3c6c0def50b"
@@ -10267,8 +10267,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 190,
-        "y": 600,
+        "x": 170,
+        "y": 960,
         "wires": [
             [
                 "f483eb1bd13f2967"
@@ -10291,8 +10291,8 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 380,
-        "y": 700,
+        "x": 360,
+        "y": 1060,
         "wires": []
     },
     {
@@ -10312,8 +10312,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 2000,
-        "y": 640,
+        "x": 1980,
+        "y": 1000,
         "wires": [
             [
                 "c0abb73411cfde78"
@@ -10332,8 +10332,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 2020,
-        "y": 680,
+        "x": 2000,
+        "y": 1040,
         "wires": [
             [
                 "4256cf3e81acc8f8"
@@ -10355,8 +10355,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 1990,
-        "y": 720,
+        "x": 1970,
+        "y": 1080,
         "wires": [
             [
                 "d4328058b56fd136"
@@ -10496,7 +10496,7 @@
         "type": "function",
         "z": "c5b9039a5fc48f97",
         "name": "function 71",
-        "func": "msg.payload = null;\nmsg.topic = 'geo:block:PSM 5:KJGE:DIVISI 2:I-44';\nmsg.command = 'GET';\nreturn msg;",
+        "func": "msg.payload = null;\nmsg.topic = 'geo:block:PSM 5:KJGE:DIVISI 2:*';\nmsg.command = 'GET';\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -10599,11 +10599,11 @@
         "paramsType": "json",
         "payloadType": "json",
         "block": false,
-        "x": 500,
-        "y": 380,
+        "x": 300,
+        "y": 420,
         "wires": [
             [
-                "e21d24c7c0b09579"
+                "d0f1d93a59575356"
             ]
         ]
     },
@@ -10623,6 +10623,315 @@
         "x": 500,
         "y": 420,
         "wires": []
+    },
+    {
+        "id": "aab998e8aad5f020",
+        "type": "inject",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 480,
+        "wires": [
+            [
+                "6281e367d16d9a0f"
+            ]
+        ]
+    },
+    {
+        "id": "fa46273efd455109",
+        "type": "debug",
+        "z": "c5b9039a5fc48f97",
+        "name": "debug 85",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 560,
+        "y": 560,
+        "wires": []
+    },
+    {
+        "id": "6281e367d16d9a0f",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "function 72",
+        "func": "msg.sub = {\n    database: 'smart-geojson',\n    design: 'block',\n    view: 'list-by-division',\n    key: ['PSM 5', 'LIBE', 'DIVISI 1']\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 310,
+        "y": 480,
+        "wires": [
+            [
+                "f81251b535406b46"
+            ]
+        ]
+    },
+    {
+        "id": "f81251b535406b46",
+        "type": "subflow:d7ccf53b2b9fe097",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "x": 340,
+        "y": 520,
+        "wires": [
+            [
+                "ac0854d97af22027"
+            ]
+        ]
+    },
+    {
+        "id": "ac0854d97af22027",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "function 73",
+        "func": "msg.payload = msg.sub.rows.map(x => {\n    let [psm, estate, division] = x.key;\n    return `geo:block:${psm}:${estate}:${division}:${x.value}`\n});\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 310,
+        "y": 560,
+        "wires": [
+            [
+                "fa46273efd455109"
+            ]
+        ]
+    },
+    {
+        "id": "d0f1d93a59575356",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "function 74",
+        "func": "msg.payload = JSON.parse(msg.payload);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 510,
+        "y": 380,
+        "wires": [
+            [
+                "e21d24c7c0b09579"
+            ]
+        ]
+    },
+    {
+        "id": "240f2b0c028562c1",
+        "type": "inject",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 700,
+        "y": 420,
+        "wires": [
+            [
+                "2147eecb0957848a"
+            ]
+        ]
+    },
+    {
+        "id": "3064742537f1ada0",
+        "type": "debug",
+        "z": "c5b9039a5fc48f97",
+        "name": "debug 86",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 460,
+        "y": 740,
+        "wires": []
+    },
+    {
+        "id": "2147eecb0957848a",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "function 75",
+        "func": "msg.payload = null;\nmsg.topic = 'geo:block:PSM 5:KJGE:DIVISI 2:*';\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 870,
+        "y": 420,
+        "wires": [
+            [
+                "8e6c817bb828a39f"
+            ]
+        ]
+    },
+    {
+        "id": "8e6c817bb828a39f",
+        "type": "redis-command",
+        "z": "c5b9039a5fc48f97",
+        "server": "0fb96b870afb5c15",
+        "command": "KEYS",
+        "name": "",
+        "topic": "",
+        "params": "[]",
+        "paramsType": "json",
+        "payloadType": "json",
+        "block": false,
+        "x": 870,
+        "y": 460,
+        "wires": [
+            [
+                "e923fcfe283dc6b9"
+            ]
+        ]
+    },
+    {
+        "id": "e923fcfe283dc6b9",
+        "type": "debug",
+        "z": "c5b9039a5fc48f97",
+        "name": "debug 87",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1060,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "68c3ea34b8d692c8",
+        "type": "inject",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 660,
+        "wires": [
+            [
+                "3b52dadd9d3a0a6a"
+            ]
+        ]
+    },
+    {
+        "id": "8e43322130d07012",
+        "type": "redis-lua-script",
+        "z": "c5b9039a5fc48f97",
+        "server": "0fb96b870afb5c15",
+        "name": "",
+        "keyval": 0,
+        "func": "local keys = redis.call('KEYS', ARGV[1])\nlocal results = {}\n\nfor i, key in ipairs(keys) do\n    results[i] = redis.call('GET', key)\nend\n\nreturn results;",
+        "stored": false,
+        "block": false,
+        "x": 280,
+        "y": 700,
+        "wires": [
+            [
+                "bf8db3f8876d80b1"
+            ]
+        ]
+    },
+    {
+        "id": "bf8db3f8876d80b1",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "function 76",
+        "func": "msg.payload = msg.payload.map(x => JSON.parse(x));\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 290,
+        "y": 740,
+        "wires": [
+            [
+                "3064742537f1ada0"
+            ]
+        ]
+    },
+    {
+        "id": "3b52dadd9d3a0a6a",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "function 77",
+        "func": "msg.payload = 'geo:block:PSM 5:KJGE:DIVISI 2:*';\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 290,
+        "y": 660,
+        "wires": [
+            [
+                "8e43322130d07012"
+            ]
+        ]
     },
     {
         "id": "2158300e6fc8788f",
