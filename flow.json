@@ -144,6 +144,14 @@
         "env": []
     },
     {
+        "id": "a40781dc17a39203",
+        "type": "tab",
+        "label": "Smart: List",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
         "id": "77002254b872fa8e",
         "type": "subflow",
         "name": "algo: jwt-sign",
@@ -7951,6 +7959,288 @@
         "wires": []
     },
     {
+        "id": "3481a142ffe4728a",
+        "type": "http in",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "url": "/api/track/hino/vehicles",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 160,
+        "y": 1180,
+        "wires": [
+            [
+                "5d1d1785d97cfd03"
+            ]
+        ]
+    },
+    {
+        "id": "5d1d1785d97cfd03",
+        "type": "function",
+        "z": "2e56a74c132aeaaf",
+        "name": "validated",
+        "func": "let valid = false;\nlet { startkey, endkey } = msg.payload;\nif (msg.payload && startkey && endkey) valid = true;\nmsg.valid = true;\nif (!valid) {\n    msg.payload = \"parameter is not valid\"\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 480,
+        "y": 1180,
+        "wires": [
+            [
+                "68959d8ccd71ba7e"
+            ]
+        ]
+    },
+    {
+        "id": "68959d8ccd71ba7e",
+        "type": "switch",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "property": "valid",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 490,
+        "y": 1220,
+        "wires": [
+            [
+                "8eb99b916ce6d2fc"
+            ],
+            [
+                "2d1f4e2d4f03cdb2"
+            ]
+        ]
+    },
+    {
+        "id": "2d1f4e2d4f03cdb2",
+        "type": "http response",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "statusCode": "400",
+        "headers": {},
+        "x": 680,
+        "y": 1300,
+        "wires": []
+    },
+    {
+        "id": "8eb99b916ce6d2fc",
+        "type": "function",
+        "z": "2e56a74c132aeaaf",
+        "name": "vehicles-by-date",
+        "func": "let { startkey, endkey } = msg.payload;\nmsg.sub = {\n    database: 'smart-bucket',\n    design: 'filter',\n    view: 'vehicle-by-date',\n    key: null,\n    startkey: startkey,\n    endkey: endkey\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 700,
+        "y": 1180,
+        "wires": [
+            [
+                "b53e64d5921eb2a0"
+            ]
+        ]
+    },
+    {
+        "id": "b53e64d5921eb2a0",
+        "type": "subflow:d7ccf53b2b9fe097",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "x": 740,
+        "y": 1220,
+        "wires": [
+            [
+                "3b0178327882674b"
+            ]
+        ]
+    },
+    {
+        "id": "3b0178327882674b",
+        "type": "function",
+        "z": "2e56a74c132aeaaf",
+        "name": "result",
+        "func": "msg.payload = msg.sub.rows?.map(x => x.value);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 790,
+        "y": 1260,
+        "wires": [
+            [
+                "111064bac481c50d"
+            ]
+        ]
+    },
+    {
+        "id": "111064bac481c50d",
+        "type": "http response",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 960,
+        "y": 1260,
+        "wires": []
+    },
+    {
+        "id": "194f5c3589859c19",
+        "type": "http in",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "url": "/api/track/hino/vehicle-positions",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 190,
+        "y": 1380,
+        "wires": [
+            [
+                "55ab8873929c560e"
+            ]
+        ]
+    },
+    {
+        "id": "55ab8873929c560e",
+        "type": "function",
+        "z": "2e56a74c132aeaaf",
+        "name": "validated",
+        "func": "let valid = false;\nlet { startkey, endkey } = msg.payload;\nif (msg.payload && startkey && endkey) valid = true;\nmsg.valid = true;\nif (!valid) {\n    msg.payload = \"parameter is not valid\"\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 480,
+        "y": 1380,
+        "wires": [
+            [
+                "0ac883d7aebc8035"
+            ]
+        ]
+    },
+    {
+        "id": "0ac883d7aebc8035",
+        "type": "switch",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "property": "valid",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 490,
+        "y": 1420,
+        "wires": [
+            [
+                "1b30919edbf12a6b"
+            ],
+            [
+                "952af4040e47242f"
+            ]
+        ]
+    },
+    {
+        "id": "1b30919edbf12a6b",
+        "type": "function",
+        "z": "2e56a74c132aeaaf",
+        "name": "vehiclepositions-by-date",
+        "func": "let { startkey, endkey } = msg.payload;\nmsg.sub = {\n    database: 'smart-bucket',\n    design: 'filter',\n    view: 'vehiclepositions-by-date',\n    key: null,\n    startkey: startkey,\n    endkey: endkey\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 730,
+        "y": 1380,
+        "wires": [
+            [
+                "5bb6c04558e2a4d6"
+            ]
+        ]
+    },
+    {
+        "id": "952af4040e47242f",
+        "type": "http response",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "statusCode": "400",
+        "headers": {},
+        "x": 680,
+        "y": 1500,
+        "wires": []
+    },
+    {
+        "id": "5bb6c04558e2a4d6",
+        "type": "subflow:d7ccf53b2b9fe097",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "x": 740,
+        "y": 1420,
+        "wires": [
+            [
+                "96cfaf331bb8bed0"
+            ]
+        ]
+    },
+    {
+        "id": "96cfaf331bb8bed0",
+        "type": "function",
+        "z": "2e56a74c132aeaaf",
+        "name": "result",
+        "func": "msg.payload = msg.sub.rows?.map(x => x.value);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 790,
+        "y": 1460,
+        "wires": [
+            [
+                "5907ac349973e246"
+            ]
+        ]
+    },
+    {
+        "id": "5907ac349973e246",
+        "type": "http response",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 960,
+        "y": 1460,
+        "wires": []
+    },
+    {
         "id": "ac083b48bc2518ab",
         "type": "http in",
         "z": "06108b8ace191ff7",
@@ -10288,288 +10578,6 @@
         "wires": []
     },
     {
-        "id": "3481a142ffe4728a",
-        "type": "http in",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "url": "/api/track/hino/vehicles",
-        "method": "post",
-        "upload": false,
-        "swaggerDoc": "",
-        "x": 180,
-        "y": 940,
-        "wires": [
-            [
-                "5d1d1785d97cfd03"
-            ]
-        ]
-    },
-    {
-        "id": "5d1d1785d97cfd03",
-        "type": "function",
-        "z": "c5b9039a5fc48f97",
-        "name": "validated",
-        "func": "let valid = false;\nlet { startkey, endkey } = msg.payload;\nif (msg.payload && startkey && endkey) valid = true;\nmsg.valid = true;\nif (!valid) {\n    msg.payload = \"parameter is not valid\"\n}\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 500,
-        "y": 940,
-        "wires": [
-            [
-                "68959d8ccd71ba7e"
-            ]
-        ]
-    },
-    {
-        "id": "68959d8ccd71ba7e",
-        "type": "switch",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "property": "valid",
-        "propertyType": "msg",
-        "rules": [
-            {
-                "t": "true"
-            },
-            {
-                "t": "false"
-            }
-        ],
-        "checkall": "true",
-        "repair": false,
-        "outputs": 2,
-        "x": 510,
-        "y": 980,
-        "wires": [
-            [
-                "8eb99b916ce6d2fc"
-            ],
-            [
-                "2d1f4e2d4f03cdb2"
-            ]
-        ]
-    },
-    {
-        "id": "2d1f4e2d4f03cdb2",
-        "type": "http response",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "statusCode": "400",
-        "headers": {},
-        "x": 700,
-        "y": 1060,
-        "wires": []
-    },
-    {
-        "id": "8eb99b916ce6d2fc",
-        "type": "function",
-        "z": "c5b9039a5fc48f97",
-        "name": "vehicles-by-date",
-        "func": "let { startkey, endkey } = msg.payload;\nmsg.sub = {\n    database: 'smart-bucket',\n    design: 'filter',\n    view: 'vehicle-by-date',\n    key: null,\n    startkey: startkey,\n    endkey: endkey\n}\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 720,
-        "y": 940,
-        "wires": [
-            [
-                "b53e64d5921eb2a0"
-            ]
-        ]
-    },
-    {
-        "id": "b53e64d5921eb2a0",
-        "type": "subflow:d7ccf53b2b9fe097",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "x": 760,
-        "y": 980,
-        "wires": [
-            [
-                "3b0178327882674b"
-            ]
-        ]
-    },
-    {
-        "id": "3b0178327882674b",
-        "type": "function",
-        "z": "c5b9039a5fc48f97",
-        "name": "result",
-        "func": "msg.payload = msg.sub.rows?.map(x => x.value);\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 810,
-        "y": 1020,
-        "wires": [
-            [
-                "111064bac481c50d"
-            ]
-        ]
-    },
-    {
-        "id": "111064bac481c50d",
-        "type": "http response",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "statusCode": "200",
-        "headers": {},
-        "x": 980,
-        "y": 1020,
-        "wires": []
-    },
-    {
-        "id": "194f5c3589859c19",
-        "type": "http in",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "url": "/api/track/hino/vehicle-positions",
-        "method": "post",
-        "upload": false,
-        "swaggerDoc": "",
-        "x": 210,
-        "y": 1140,
-        "wires": [
-            [
-                "55ab8873929c560e"
-            ]
-        ]
-    },
-    {
-        "id": "55ab8873929c560e",
-        "type": "function",
-        "z": "c5b9039a5fc48f97",
-        "name": "validated",
-        "func": "let valid = false;\nlet { startkey, endkey } = msg.payload;\nif (msg.payload && startkey && endkey) valid = true;\nmsg.valid = true;\nif (!valid) {\n    msg.payload = \"parameter is not valid\"\n}\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 500,
-        "y": 1140,
-        "wires": [
-            [
-                "0ac883d7aebc8035"
-            ]
-        ]
-    },
-    {
-        "id": "0ac883d7aebc8035",
-        "type": "switch",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "property": "valid",
-        "propertyType": "msg",
-        "rules": [
-            {
-                "t": "true"
-            },
-            {
-                "t": "false"
-            }
-        ],
-        "checkall": "true",
-        "repair": false,
-        "outputs": 2,
-        "x": 510,
-        "y": 1180,
-        "wires": [
-            [
-                "1b30919edbf12a6b"
-            ],
-            [
-                "952af4040e47242f"
-            ]
-        ]
-    },
-    {
-        "id": "1b30919edbf12a6b",
-        "type": "function",
-        "z": "c5b9039a5fc48f97",
-        "name": "vehiclepositions-by-date",
-        "func": "let { startkey, endkey } = msg.payload;\nmsg.sub = {\n    database: 'smart-bucket',\n    design: 'filter',\n    view: 'vehiclepositions-by-date',\n    key: null,\n    startkey: startkey,\n    endkey: endkey\n}\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 750,
-        "y": 1140,
-        "wires": [
-            [
-                "5bb6c04558e2a4d6"
-            ]
-        ]
-    },
-    {
-        "id": "952af4040e47242f",
-        "type": "http response",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "statusCode": "400",
-        "headers": {},
-        "x": 700,
-        "y": 1260,
-        "wires": []
-    },
-    {
-        "id": "5bb6c04558e2a4d6",
-        "type": "subflow:d7ccf53b2b9fe097",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "x": 760,
-        "y": 1180,
-        "wires": [
-            [
-                "96cfaf331bb8bed0"
-            ]
-        ]
-    },
-    {
-        "id": "96cfaf331bb8bed0",
-        "type": "function",
-        "z": "c5b9039a5fc48f97",
-        "name": "result",
-        "func": "msg.payload = msg.sub.rows?.map(x => x.value);\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 810,
-        "y": 1220,
-        "wires": [
-            [
-                "5907ac349973e246"
-            ]
-        ]
-    },
-    {
-        "id": "5907ac349973e246",
-        "type": "http response",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "statusCode": "200",
-        "headers": {},
-        "x": 980,
-        "y": 1220,
-        "wires": []
-    },
-    {
         "id": "2158300e6fc8788f",
         "type": "cronplus",
         "z": "d13820078197e616",
@@ -11315,5 +11323,430 @@
                 "12112cb4a3a5cf25"
             ]
         ]
+    },
+    {
+        "id": "bc39f3d827ecdc09",
+        "type": "function",
+        "z": "a40781dc17a39203",
+        "name": "result",
+        "func": "let { type } = msg.ori;\nlet data = msg.payload.docs?.map(x => x[type]);\nmsg.payload = removeDuplicate(data).sort();\nreturn msg;\n\nfunction removeDuplicate(arr) {\n  return Array.from(new Set(arr))\n}",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1470,
+        "y": 120,
+        "wires": [
+            [
+                "cb8db6fb6a216c0f"
+            ]
+        ]
+    },
+    {
+        "id": "c730c3e302695654",
+        "type": "function",
+        "z": "a40781dc17a39203",
+        "name": "validate",
+        "func": "let { category, type, keys } = msg.payload;\nlet valid = false;\nif (category && type && keys && Array.isArray(keys)) {\n    valid = true;\n    msg.ori = msg.payload;\n} else {\n    msg.payload = 'check your parameters !'\n}\nmsg.valid = valid;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 320,
+        "y": 160,
+        "wires": [
+            [
+                "b26fd6de874feacd"
+            ]
+        ]
+    },
+    {
+        "id": "f5adab1a23e313f2",
+        "type": "switch",
+        "z": "a40781dc17a39203",
+        "name": "category",
+        "property": "ori.category",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "geojson",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "area",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "user-role",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 3,
+        "x": 740,
+        "y": 180,
+        "wires": [
+            [
+                "dc8282e929413141"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "c1a2f9751c60c5f4",
+        "type": "function",
+        "z": "a40781dc17a39203",
+        "name": "build query GeoJSON",
+        "func": "let { category, type, keys } = msg.ori;\nlet indexes = ['psm', 'estate', 'division', 'block', 'road'];\nlet payload = {\n   selector: {\n      \"geoType\": {\n         \"$eq\": type\n      }\n   },\n   fields: [\n      type\n   ],\n   limit: 100000\n};\nif (Array.isArray(keys)) {\n   for (let i = 0; i < keys.length; i++) {\n      payload.selector[indexes[i]] = {\n         \"$eq\": keys[i]\n      };\n   }\n}\n\nlet database;\nswitch (category) {\n   case 'geojson': database = 'smart-geojson';\n      break;\n   case 'area': database = 'smart-libs';\n      break;\n}\n\nmsg.payload = payload;\nmsg.database = database;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1240,
+        "y": 80,
+        "wires": [
+            [
+                "858db558de269ca7"
+            ]
+        ]
+    },
+    {
+        "id": "858db558de269ca7",
+        "type": "cloudantplus in",
+        "z": "a40781dc17a39203",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "",
+        "service": "_ext_",
+        "search": "_query_",
+        "design": "",
+        "index": "",
+        "x": 1260,
+        "y": 120,
+        "wires": [
+            [
+                "b9efd20af3cfc67c"
+            ]
+        ]
+    },
+    {
+        "id": "cb8db6fb6a216c0f",
+        "type": "http response",
+        "z": "a40781dc17a39203",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 1660,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "2f1636cd6056499e",
+        "type": "function",
+        "z": "a40781dc17a39203",
+        "name": "set redis",
+        "func": "let { type } = msg.ori;\nlet data = msg.payload.docs?.map(x => x[type]);\nmsg.topic = msg.redisKey;\nmsg.payload = JSON.stringify(removeDuplicate(data).sort());\nreturn msg;\n\nfunction removeDuplicate(arr) {\n  return Array.from(new Set(arr))\n}",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1480,
+        "y": 180,
+        "wires": [
+            [
+                "34df746305f1dedf"
+            ]
+        ]
+    },
+    {
+        "id": "34df746305f1dedf",
+        "type": "redis-command",
+        "z": "a40781dc17a39203",
+        "server": "0fb96b870afb5c15",
+        "command": "SET",
+        "name": "",
+        "topic": "",
+        "params": "[]",
+        "paramsType": "json",
+        "payloadType": "json",
+        "block": false,
+        "x": 1660,
+        "y": 180,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b79ed9336b00b0e7",
+        "type": "http in",
+        "z": "a40781dc17a39203",
+        "name": "",
+        "url": "/api/list",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 130,
+        "y": 160,
+        "wires": [
+            [
+                "c730c3e302695654"
+            ]
+        ]
+    },
+    {
+        "id": "5925aba2dcd36be1",
+        "type": "function",
+        "z": "a40781dc17a39203",
+        "name": "redisKey",
+        "func": "let { category, type, keys } = msg.ori;\nlet redisKey = `list:${category}:${type}`;\nif (Array.isArray(keys)) {\n    keys.forEach(x => {\n        redisKey = `${redisKey}:${x}`\n    })\n}\nmsg.payload = redisKey;\nmsg.redisKey = redisKey;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 540,
+        "y": 140,
+        "wires": [
+            [
+                "5f3bf3978209a62c"
+            ]
+        ]
+    },
+    {
+        "id": "5f3bf3978209a62c",
+        "type": "redis-command",
+        "z": "a40781dc17a39203",
+        "server": "0fb96b870afb5c15",
+        "command": "GET",
+        "name": "",
+        "topic": "",
+        "params": "[]",
+        "paramsType": "json",
+        "payloadType": "json",
+        "block": false,
+        "x": 540,
+        "y": 180,
+        "wires": [
+            [
+                "192ab4e2ca20df37"
+            ]
+        ]
+    },
+    {
+        "id": "192ab4e2ca20df37",
+        "type": "switch",
+        "z": "a40781dc17a39203",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "null"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 550,
+        "y": 220,
+        "wires": [
+            [
+                "f5adab1a23e313f2"
+            ],
+            [
+                "5278d36a58e05a39"
+            ]
+        ]
+    },
+    {
+        "id": "b26fd6de874feacd",
+        "type": "switch",
+        "z": "a40781dc17a39203",
+        "name": "valid ?",
+        "property": "valid",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 330,
+        "y": 200,
+        "wires": [
+            [
+                "5925aba2dcd36be1"
+            ],
+            [
+                "9ecb0cef0c0f3d6c"
+            ]
+        ]
+    },
+    {
+        "id": "9ecb0cef0c0f3d6c",
+        "type": "http response",
+        "z": "a40781dc17a39203",
+        "name": "",
+        "statusCode": "400",
+        "headers": {},
+        "x": 540,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "5278d36a58e05a39",
+        "type": "function",
+        "z": "a40781dc17a39203",
+        "name": "parse",
+        "func": "msg.payload = JSON.parse(msg.payload);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 730,
+        "y": 240,
+        "wires": [
+            [
+                "774da1f203175e95"
+            ]
+        ]
+    },
+    {
+        "id": "774da1f203175e95",
+        "type": "http response",
+        "z": "a40781dc17a39203",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 740,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "b9efd20af3cfc67c",
+        "type": "switch",
+        "z": "a40781dc17a39203",
+        "name": "document found ?",
+        "property": "payload.docs.length",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "gt",
+                "v": "0",
+                "vt": "num"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 1250,
+        "y": 160,
+        "wires": [
+            [
+                "bc39f3d827ecdc09",
+                "2f1636cd6056499e"
+            ],
+            [
+                "e3836fccbda847ef"
+            ]
+        ]
+    },
+    {
+        "id": "e3836fccbda847ef",
+        "type": "http response",
+        "z": "a40781dc17a39203",
+        "name": "",
+        "statusCode": "204",
+        "headers": {},
+        "x": 1480,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "dc8282e929413141",
+        "type": "function",
+        "z": "a40781dc17a39203",
+        "name": "validate GeoJSON",
+        "func": "let { type, keys } = msg.ori;\nlet { valid, message } = validate(type, keys);\nmsg.valid = valid;\nif (!valid) msg.payload = message;\nreturn msg;\n\nfunction validate(type, keys) {\n    let allowedType = ['psm', 'estate', 'division', 'block', 'road'];\n    let valid = false;\n    let message;\n    if (allowedType.includes(type)) {\n        if (Array.isArray(keys)) {\n            switch (type) {\n                case 'psm':\n                    if (keys.length == 0) valid = true;\n                    else {\n                        message = 'keys must be empty to get all PSM'\n                    }\n                    break;\n                case 'estate':\n                    if (keys.length == 1) valid = true;\n                    else {\n                        message = 'set PSM if type = estate'\n                    }\n                    break;\n                case 'division':\n                    if (keys.length == 2) valid = true;\n                    else {\n                        message = 'set PSM & Estate if type = division'\n                    }\n                    break;\n                case 'block':\n                    if (keys.length == 3) valid = true;\n                    else {\n                        message = 'set PSM, Estate, and division if type = block'\n                    }\n                    break;\n                case 'road':\n                    if (keys.length == 3) valid = true;\n                    else {\n                        message = 'set PSM, Estate, and division if type = road'\n                    }\n                    break;\n            }\n        } else {\n            message = 'keys must be an array !'\n        }\n    } else {\n        message = 'type is not allowed !'\n    }\n\n    return { valid, message }\n}",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 970,
+        "y": 100,
+        "wires": [
+            [
+                "0a656d6d58ffc87d"
+            ]
+        ]
+    },
+    {
+        "id": "0a656d6d58ffc87d",
+        "type": "switch",
+        "z": "a40781dc17a39203",
+        "name": "valid ?",
+        "property": "valid",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 1010,
+        "y": 140,
+        "wires": [
+            [
+                "c1a2f9751c60c5f4"
+            ],
+            [
+                "ba0464c62058d69a"
+            ]
+        ]
+    },
+    {
+        "id": "ba0464c62058d69a",
+        "type": "http response",
+        "z": "a40781dc17a39203",
+        "name": "",
+        "statusCode": "400",
+        "headers": {},
+        "x": 1220,
+        "y": 220,
+        "wires": []
     }
 ]
