@@ -2538,7 +2538,7 @@
         "type": "function",
         "z": "d7ccf53b2b9fe097",
         "name": "read sub",
-        "func": "msg.backup = msg.payload;\n\nlet { database, design, view, key, startkey, endkey } = msg.sub;\nif (key) {\n    let keyStr = (Array.isArray(key)) ? `[${key.map(x => `\"${x}\"`).join(',')}]` : `\"${key}\"`;\n    msg.url = `${env.get('DOCKER_COUCHDB_DOMAIN')}/${database}/_design/${design}/_view/${view}?key=${keyStr}`;\n} else if (startkey && endkey) {\n    msg.url = `${env.get('DOCKER_COUCHDB_DOMAIN')}/${database}/_design/${design}/_view/${view}?startkey=\"${startkey}\"&endkey=\"${endkey}\"`;\n}\nmsg.headers = {\n    \"Authorization\": \"Basic \" +\n        Buffer.from(`${env.get('DOCKER_COUCHDB_USER')}:${env.get('DOCKER_COUCHDB_PASSWORD')}`).toString(\"base64\"),\n    \"Content-Type\": \"application/json; charset=utf-8\"\n}\nreturn msg;",
+        "func": "msg.backup = msg.payload;\n\nlet { database, design, view, key, startkey, endkey, group } = msg.sub;\nlet url = `${env.get('DOCKER_COUCHDB_DOMAIN')}/${database}/_design/${design}/_view/${view}?`;\nif (key) {\n    let keyStr = (Array.isArray(key)) ? `[${key.map(x => `\"${x}\"`).join(',')}]` : `\"${key}\"`;\n    url = `${url}key=${keyStr}`;\n} else if (startkey && endkey) {\n    url = `${url}startkey=\"${startkey}\"&endkey=\"${endkey}\"`;\n}\nif (group === true && !key && !startkey && !endkey) url = `${url}group=true`;\nelse url = `${url}&group=true`;\n\nmsg.url = url;\nmsg.headers = {\n    \"Authorization\": \"Basic \" +\n        Buffer.from(`${env.get('DOCKER_COUCHDB_USER')}:${env.get('DOCKER_COUCHDB_PASSWORD')}`).toString(\"base64\"),\n    \"Content-Type\": \"application/json; charset=utf-8\"\n}\nreturn msg;",
         "outputs": 1,
         "timeout": "",
         "noerr": 0,
@@ -10576,6 +10576,94 @@
         "x": 1160,
         "y": 320,
         "wires": []
+    },
+    {
+        "id": "c8302b5e6b8f6d5a",
+        "type": "http in",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "url": "/geo-bulk",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 140,
+        "y": 960,
+        "wires": [
+            [
+                "b0868e22b268ccd0"
+            ]
+        ]
+    },
+    {
+        "id": "6f0ff7fa8a76d2fa",
+        "type": "http response",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 620,
+        "y": 1040,
+        "wires": []
+    },
+    {
+        "id": "b0868e22b268ccd0",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "function 57",
+        "func": "msg.ori = msg.payload;\nlet { key } = msg.ori;\nmsg.sub = {\n    database: 'smart-geojson',\n    design: 'list',\n    view: key,\n    key: null,\n    group: true\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 960,
+        "wires": [
+            [
+                "e9d722c7e60ccefd"
+            ]
+        ]
+    },
+    {
+        "id": "e9d722c7e60ccefd",
+        "type": "subflow:d7ccf53b2b9fe097",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "x": 380,
+        "y": 1000,
+        "wires": [
+            [
+                "3c6da1af1b3d3e8b"
+            ]
+        ]
+    },
+    {
+        "id": "3c6da1af1b3d3e8b",
+        "type": "change",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "sub",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 360,
+        "y": 1040,
+        "wires": [
+            [
+                "6f0ff7fa8a76d2fa"
+            ]
+        ]
     },
     {
         "id": "2158300e6fc8788f",
