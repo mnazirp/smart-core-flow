@@ -154,7 +154,7 @@
     {
         "id": "4482c877021370dc",
         "type": "tab",
-        "label": "Redis",
+        "label": "Utils: redis",
         "disabled": false,
         "info": "",
         "env": []
