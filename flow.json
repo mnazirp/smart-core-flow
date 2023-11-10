@@ -154,7 +154,7 @@
     {
         "id": "4482c877021370dc",
         "type": "tab",
-        "label": "Utils: redis",
+        "label": "Utils: Redis",
         "disabled": false,
         "info": "",
         "env": []
@@ -1909,7 +1909,7 @@
         "type": "function",
         "z": "d7ccf53b2b9fe097",
         "name": "read sub",
-        "func": "msg.backup = msg.payload;\n\nlet { database, design, view, key, startkey, endkey, group } = msg.sub;\nlet url = `${env.get('DOCKER_COUCHDB_DOMAIN')}/${database}/_design/${design}/_view/${view}?`;\nif (key) {\n    let keyStr = (Array.isArray(key)) ? `[${key.map(x => `\"${x}\"`).join(',')}]` : `\"${key}\"`;\n    url = `${url}key=${keyStr}`;\n} else if (startkey && endkey) {\n    url = `${url}startkey=\"${startkey}\"&endkey=\"${endkey}\"`;\n}\nif (group === true && !key && !startkey && !endkey) url = `${url}group=true`;\nelse if (group === true) url = `${url}&group=true`;\n\nmsg.url = url;\nmsg.headers = {\n    \"Authorization\": \"Basic \" +\n        Buffer.from(`${env.get('DOCKER_COUCHDB_USER')}:${env.get('DOCKER_COUCHDB_PASSWORD')}`).toString(\"base64\"),\n    \"Content-Type\": \"application/json; charset=utf-8\"\n}\nreturn msg;",
+        "func": "msg.backup = msg.payload;\n\nlet { database, design, view, key, startkey, endkey, group } = msg.sub;\nlet url = `${env.get('DOCKER_COUCHDB_DOMAIN')}/${database}/_design/${design}/_view/${view}?`;\nif (key) {\n    let keyStr = (Array.isArray(key)) ? `[${key.map(x => `\"${x}\"`).join(',')}]` : `\"${key}\"`;\n    url = `${url}key=${keyStr}`;\n} else if (startkey && endkey) {\n    if (Array.isArray(startkey) && Array.isArray(endkey)) {\n        url = `${url}startkey=[${startkey.map(x => `\"${x}\"`)}]&endkey=[${endkey.map(x => `\"${x}\"`)}]`;\n    } else {\n        url = `${url}startkey=\"${startkey}\"&endkey=\"${endkey}\"`;\n    }\n}\nif (group === true && !key && !startkey && !endkey) url = `${url}group=true`;\nelse if (group === true) url = `${url}&group=true`;\n\nmsg.url = url;\nmsg.headers = {\n    \"Authorization\": \"Basic \" +\n        Buffer.from(`${env.get('DOCKER_COUCHDB_USER')}:${env.get('DOCKER_COUCHDB_PASSWORD')}`).toString(\"base64\"),\n    \"Content-Type\": \"application/json; charset=utf-8\"\n}\nreturn msg;",
         "outputs": 1,
         "timeout": "",
         "noerr": 0,
@@ -6660,8 +6660,8 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 660,
-        "y": 1060,
+        "x": 600,
+        "y": 1100,
         "wires": []
     },
     {
@@ -7610,6 +7610,147 @@
         "headers": {},
         "x": 960,
         "y": 1460,
+        "wires": []
+    },
+    {
+        "id": "15be92f129517a7c",
+        "type": "function",
+        "z": "2e56a74c132aeaaf",
+        "name": "vehiclepositions-by-date",
+        "func": "let { type, vin, startkey, endkey } = msg.payload;\nlet view = 'hino-position-by-vin-date';\nif(type == 'vehicle') view = 'hino-vehicle-by-vin-date';\nmsg.sub = {\n    database: 'smart-bucket',\n    design: 'filter',\n    view,\n    key: null,\n    startkey: [vin, startkey],\n    endkey: [vin, endkey]\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 690,
+        "y": 1580,
+        "wires": [
+            [
+                "c0caa60652aaf55a"
+            ]
+        ]
+    },
+    {
+        "id": "c0caa60652aaf55a",
+        "type": "subflow:d7ccf53b2b9fe097",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "x": 700,
+        "y": 1620,
+        "wires": [
+            [
+                "c81357b45bd12f3c"
+            ]
+        ]
+    },
+    {
+        "id": "4e9e4288d8aa8420",
+        "type": "http in",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "url": "/api/track/hino/by-vin-date",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 170,
+        "y": 1580,
+        "wires": [
+            [
+                "5f26c7e45011f372"
+            ]
+        ]
+    },
+    {
+        "id": "5f26c7e45011f372",
+        "type": "function",
+        "z": "2e56a74c132aeaaf",
+        "name": "validated",
+        "func": "let valid = false;\nlet { type, vin, startkey, endkey } = msg.payload;\nlet option = ['position', 'vehicle'];\nif (type && option.includes(type) && vin && msg.payload && startkey && endkey) valid = true;\nmsg.valid = true;\nif (!valid) {\n    msg.payload = \"parameter is not valid\"\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 440,
+        "y": 1580,
+        "wires": [
+            [
+                "742976742322e249"
+            ]
+        ]
+    },
+    {
+        "id": "742976742322e249",
+        "type": "switch",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "property": "valid",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 450,
+        "y": 1620,
+        "wires": [
+            [
+                "15be92f129517a7c"
+            ],
+            [
+                "b80de8b64d322efa"
+            ]
+        ]
+    },
+    {
+        "id": "c81357b45bd12f3c",
+        "type": "function",
+        "z": "2e56a74c132aeaaf",
+        "name": "result",
+        "func": "msg.payload = msg.sub.rows?.map(x => x.value);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 750,
+        "y": 1660,
+        "wires": [
+            [
+                "f0e2c81202321666"
+            ]
+        ]
+    },
+    {
+        "id": "f0e2c81202321666",
+        "type": "http response",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 920,
+        "y": 1660,
+        "wires": []
+    },
+    {
+        "id": "b80de8b64d322efa",
+        "type": "http response",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "statusCode": "400",
+        "headers": {},
+        "x": 640,
+        "y": 1700,
         "wires": []
     },
     {
@@ -8584,11 +8725,11 @@
         "type": "http in",
         "z": "c5b9039a5fc48f97",
         "name": "",
-        "url": "/geo",
+        "url": "/api/geo",
         "method": "post",
         "upload": false,
         "swaggerDoc": "",
-        "x": 120,
+        "x": 130,
         "y": 100,
         "wires": [
             [
@@ -9091,11 +9232,11 @@
         "type": "http in",
         "z": "c5b9039a5fc48f97",
         "name": "",
-        "url": "/geo-bulk",
+        "url": "/api/geo-bulk",
         "method": "post",
         "upload": false,
         "swaggerDoc": "",
-        "x": 140,
+        "x": 150,
         "y": 460,
         "wires": [
             [
