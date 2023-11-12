@@ -833,6 +833,43 @@
         "color": "#DDAA99"
     },
     {
+        "id": "5d89daf704594482",
+        "type": "subflow",
+        "name": "sub: pnmp-tracker",
+        "info": "## Input\r\n\r\n### msg.sub\r\n\r\n    {\r\n        endpoint: 'trees_counting_tracker',\r\n        estate: 'SMSE',\r\n        division: 'DIVISI 1',\r\n        block: 'D-71'\r\n    }",
+        "category": "",
+        "in": [
+            {
+                "x": 60,
+                "y": 80,
+                "wires": [
+                    {
+                        "id": "0719bcb6a449454d"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 840,
+                "y": 80,
+                "wires": [
+                    {
+                        "id": "63ba810d5a05f340",
+                        "port": 0
+                    },
+                    {
+                        "id": "a67d312e91796514",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [],
+        "meta": {},
+        "color": "#DDAA99"
+    },
+    {
         "id": "784d89e62dfb5070",
         "type": "cloudantplus",
         "host": "${DOCKER_COUCHDB}",
@@ -2385,13 +2422,18 @@
                 "t": "eq",
                 "v": "road",
                 "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "tree",
+                "vt": "str"
             }
         ],
         "checkall": "true",
         "repair": false,
-        "outputs": 5,
+        "outputs": 6,
         "x": 270,
-        "y": 160,
+        "y": 180,
         "wires": [
             [
                 "366861ce468a7842"
@@ -2407,6 +2449,9 @@
             ],
             [
                 "9eb43b3be552f09d"
+            ],
+            [
+                "b61d343824e38a72"
             ]
         ]
     },
@@ -2545,6 +2590,25 @@
         ]
     },
     {
+        "id": "b61d343824e38a72",
+        "type": "cloudantplus in",
+        "z": "3c790259a2397aef",
+        "name": "filter/tree",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-geojson",
+        "service": "_ext_",
+        "search": "_view_",
+        "design": "filter",
+        "index": "tree",
+        "x": 480,
+        "y": 280,
+        "wires": [
+            [
+                "b7023ff3abe0b03f"
+            ]
+        ]
+    },
+    {
         "id": "ad129211257cd7e3",
         "type": "redis-lua-script",
         "z": "8c8c795915b75984",
@@ -2598,6 +2662,119 @@
         "y": 160,
         "wires": [
             []
+        ]
+    },
+    {
+        "id": "bbed63f3189eaea8",
+        "type": "http request",
+        "z": "5d89daf704594482",
+        "name": "",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 250,
+        "y": 120,
+        "wires": [
+            [
+                "9f71bca7e2834d5d"
+            ]
+        ]
+    },
+    {
+        "id": "0719bcb6a449454d",
+        "type": "function",
+        "z": "5d89daf704594482",
+        "name": "read sub payload",
+        "func": "/**backup payload */\nmsg.backup = msg.payload;\n\nlet { endpoint, estate, division, block } = msg.sub;\nlet url = `${env.get('PNMP_API_URL')}/pnmp_tracker?endpoint=${endpoint}&estate=${estate}`;\nif (division) {\n    url += `&division=${division}`;\n    if (block) url += `&block=${block}`;\n}\nmsg.url = url;\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 230,
+        "y": 80,
+        "wires": [
+            [
+                "bbed63f3189eaea8"
+            ]
+        ]
+    },
+    {
+        "id": "63ba810d5a05f340",
+        "type": "function",
+        "z": "5d89daf704594482",
+        "name": "parse payload",
+        "func": "msg.sub = JSON.parse(msg.payload);\nmsg.payload = msg.backup;\ndelete msg.backup;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 620,
+        "y": 80,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "a67d312e91796514",
+        "type": "function",
+        "z": "5d89daf704594482",
+        "name": "EAI_AGAIN",
+        "func": "msg.sub = {\n    error: msg.payload\n};\nmsg.payload = msg.backup;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 610,
+        "y": 160,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "9f71bca7e2834d5d",
+        "type": "switch",
+        "z": "5d89daf704594482",
+        "name": "error?",
+        "property": "statusCode",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "gte",
+                "v": "200",
+                "vt": "num"
+            },
+            {
+                "t": "eq",
+                "v": "EAI_AGAIN",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 430,
+        "y": 120,
+        "wires": [
+            [
+                "63ba810d5a05f340"
+            ],
+            [
+                "a67d312e91796514"
+            ]
         ]
     },
     {
@@ -9251,8 +9428,8 @@
         "name": "",
         "statusCode": "200",
         "headers": {},
-        "x": 1260,
-        "y": 680,
+        "x": 1240,
+        "y": 640,
         "wires": []
     },
     {
@@ -9294,7 +9471,7 @@
         "y": 640,
         "wires": [
             [
-                "877e59edc4bff37d"
+                "6f0ff7fa8a76d2fa"
             ]
         ]
     },
@@ -9337,7 +9514,7 @@
         "type": "function",
         "z": "c5b9039a5fc48f97",
         "name": "map result",
-        "func": "msg.payload = msg.sub.rows?.map(x => x.value);\nreturn msg;",
+        "func": "msg.payload = {\n    type: msg.select,\n    data: {\n        \"type\": \"FeatureCollection\",\n        \"features\": msg.sub.rows?.map(x => x.value)\n    }\n};\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -9349,26 +9526,6 @@
         "wires": [
             [
                 "64be84597bcda077"
-            ]
-        ]
-    },
-    {
-        "id": "877e59edc4bff37d",
-        "type": "function",
-        "z": "c5b9039a5fc48f97",
-        "name": "flating arrays",
-        "func": "msg.payload = {\n    \"type\": \"FeatureCollection\",\n    \"features\": msg.payload.flat().filter(x => x != null)\n};\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 1090,
-        "y": 680,
-        "wires": [
-            [
-                "6f0ff7fa8a76d2fa"
             ]
         ]
     },
@@ -9484,7 +9641,7 @@
         "type": "function",
         "z": "c5b9039a5fc48f97",
         "name": "parse result",
-        "func": "msg.payload = JSON.parse(msg.payload);\nreturn msg;",
+        "func": "msg.payload = {\n    type: msg.select,\n    data: {\n        \"type\": \"FeatureCollection\",\n        \"features\": JSON.parse(msg.payload)\n    }\n};\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -9898,7 +10055,7 @@
         "type": "function",
         "z": "c5b9039a5fc48f97",
         "name": "split ESTATE",
-        "func": "let estates = msg.psm.children;\nlet counter = 0;\nsplit();\ndelete msg.payload;\nreturn null;\n\nfunction split() {\n    if (counter < estates.length) {\n        let data = estates[counter];\n        msg.payload = data;\n        msg.estate = data;\n        node.send({...msg});\n        counter++;\n        setTimeout(split, 5000);\n    }\n}",
+        "func": "let estates = msg.psm.children;\nlet counter = 0;\nsplit();\ndelete msg.payload;\nreturn null;\n\nfunction split() {\n    if (counter < estates.length) {\n        let data = estates[counter];\n        msg.payload = data;\n        msg.estate = data;\n        node.send({...msg});\n        counter++;\n        setTimeout(split, 10000);\n    }\n}",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -10189,7 +10346,7 @@
         "type": "function",
         "z": "c5b9039a5fc48f97",
         "name": "split DIVISION",
-        "func": "let divisions = msg.divisions;\nlet counter = 0;\nsplit();\ndelete msg.payload;\nreturn null;\n\nfunction split() {\n    if (counter < divisions.length) {\n        let data = divisions[counter];\n        msg.payload = data;\n        msg.division = data;\n        node.send({...msg});\n        counter++;\n        setTimeout(split, 1000);\n    }\n}",
+        "func": "let divisions = msg.divisions;\nlet counter = 0;\nsplit();\ndelete msg.payload;\nreturn null;\n\nfunction split() {\n    if (counter < divisions.length) {\n        let data = divisions[counter];\n        msg.payload = data;\n        msg.division = data;\n        node.send({...msg});\n        counter++;\n        setTimeout(split, 5000);\n    }\n}",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -10315,7 +10472,7 @@
         "type": "function",
         "z": "c5b9039a5fc48f97",
         "name": "prepare doc & key block",
-        "func": "let docs = msg.sub.data?.geojson?.features.map(x => {\n    return {\n        geoType: 'block',\n        psm: x.properties.psm,\n        pt: x.properties.pt,\n        estate: x.properties.estate,\n        division: x.properties.divisi,\n        block: x.properties.blok,\n        type: x.type,\n        properties: x.properties,\n        geometry: x.geometry\n    }\n});\nlet keys = msg.sub.data?.geojson?.features.map(x => {\n    return [\n        x.properties.psm,\n        x.properties.pt,\n        x.properties.estate,\n        x.properties.divisi,\n        x.properties.blok\n    ];\n});\nmsg.sub = {\n    type: 'block',\n    keys,\n    docs\n}\nreturn msg;",
+        "func": "let docs = msg.sub.data?.geojson?.features.map(x => {\n    return {\n        geoType: 'block',\n        psm: x.properties.psm,\n        pt: x.properties.pt,\n        estate: x.properties.estate,\n        division: x.properties.divisi,\n        block: x.properties.blok,\n        type: x.type,\n        properties: x.properties,\n        geometry: x.geometry\n    }\n});\nlet keys = msg.sub.data?.geojson?.features.map(x => {\n    return [\n        x.properties.psm,\n        x.properties.pt,\n        x.properties.estate,\n        x.properties.divisi,\n        x.properties.blok\n    ];\n});\nmsg.sub = {\n    type: 'block',\n    keys,\n    docs\n}\nmsg.blocks = keys;\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -10323,10 +10480,11 @@
         "finalize": "",
         "libs": [],
         "x": 2550,
-        "y": 940,
+        "y": 960,
         "wires": [
             [
-                "59597b8cc3477726"
+                "59597b8cc3477726",
+                "6613ace28142a03e"
             ]
         ]
     },
@@ -10335,7 +10493,7 @@
         "type": "debug",
         "z": "c5b9039a5fc48f97",
         "name": "debug 78",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -10366,7 +10524,7 @@
         "z": "c5b9039a5fc48f97",
         "name": "",
         "x": 2570,
-        "y": 980,
+        "y": 1000,
         "wires": [
             []
         ]
@@ -10425,7 +10583,7 @@
         "type": "debug",
         "z": "c5b9039a5fc48f97",
         "name": "debug 79",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -10434,7 +10592,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 2740,
-        "y": 1180,
+        "y": 1160,
         "wires": []
     },
     {
@@ -10455,7 +10613,7 @@
         "type": "debug",
         "z": "c5b9039a5fc48f97",
         "name": "debug 82",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -10465,6 +10623,214 @@
         "statusType": "auto",
         "x": 3040,
         "y": 1120,
+        "wires": []
+    },
+    {
+        "id": "f4cb91c123373215",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "get trees by block",
+        "func": "msg.sub = {\n    endpoint: 'trees_counting_tracker',\n    estate: 'SMSE',\n    division: 'DIVISI 1',\n    block: 'D-71'\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 1020,
+        "wires": [
+            [
+                "3fb8f342e918b871"
+            ]
+        ]
+    },
+    {
+        "id": "8ef85d816f6bc57a",
+        "type": "inject",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 180,
+        "y": 1020,
+        "wires": [
+            [
+                "f4cb91c123373215"
+            ]
+        ]
+    },
+    {
+        "id": "a458f1e68ebefa1b",
+        "type": "debug",
+        "z": "c5b9039a5fc48f97",
+        "name": "debug 85",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 460,
+        "y": 1100,
+        "wires": []
+    },
+    {
+        "id": "3fb8f342e918b871",
+        "type": "subflow:5d89daf704594482",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "x": 430,
+        "y": 1060,
+        "wires": [
+            [
+                "a458f1e68ebefa1b"
+            ]
+        ]
+    },
+    {
+        "id": "df3aaf8db1453fb1",
+        "type": "subflow:5d89daf704594482",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "x": 2910,
+        "y": 920,
+        "wires": [
+            [
+                "18692e337c23ee5a"
+            ]
+        ]
+    },
+    {
+        "id": "6613ace28142a03e",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "split BLOCK",
+        "func": "let blocks = msg.blocks;\nlet counter = 0;\nsplit();\ndelete msg.payload;\nreturn null;\n\nfunction split() {\n    if (counter < blocks.length) {\n        let [psm, pt, estate, division, block] = blocks[counter];\n        msg.payload = { psm, pt, estate, division, block };\n        msg.sub = {\n            endpoint: 'trees_counting_tracker',\n            estate: estate,\n            division: division,\n            block: block\n        }\n        node.send({ ...msg });\n        counter++;\n        setTimeout(split, 5000);\n    }\n}",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2890,
+        "y": 880,
+        "wires": [
+            [
+                "df3aaf8db1453fb1"
+            ]
+        ]
+    },
+    {
+        "id": "18692e337c23ee5a",
+        "type": "switch",
+        "z": "c5b9039a5fc48f97",
+        "name": "tree found ?",
+        "property": "sub.status",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 2930,
+        "y": 960,
+        "wires": [
+            [
+                "05fecf631e8f6365"
+            ],
+            [
+                "b9c0e38d79314ce4"
+            ]
+        ]
+    },
+    {
+        "id": "05fecf631e8f6365",
+        "type": "function",
+        "z": "c5b9039a5fc48f97",
+        "name": "prepare doc & key tree",
+        "func": "let docs = msg.sub.data?.geojson?.features.map(x => {\n    return {\n        geoType: 'tree',\n        psm: x.properties.psm,\n        region: x.properties.region,\n        estate: x.properties.estate,\n        division: x.properties.divisi,\n        complex: x.properties.komplek,\n        block: x.properties.blok,\n        type: x.type,\n        properties: x.properties,\n        geometry: x.geometry\n    }\n});\nlet keys = msg.sub.data?.geojson?.features.map(x => {\n    return [\n        x.properties.psm,\n        x.properties.region,\n        x.properties.estate,\n        x.properties.divisi,\n        x.properties.komplek,\n        x.properties.blok,\n    ];\n});\nmsg.sub = {\n    type: 'tree',\n    keys,\n    docs\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 3180,
+        "y": 920,
+        "wires": [
+            [
+                "aecf50bf3d097c7a"
+            ]
+        ]
+    },
+    {
+        "id": "aecf50bf3d097c7a",
+        "type": "subflow:3c790259a2397aef",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "x": 3210,
+        "y": 960,
+        "wires": [
+            [
+                "efcfb90aa4c5767a"
+            ]
+        ]
+    },
+    {
+        "id": "b9c0e38d79314ce4",
+        "type": "debug",
+        "z": "c5b9039a5fc48f97",
+        "name": "debug 87",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 3140,
+        "y": 1000,
+        "wires": []
+    },
+    {
+        "id": "efcfb90aa4c5767a",
+        "type": "debug",
+        "z": "c5b9039a5fc48f97",
+        "name": "debug 88",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 3460,
+        "y": 960,
         "wires": []
     },
     {
