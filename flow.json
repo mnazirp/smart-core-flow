@@ -24,14 +24,6 @@
         "env": []
     },
     {
-        "id": "35d2cc8d792ddb2a",
-        "type": "tab",
-        "label": "Migrations",
-        "disabled": false,
-        "info": "// nrlint function-eslint:off\n",
-        "env": []
-    },
-    {
         "id": "bf22cd3c7ed55a35",
         "type": "tab",
         "label": "R&D",
@@ -877,28 +869,10 @@
         "useapikey": false
     },
     {
-        "id": "9dc2644ec5b51cb2",
-        "type": "mysql2-server",
-        "host": "${DOCKER_MYSQL_HOST}",
-        "port": "${DOCKER_MYSQL_PORT}",
-        "username": "${DOCKER_MYSQL_USER}",
-        "password": "password",
-        "db": "${DOCKER_MYSQL_DBNAME}",
-        "servername": "DOCKER_MYSQL"
-    },
-    {
         "id": "0fb96b870afb5c15",
         "type": "redis-config",
         "name": "DOCKER_REDIS",
         "options": "DOCKER_REDIS_URL",
-        "cluster": false,
-        "optionsType": "env"
-    },
-    {
-        "id": "3cc67d60c90e6c5d",
-        "type": "redis-config",
-        "name": "DOCKER_REDIS_TS",
-        "options": "DOCKER_REDIS_TS_URL",
         "cluster": false,
         "optionsType": "env"
     },
@@ -3727,477 +3701,6 @@
         "wires": []
     },
     {
-        "id": "24214884693edfa2",
-        "type": "function",
-        "z": "35d2cc8d792ddb2a",
-        "name": "set query",
-        "func": "msg.topic = `select * from digaportal.v_getsysroleuser2`;\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 460,
-        "y": 80,
-        "wires": [
-            [
-                "40248a209f3fdb0c"
-            ]
-        ]
-    },
-    {
-        "id": "40248a209f3fdb0c",
-        "type": "mysql2",
-        "z": "35d2cc8d792ddb2a",
-        "name": "",
-        "server": "9dc2644ec5b51cb2",
-        "bind": "",
-        "topic": "",
-        "x": 460,
-        "y": 120,
-        "wires": [
-            [
-                "dd4fb4fce5680691"
-            ]
-        ]
-    },
-    {
-        "id": "f183a287ee95d591",
-        "type": "debug",
-        "z": "35d2cc8d792ddb2a",
-        "name": "debug 2",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 1140,
-        "y": 120,
-        "wires": []
-    },
-    {
-        "id": "dd4fb4fce5680691",
-        "type": "change",
-        "z": "35d2cc8d792ddb2a",
-        "name": "",
-        "rules": [
-            {
-                "t": "set",
-                "p": "users",
-                "pt": "msg",
-                "to": "payload",
-                "tot": "msg"
-            },
-            {
-                "t": "set",
-                "p": "payload",
-                "pt": "msg",
-                "to": "{\"keys\":[[\"reference\",\"smart-corp-role\"],[\"reference\",\"smart-system-role\"]]}",
-                "tot": "json"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 480,
-        "y": 160,
-        "wires": [
-            [
-                "99dafc8417f56638"
-            ]
-        ]
-    },
-    {
-        "id": "99dafc8417f56638",
-        "type": "cloudantplus in",
-        "z": "35d2cc8d792ddb2a",
-        "name": "",
-        "cloudant": "784d89e62dfb5070",
-        "database": "smart-libs",
-        "service": "_ext_",
-        "search": "_view_",
-        "design": "type",
-        "index": "by-topic",
-        "x": 500,
-        "y": 200,
-        "wires": [
-            [
-                "f5aa11d58f518d50"
-            ]
-        ]
-    },
-    {
-        "id": "f5aa11d58f518d50",
-        "type": "function",
-        "z": "35d2cc8d792ddb2a",
-        "name": "mapping result",
-        "func": "msg.corpRole = msg.payload.find(x => x.key[1] === 'smart-corp-role').data;\nmsg.systemRole = msg.corpRole = msg.payload.find(x => x.key[1] === 'smart-system-role').data;\nlet users = msg.users.map(x => {\n    let algorithm = 'aes256';\n    let key = env.get('CRYPTO_KEY');\n    let iv = env.get('CRYPTO_IV');\n    let cipher = crypto.createCipheriv(algorithm, key, iv);\n    let encrypted = cipher.update(`${x.NIK};pass`, 'utf8', 'hex') + cipher.final('hex');\n    let type = 'non-adfs';\n    if (/^\\d+$/.test(x.NIK) && x.NIK.length === 8) type = 'adfs';\n\n    return {\n        nik: x.NIK,\n        type: type,\n        fullName: x.szFullName,\n        email: x.szEmailAddress,\n        occupation: msg.corpRole.find(r => r.origin === x.szCorpRoleName)?.code || null,\n        roles: {\n            corp: msg.corpRole.find(r => r.origin === x.szCorpRoleName)?.code || null,\n            system: msg.systemRole.filter(r => r.origin === x.szSysRoleName).map(r => r.code) || null\n        },\n        authorizations: [\n            {\n                type: 'password',\n                passwords: [encrypted]\n            }\n        ]\n    }\n});\nmsg.documents = {\n    docs: users\n};\nreturn msg;",
-        "outputs": 1,
-        "timeout": "",
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [
-            {
-                "var": "crypto",
-                "module": "crypto"
-            }
-        ],
-        "x": 720,
-        "y": 80,
-        "wires": [
-            [
-                "8f9ff0f95018dd01"
-            ]
-        ]
-    },
-    {
-        "id": "36b892547277fd3e",
-        "type": "http request",
-        "z": "35d2cc8d792ddb2a",
-        "name": "",
-        "method": "POST",
-        "ret": "txt",
-        "paytoqs": "ignore",
-        "url": "http://localhost:5930/smart-users/_bulk_docs",
-        "tls": "",
-        "persist": false,
-        "proxy": "",
-        "insecureHTTPParser": false,
-        "authType": "basic",
-        "senderr": false,
-        "headers": [],
-        "x": 950,
-        "y": 120,
-        "wires": [
-            [
-                "f183a287ee95d591"
-            ]
-        ]
-    },
-    {
-        "id": "8f9ff0f95018dd01",
-        "type": "http request",
-        "z": "35d2cc8d792ddb2a",
-        "name": "delete database",
-        "method": "DELETE",
-        "ret": "txt",
-        "paytoqs": "ignore",
-        "url": "http://localhost:5930/smart-users",
-        "tls": "",
-        "persist": false,
-        "proxy": "",
-        "insecureHTTPParser": false,
-        "authType": "basic",
-        "senderr": false,
-        "headers": [],
-        "x": 720,
-        "y": 120,
-        "wires": [
-            [
-                "292e9cb262adf6cc"
-            ]
-        ]
-    },
-    {
-        "id": "292e9cb262adf6cc",
-        "type": "http request",
-        "z": "35d2cc8d792ddb2a",
-        "name": "create database",
-        "method": "PUT",
-        "ret": "txt",
-        "paytoqs": "ignore",
-        "url": "http://localhost:5930/smart-users",
-        "tls": "",
-        "persist": false,
-        "proxy": "",
-        "insecureHTTPParser": false,
-        "authType": "basic",
-        "senderr": false,
-        "headers": [],
-        "x": 720,
-        "y": 160,
-        "wires": [
-            [
-                "b6ef183ef6f342f9"
-            ]
-        ]
-    },
-    {
-        "id": "b6ef183ef6f342f9",
-        "type": "change",
-        "z": "35d2cc8d792ddb2a",
-        "name": "",
-        "rules": [
-            {
-                "t": "set",
-                "p": "payload",
-                "pt": "msg",
-                "to": "documents",
-                "tot": "msg"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 960,
-        "y": 80,
-        "wires": [
-            [
-                "36b892547277fd3e"
-            ]
-        ]
-    },
-    {
-        "id": "be7488b241be2426",
-        "type": "promptinput",
-        "z": "35d2cc8d792ddb2a",
-        "name": "confirm",
-        "datatype": "str",
-        "prompt": "this process will overwriten smart-users data, are you sure ? yes / no",
-        "property": "payload",
-        "propertyType": "msg",
-        "x": 110,
-        "y": 80,
-        "wires": [
-            [
-                "e76b6489929bdac5"
-            ]
-        ]
-    },
-    {
-        "id": "e76b6489929bdac5",
-        "type": "switch",
-        "z": "35d2cc8d792ddb2a",
-        "name": "",
-        "property": "payload",
-        "propertyType": "msg",
-        "rules": [
-            {
-                "t": "eq",
-                "v": "yes",
-                "vt": "str"
-            }
-        ],
-        "checkall": "true",
-        "repair": false,
-        "outputs": 1,
-        "x": 250,
-        "y": 80,
-        "wires": [
-            [
-                "24214884693edfa2"
-            ]
-        ]
-    },
-    {
-        "id": "5b4debb4c819653b",
-        "type": "function",
-        "z": "35d2cc8d792ddb2a",
-        "name": "set query",
-        "func": "msg.topic = `\nselect\n\ttab.iOrgID,\n\tvalRef.szValueRef as cCategory,\n\ttab.szOrgName as ChildName,\n\ttab.szDescription as ChildDesc,\n\tparent.iOrgID as ParentID,\n\tparRef.szValueRef as pCategory,\n\tparent.szOrgName as ParentName,\n\tparent.szDescription as ParentDesc\nfrom\n\tdigaportal.oa_organization tab\nleft join digaportal.oa_organization parent on\n\ttab.szParentOrgID = parent.iOrgID\nleft join digaportal.gn_valueref valRef on\n\ttab.iOrgCatID = valRef.iValueRefID\nleft join digaportal.gn_valueref parRef on\n\tparent.iOrgCatID = parRef.iValueRefID\norder by\n\ttab.iOrgID\n`;\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 300,
-        "y": 300,
-        "wires": [
-            [
-                "39b354d40ed8a1be"
-            ]
-        ]
-    },
-    {
-        "id": "39b354d40ed8a1be",
-        "type": "mysql2",
-        "z": "35d2cc8d792ddb2a",
-        "name": "",
-        "server": "9dc2644ec5b51cb2",
-        "bind": "",
-        "topic": "",
-        "x": 300,
-        "y": 340,
-        "wires": [
-            [
-                "99053d0de0ebc04b"
-            ]
-        ]
-    },
-    {
-        "id": "c6797d015f1c1a35",
-        "type": "debug",
-        "z": "35d2cc8d792ddb2a",
-        "name": "debug 3",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 520,
-        "y": 380,
-        "wires": []
-    },
-    {
-        "id": "99053d0de0ebc04b",
-        "type": "function",
-        "z": "35d2cc8d792ddb2a",
-        "name": "function 3",
-        "func": "let root = msg.payload.filter(x => x.ParentID === null);;\nlet rs = [];\nroot.forEach(x => {\n    rs.push({\n        id: x.iOrgID,\n        name: x.ChildName.toUpperCase(),\n        desc: x.ChildDesc,\n        category: x.cCategory.toUpperCase(),\n        children: getChildren(msg.payload, x.iOrgID)\n    });\n});\nmsg.payload = rs;\nreturn msg;\n\nfunction getChildren(data, parentID) {\n    let result = [];\n    for (let i = 0; i < data.length; i++) {\n        let item = data[i];\n        if (item.ParentID === parentID) {\n            result.push({\n                id: item.iOrgID,\n                name: item.ChildName.toUpperCase(),\n                desc: item.ChildDesc,\n                category: (item.cCategory.toUpperCase().includes(\"ROAD\")) ? \"ROAD\" : item.cCategory.toUpperCase(),\n                children: (data.some(x => x.ParentID === parentID)) ? getChildren(data, item.iOrgID) : null\n            })\n        }\n    }\n    return result;\n}\n\n// function getChildren(data, parentID) {\n//     let result = [];\n//     for (let i = 0; i < data.length; i++) {\n//         let item = data[i];\n//         if (item.ParentID === parentID) {\n//             result.push({\n//                 id: item.iOrgID,\n//                 name: item.ChildName.toUpperCase(),\n//                 desc: item.ChildDesc,\n//                 category: (item.cCategory.toUpperCase().includes(\"ROAD\")) ? \"ROAD\" : item.cCategory.toUpperCase(),\n//                 children: (data.some(x => x.ParentID === parentID)) ? getChildren(data.filter(x => x.ParentID === parentID), item.iOrgID) : null\n//             })\n//         }\n//     }\n//     return result;\n// }",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 300,
-        "y": 380,
-        "wires": [
-            [
-                "c6797d015f1c1a35"
-            ]
-        ]
-    },
-    {
-        "id": "9a395cb0556025f3",
-        "type": "inject",
-        "z": "35d2cc8d792ddb2a",
-        "name": "",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 120,
-        "y": 300,
-        "wires": [
-            [
-                "5b4debb4c819653b"
-            ]
-        ]
-    },
-    {
-        "id": "5074b4b5d2488f4c",
-        "type": "function",
-        "z": "35d2cc8d792ddb2a",
-        "name": "set query",
-        "func": "msg.topic = `\nselect\n\tszValueRef as label,\n\tszValueRefDescription as description,\n\tszCategory as category,\n\tszCategory2 as category2,\n\tszCategory3 as category3,\n\tszCategory4 as category4,\n\tszCategory5 as category5\nfrom\n\tgn_valueref gv\norder by\n\tszCategory,\n\tszCategory2,\n\tszCategory3,\n\tszCategory4,\n\tszCategory5\n`;\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 300,
-        "y": 460,
-        "wires": [
-            [
-                "53b9204cb4d470b1"
-            ]
-        ]
-    },
-    {
-        "id": "53b9204cb4d470b1",
-        "type": "mysql2",
-        "z": "35d2cc8d792ddb2a",
-        "name": "",
-        "server": "9dc2644ec5b51cb2",
-        "bind": "",
-        "topic": "",
-        "x": 300,
-        "y": 500,
-        "wires": [
-            [
-                "a78e0a347e852e3d"
-            ]
-        ]
-    },
-    {
-        "id": "d616f6a00d4a5f6d",
-        "type": "debug",
-        "z": "35d2cc8d792ddb2a",
-        "name": "debug 4",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 520,
-        "y": 540,
-        "wires": []
-    },
-    {
-        "id": "a78e0a347e852e3d",
-        "type": "function",
-        "z": "35d2cc8d792ddb2a",
-        "name": "function 4",
-        "func": "\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 300,
-        "y": 540,
-        "wires": [
-            [
-                "d616f6a00d4a5f6d"
-            ]
-        ]
-    },
-    {
-        "id": "5270905cc4ac9962",
-        "type": "inject",
-        "z": "35d2cc8d792ddb2a",
-        "name": "",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 120,
-        "y": 460,
-        "wires": [
-            [
-                "5074b4b5d2488f4c"
-            ]
-        ]
-    },
-    {
         "id": "9ae2b5c84660f97f",
         "type": "inject",
         "z": "bf22cd3c7ed55a35",
@@ -6371,1143 +5874,6 @@
         ]
     },
     {
-        "id": "3653f1b59ac43d23",
-        "type": "function",
-        "z": "2e56a74c132aeaaf",
-        "name": "Set query ",
-        "func": "let payload = JSON.parse(msg.payload);\nmsg.isValid = false;\nif (payload.data) {\n    msg.isValid = true;\n    msg.payload = payload;\n}\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 460,
-        "y": 180,
-        "wires": [
-            [
-                "7510047f37bdee05"
-            ]
-        ]
-    },
-    {
-        "id": "ce895a4cf9597e04",
-        "type": "http request",
-        "z": "2e56a74c132aeaaf",
-        "name": "Hino get vehiclepositions",
-        "method": "GET",
-        "ret": "txt",
-        "paytoqs": "ignore",
-        "url": "https://api-sandbox.hino.co.id/hmsi/hmsi-std-api/vehiclepositions?size=2000",
-        "tls": "",
-        "persist": false,
-        "proxy": "",
-        "insecureHTTPParser": false,
-        "authType": "bearer",
-        "senderr": false,
-        "headers": [
-            {
-                "keyType": "other",
-                "keyValue": "X-IBM-Client-Id",
-                "valueType": "other",
-                "valueValue": "6823e121-a1ec-4fff-8711-b5c18486b57b"
-            },
-            {
-                "keyType": "other",
-                "keyValue": "accept",
-                "valueType": "other",
-                "valueValue": "application/json"
-            }
-        ],
-        "x": 410,
-        "y": 140,
-        "wires": [
-            [
-                "3653f1b59ac43d23"
-            ]
-        ]
-    },
-    {
-        "id": "e1509d66ddce4f68",
-        "type": "function",
-        "z": "2e56a74c132aeaaf",
-        "name": "function 12",
-        "func": "msg.payload = {\n    grant_type: 'client_credentials'\n}\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 370,
-        "y": 100,
-        "wires": [
-            [
-                "ce895a4cf9597e04"
-            ]
-        ]
-    },
-    {
-        "id": "b54662cce8df2b14",
-        "type": "debug",
-        "z": "2e56a74c132aeaaf",
-        "name": "debug 17",
-        "active": false,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 1240,
-        "y": 180,
-        "wires": []
-    },
-    {
-        "id": "64aa3dd0a5ed610e",
-        "type": "catch",
-        "z": "2e56a74c132aeaaf",
-        "name": "",
-        "scope": [
-            "3653f1b59ac43d23",
-            "ce895a4cf9597e04",
-            "e1509d66ddce4f68",
-            "29fcbcf1031024cb",
-            "2d1679d174ec0ca8",
-            "4d4789372c0b02b2",
-            "a3cf852138203866",
-            "7e902022fa305aeb"
-        ],
-        "uncaught": false,
-        "x": 1050,
-        "y": 40,
-        "wires": [
-            [
-                "6640ae2f60f53b0c"
-            ]
-        ]
-    },
-    {
-        "id": "5752655b2f043898",
-        "type": "inject",
-        "z": "2e56a74c132aeaaf",
-        "name": "",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 120,
-        "y": 140,
-        "wires": [
-            [
-                "e1509d66ddce4f68"
-            ]
-        ]
-    },
-    {
-        "id": "7510047f37bdee05",
-        "type": "switch",
-        "z": "2e56a74c132aeaaf",
-        "name": "",
-        "property": "isValid",
-        "propertyType": "msg",
-        "rules": [
-            {
-                "t": "true"
-            },
-            {
-                "t": "false"
-            }
-        ],
-        "checkall": "true",
-        "repair": false,
-        "outputs": 2,
-        "x": 470,
-        "y": 220,
-        "wires": [
-            [
-                "b4f97edae7789e18",
-                "b7ad417b24957447"
-            ],
-            [
-                "666488dda2f67f77"
-            ]
-        ]
-    },
-    {
-        "id": "666488dda2f67f77",
-        "type": "function",
-        "z": "2e56a74c132aeaaf",
-        "name": "function 23",
-        "func": "msg.payload = JSON.parse(msg.payload);\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 690,
-        "y": 340,
-        "wires": [
-            [
-                "b54662cce8df2b14"
-            ]
-        ]
-    },
-    {
-        "id": "a4b12276bbdddc5e",
-        "type": "inject",
-        "z": "2e56a74c132aeaaf",
-        "name": "",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 120,
-        "y": 980,
-        "wires": [
-            [
-                "21b07d215dbdd4fe"
-            ]
-        ]
-    },
-    {
-        "id": "3fd4fae1e0a969d5",
-        "type": "debug",
-        "z": "2e56a74c132aeaaf",
-        "name": "debug 23",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 660,
-        "y": 1020,
-        "wires": []
-    },
-    {
-        "id": "21b07d215dbdd4fe",
-        "type": "function",
-        "z": "2e56a74c132aeaaf",
-        "name": "function 24",
-        "func": "msg.payload = [\"hino:speed\", \n    1681903255000, 31,\n    \"LABELS\", \"vim\", \"MJEC1JG43N5201104\",\n    \"vehicleStatus\", \"OFF\"\n]\nmsg.topic = null\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 330,
-        "y": 980,
-        "wires": [
-            [
-                "ecd11c5d24bfe791"
-            ]
-        ]
-    },
-    {
-        "id": "ecd11c5d24bfe791",
-        "type": "redis-command",
-        "z": "2e56a74c132aeaaf",
-        "server": "3cc67d60c90e6c5d",
-        "command": "TS.ADD",
-        "name": "",
-        "topic": "",
-        "params": "[]",
-        "paramsType": "json",
-        "payloadType": "json",
-        "block": false,
-        "x": 340,
-        "y": 1020,
-        "wires": [
-            [
-                "3fd4fae1e0a969d5"
-            ]
-        ]
-    },
-    {
-        "id": "29fcbcf1031024cb",
-        "type": "redis-command",
-        "z": "2e56a74c132aeaaf",
-        "server": "3cc67d60c90e6c5d",
-        "command": "TS.ADD",
-        "name": "",
-        "topic": "",
-        "params": "[]",
-        "paramsType": "json",
-        "payloadType": "json",
-        "block": false,
-        "x": 880,
-        "y": 280,
-        "wires": [
-            [
-                "4bade8d3bb8a63aa"
-            ]
-        ]
-    },
-    {
-        "id": "0252672c8a320eef",
-        "type": "change",
-        "z": "2e56a74c132aeaaf",
-        "name": "",
-        "rules": [
-            {
-                "t": "set",
-                "p": "topic",
-                "pt": "msg",
-                "to": "null",
-                "tot": "jsonata"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 870,
-        "y": 240,
-        "wires": [
-            [
-                "29fcbcf1031024cb"
-            ]
-        ]
-    },
-    {
-        "id": "a5dbf084af25a58b",
-        "type": "split",
-        "z": "2e56a74c132aeaaf",
-        "name": "",
-        "splt": "\\n",
-        "spltType": "str",
-        "arraySplt": 1,
-        "arraySpltType": "len",
-        "stream": false,
-        "addname": "",
-        "x": 670,
-        "y": 280,
-        "wires": [
-            [
-                "0252672c8a320eef"
-            ]
-        ]
-    },
-    {
-        "id": "6640ae2f60f53b0c",
-        "type": "debug",
-        "z": "2e56a74c132aeaaf",
-        "name": "debug 24",
-        "active": true,
-        "tosidebar": true,
-        "console": true,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 1250,
-        "y": 40,
-        "wires": []
-    },
-    {
-        "id": "4bade8d3bb8a63aa",
-        "type": "join",
-        "z": "2e56a74c132aeaaf",
-        "name": "",
-        "mode": "auto",
-        "build": "object",
-        "property": "payload",
-        "propertyType": "msg",
-        "key": "topic",
-        "joiner": "\\n",
-        "joinerType": "str",
-        "accumulate": "false",
-        "timeout": "",
-        "count": "",
-        "reduceRight": false,
-        "x": 1050,
-        "y": 280,
-        "wires": [
-            [
-                "b54662cce8df2b14"
-            ]
-        ]
-    },
-    {
-        "id": "a02a5998c93e9f87",
-        "type": "function",
-        "z": "2e56a74c132aeaaf",
-        "name": "function 25",
-        "func": "msg.payload = [\"gps_tracking_data\", 1647150000, 1647160000]\nmsg.topic = null;\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 330,
-        "y": 1060,
-        "wires": [
-            [
-                "82dabd8ab6cdd216"
-            ]
-        ]
-    },
-    {
-        "id": "82dabd8ab6cdd216",
-        "type": "redis-command",
-        "z": "2e56a74c132aeaaf",
-        "server": "0fb96b870afb5c15",
-        "command": "ZRANGEBYSCORE",
-        "name": "",
-        "topic": "",
-        "params": "[]",
-        "paramsType": "json",
-        "payloadType": "json",
-        "block": false,
-        "x": 370,
-        "y": 1100,
-        "wires": [
-            [
-                "7e1da47f1b4f2f55"
-            ]
-        ]
-    },
-    {
-        "id": "19c16317cdfbf697",
-        "type": "inject",
-        "z": "2e56a74c132aeaaf",
-        "name": "",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 120,
-        "y": 1060,
-        "wires": [
-            [
-                "a02a5998c93e9f87"
-            ]
-        ]
-    },
-    {
-        "id": "7e1da47f1b4f2f55",
-        "type": "debug",
-        "z": "2e56a74c132aeaaf",
-        "name": "debug 25",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 600,
-        "y": 1100,
-        "wires": []
-    },
-    {
-        "id": "b7ad417b24957447",
-        "type": "function",
-        "z": "2e56a74c132aeaaf",
-        "name": "Set query ",
-        "func": "let payload = msg.payload;\nlet params = [];\npayload.data.forEach(x => {\n    if (x.vin && x.positionDateTime) {\n        let time = new Date(x.positionDateTime).getTime();\n        let status = -1;\n        if(x.vehicleStatus === 'OFF') status = 0;\n        else if(x.vehicleStatus === 'MOVING') status = 1;\n        else if(x.vehicleStatus === 'IDLE') status = 2;\n\n        params.push([`${x.vin}:vehicleStatus`, time, status,\n            \"DUPLICATE_POLICY\", \"LAST\", \"LABELS\", \"vin\", x.vin]);\n        params.push([`${x.vin}:altitude`, time, (x.altitude) ? x.altitude : 0,\n            \"DUPLICATE_POLICY\", \"LAST\",\"LABELS\", \"vin\", x.vin]);\n        params.push([`${x.vin}:odometer`, time, (x.odometer) ? x.odometer : 0,\n            \"DUPLICATE_POLICY\", \"LAST\",\"LABELS\", \"vin\", x.vin]);\n        params.push([`${x.vin}:engineHours`, time, (x.engineHours) ? x.engineHours : 0,\n            \"DUPLICATE_POLICY\", \"LAST\",\"LABELS\", \"vin\", x.vin]);\n        params.push([`${x.vin}:latitude`, time, (x.latitude) ? x.latitude : 0,\n            \"DUPLICATE_POLICY\", \"LAST\",\"LABELS\", \"vin\", x.vin]);\n        params.push([`${x.vin}:longitude`, time, (x.longitude) ? x.longitude : 0,\n            \"DUPLICATE_POLICY\", \"LAST\",\"LABELS\", \"vin\", x.vin]);\n        params.push([`${x.vin}:heading`, time, (x.heading) ? x.heading : 0,\n            \"DUPLICATE_POLICY\", \"LAST\",\"LABELS\", \"vin\", x.vin]);\n        params.push([`${x.vin}:speed`, time, (x.speed) ? x.speed : 0,\n            \"DUPLICATE_POLICY\", \"LAST\",\"LABELS\", \"vin\", x.vin]);\n    }\n});\nmsg.payload = params;\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 680,
-        "y": 240,
-        "wires": [
-            [
-                "a5dbf084af25a58b"
-            ]
-        ]
-    },
-    {
-        "id": "f3462a98979cea3f",
-        "type": "cronplus",
-        "z": "2e56a74c132aeaaf",
-        "d": true,
-        "name": "",
-        "outputField": "payload",
-        "timeZone": "",
-        "persistDynamic": false,
-        "commandResponseMsgOutput": "output1",
-        "outputs": 1,
-        "options": [
-            {
-                "name": "schedule1",
-                "topic": "topic1",
-                "payloadType": "default",
-                "payload": "",
-                "expressionType": "cron",
-                "expression": "0 */5 * * * * *",
-                "location": "",
-                "offset": "0",
-                "solarType": "all",
-                "solarEvents": "sunrise,sunset"
-            }
-        ],
-        "x": 120,
-        "y": 100,
-        "wires": [
-            [
-                "e1509d66ddce4f68"
-            ]
-        ]
-    },
-    {
-        "id": "b4f97edae7789e18",
-        "type": "function",
-        "z": "2e56a74c132aeaaf",
-        "name": "Insert query ",
-        "func": "let payload = msg.payload;\nmsg.data = payload;\nlet query = `INSERT INTO smart.hino_vehicle_position \n        (vin, vehicleStatus, odometer, engineHours, longitude, heading, speed, \n        positionDateTime, createdDateTime, latitude, altitude) VALUES`;\nlet params = [];\npayload.data.forEach(x => {\n    let datePosition = (x.positionDateTime) ? `STR_TO_DATE('${x.positionDateTime}','%Y-%m-%dT%H:%i:%sZ')` : null;\n    let dateCreated = (x.createdDateTime) ? `STR_TO_DATE('${x.createdDateTime}','%Y-%m-%dT%H:%i:%sZ')` : null;\n    let item = `('${x.vin}', '${x.vehicleStatus}', ${x.odometer}, ${x.engineHours}, ${x.longitude}, \n                ${x.heading}, ${x.speed}, ${datePosition}, ${dateCreated}, ${x.latitude}, \n                ${x.altitude})`;\n    params.push(item.replace(/\\n/gm, \" \"));\n});\nquery = query.replace(/\\n/gm, \" \");\nquery = query + ' ' + params.join(', ');\nmsg.params = params;\nmsg.payload = null;\nmsg.topic = query;\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 690,
-        "y": 140,
-        "wires": [
-            [
-                "2e42cb81b2dd6771"
-            ]
-        ]
-    },
-    {
-        "id": "2e42cb81b2dd6771",
-        "type": "mysql2",
-        "z": "2e56a74c132aeaaf",
-        "name": "",
-        "server": "9dc2644ec5b51cb2",
-        "bind": "",
-        "topic": "",
-        "x": 680,
-        "y": 180,
-        "wires": [
-            [
-                "b54662cce8df2b14"
-            ]
-        ]
-    },
-    {
-        "id": "9be52a1337887cb9",
-        "type": "cronplus",
-        "z": "2e56a74c132aeaaf",
-        "d": true,
-        "name": "",
-        "outputField": "payload",
-        "timeZone": "",
-        "persistDynamic": false,
-        "commandResponseMsgOutput": "output1",
-        "outputs": 1,
-        "options": [
-            {
-                "name": "schedule1",
-                "topic": "topic1",
-                "payloadType": "default",
-                "payload": "",
-                "expressionType": "cron",
-                "expression": "0 0 */1 * * * *",
-                "location": "",
-                "offset": "0",
-                "solarType": "all",
-                "solarEvents": "sunrise,sunset"
-            }
-        ],
-        "x": 120,
-        "y": 420,
-        "wires": [
-            [
-                "58d1c513d8d29371"
-            ]
-        ]
-    },
-    {
-        "id": "b9dacb1caeda7b7a",
-        "type": "inject",
-        "z": "2e56a74c132aeaaf",
-        "name": "",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 120,
-        "y": 460,
-        "wires": [
-            [
-                "58d1c513d8d29371"
-            ]
-        ]
-    },
-    {
-        "id": "58d1c513d8d29371",
-        "type": "function",
-        "z": "2e56a74c132aeaaf",
-        "name": "function 30",
-        "func": "msg.payload = {\n    grant_type: 'client_credentials'\n}\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 370,
-        "y": 420,
-        "wires": [
-            [
-                "a3cf852138203866"
-            ]
-        ]
-    },
-    {
-        "id": "a3cf852138203866",
-        "type": "http request",
-        "z": "2e56a74c132aeaaf",
-        "name": "Hino get vehicles",
-        "method": "GET",
-        "ret": "txt",
-        "paytoqs": "ignore",
-        "url": "https://api-sandbox.hino.co.id/hmsi/hmsi-std-api/vehicles?size=2000",
-        "tls": "",
-        "persist": false,
-        "proxy": "",
-        "insecureHTTPParser": false,
-        "authType": "bearer",
-        "senderr": false,
-        "headers": [
-            {
-                "keyType": "other",
-                "keyValue": "X-IBM-Client-Id",
-                "valueType": "other",
-                "valueValue": "6823e121-a1ec-4fff-8711-b5c18486b57b"
-            },
-            {
-                "keyType": "other",
-                "keyValue": "accept",
-                "valueType": "other",
-                "valueValue": "application/json"
-            }
-        ],
-        "x": 390,
-        "y": 460,
-        "wires": [
-            [
-                "7e902022fa305aeb"
-            ]
-        ]
-    },
-    {
-        "id": "ece565574deb460b",
-        "type": "debug",
-        "z": "2e56a74c132aeaaf",
-        "name": "debug 28",
-        "active": false,
-        "tosidebar": true,
-        "console": true,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 1050,
-        "y": 460,
-        "wires": []
-    },
-    {
-        "id": "7e902022fa305aeb",
-        "type": "function",
-        "z": "2e56a74c132aeaaf",
-        "name": "Set query ",
-        "func": "let payload = JSON.parse(msg.payload);\nmsg.isValid = false;\nif (payload.data) {\n    msg.isValid = true;\n    msg.payload = payload;\n}\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 620,
-        "y": 420,
-        "wires": [
-            [
-                "6d20e612113dd4ac"
-            ]
-        ]
-    },
-    {
-        "id": "6d20e612113dd4ac",
-        "type": "switch",
-        "z": "2e56a74c132aeaaf",
-        "name": "",
-        "property": "isValid",
-        "propertyType": "msg",
-        "rules": [
-            {
-                "t": "true"
-            },
-            {
-                "t": "false"
-            }
-        ],
-        "checkall": "true",
-        "repair": false,
-        "outputs": 2,
-        "x": 630,
-        "y": 460,
-        "wires": [
-            [
-                "2d1679d174ec0ca8"
-            ],
-            [
-                "4dfc392dbc71f985"
-            ]
-        ]
-    },
-    {
-        "id": "4dfc392dbc71f985",
-        "type": "function",
-        "z": "2e56a74c132aeaaf",
-        "name": "function 31",
-        "func": "msg.payload = JSON.parse(msg.payload);\ndelete msg.headers;\ndelete msg.headers;\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 830,
-        "y": 520,
-        "wires": [
-            [
-                "ece565574deb460b"
-            ]
-        ]
-    },
-    {
-        "id": "2d1679d174ec0ca8",
-        "type": "function",
-        "z": "2e56a74c132aeaaf",
-        "name": "Insert query ",
-        "func": "let payload = msg.payload;\nmsg.data = payload;\nlet query = `INSERT INTO smart.hino_vehicles (vin, plate, name, imei, brand, type, model) VALUES`;\nlet params = [];\npayload.data.forEach(x => {\n    let item = `('${x.vin}', '${x.plate}', '${x.name}', '${x.imei}', '${x.brand}', \n                '${x.type}', '${x.model}')`;\n    params.push(item.replace(/\\n/gm, \" \"));\n});\nquery = query.replace(/\\n/gm, \" \");\nquery = query + ' ' + params.join(', ');\nmsg.params = params;\nmsg.payload = null;\nmsg.topic = query;\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 830,
-        "y": 420,
-        "wires": [
-            [
-                "4d4789372c0b02b2"
-            ]
-        ]
-    },
-    {
-        "id": "4d4789372c0b02b2",
-        "type": "mysql2",
-        "z": "2e56a74c132aeaaf",
-        "name": "",
-        "server": "9dc2644ec5b51cb2",
-        "bind": "",
-        "topic": "",
-        "x": 820,
-        "y": 460,
-        "wires": [
-            [
-                "ece565574deb460b"
-            ]
-        ]
-    },
-    {
-        "id": "d65341bcc093ea69",
-        "type": "function",
-        "z": "2e56a74c132aeaaf",
-        "name": "Set query ",
-        "func": "let payload = JSON.parse(msg.payload);\nmsg.isValid = false;\nif (payload.data) {\n    msg.isValid = true;\n    msg.payload = payload;\n}\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 460,
-        "y": 660,
-        "wires": [
-            [
-                "b580bd52b036db83",
-                "aac3c124176255ee"
-            ]
-        ]
-    },
-    {
-        "id": "e4aef73602e177eb",
-        "type": "http request",
-        "z": "2e56a74c132aeaaf",
-        "name": "Hino get vehiclepositions",
-        "method": "GET",
-        "ret": "txt",
-        "paytoqs": "ignore",
-        "url": "https://api-sandbox.hino.co.id/hmsi/hmsi-std-api/v2/vehiclepositions",
-        "tls": "",
-        "persist": false,
-        "proxy": "",
-        "insecureHTTPParser": false,
-        "authType": "bearer",
-        "senderr": false,
-        "headers": [
-            {
-                "keyType": "other",
-                "keyValue": "X-IBM-Client-Id",
-                "valueType": "other",
-                "valueValue": "6823e121-a1ec-4fff-8711-b5c18486b57b"
-            },
-            {
-                "keyType": "other",
-                "keyValue": "accept",
-                "valueType": "other",
-                "valueValue": "application/json"
-            }
-        ],
-        "x": 410,
-        "y": 620,
-        "wires": [
-            [
-                "d65341bcc093ea69"
-            ]
-        ]
-    },
-    {
-        "id": "f40a283f15f93708",
-        "type": "function",
-        "z": "2e56a74c132aeaaf",
-        "name": "function 34",
-        "func": "msg.payload = {\n    grant_type: 'client_credentials'\n}\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 370,
-        "y": 580,
-        "wires": [
-            [
-                "e4aef73602e177eb"
-            ]
-        ]
-    },
-    {
-        "id": "11ceb0b05dae2fd5",
-        "type": "debug",
-        "z": "2e56a74c132aeaaf",
-        "name": "debug 29",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 900,
-        "y": 700,
-        "wires": []
-    },
-    {
-        "id": "88d5df66e6e4b4ba",
-        "type": "inject",
-        "z": "2e56a74c132aeaaf",
-        "name": "",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 120,
-        "y": 620,
-        "wires": [
-            [
-                "f40a283f15f93708"
-            ]
-        ]
-    },
-    {
-        "id": "85fc722ab15c6ffb",
-        "type": "cronplus",
-        "z": "2e56a74c132aeaaf",
-        "d": true,
-        "name": "",
-        "outputField": "payload",
-        "timeZone": "",
-        "persistDynamic": false,
-        "commandResponseMsgOutput": "output1",
-        "outputs": 1,
-        "options": [
-            {
-                "name": "schedule1",
-                "topic": "topic1",
-                "payloadType": "default",
-                "payload": "",
-                "expressionType": "cron",
-                "expression": "0 */5 * * * * *",
-                "location": "",
-                "offset": "0",
-                "solarType": "all",
-                "solarEvents": "sunrise,sunset"
-            }
-        ],
-        "x": 120,
-        "y": 580,
-        "wires": [
-            [
-                "f40a283f15f93708"
-            ]
-        ]
-    },
-    {
-        "id": "8cc3e34655ae207a",
-        "type": "cronplus",
-        "z": "2e56a74c132aeaaf",
-        "d": true,
-        "name": "",
-        "outputField": "payload",
-        "timeZone": "",
-        "persistDynamic": false,
-        "commandResponseMsgOutput": "output1",
-        "outputs": 1,
-        "options": [
-            {
-                "name": "schedule1",
-                "topic": "topic1",
-                "payloadType": "default",
-                "payload": "",
-                "expressionType": "cron",
-                "expression": "0 0 */1 * * * *",
-                "location": "",
-                "offset": "0",
-                "solarType": "all",
-                "solarEvents": "sunrise,sunset"
-            }
-        ],
-        "x": 120,
-        "y": 840,
-        "wires": [
-            [
-                "25d3f50aa7177ee7"
-            ]
-        ]
-    },
-    {
-        "id": "394702c5ec3d9881",
-        "type": "inject",
-        "z": "2e56a74c132aeaaf",
-        "name": "",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 120,
-        "y": 880,
-        "wires": [
-            [
-                "25d3f50aa7177ee7"
-            ]
-        ]
-    },
-    {
-        "id": "25d3f50aa7177ee7",
-        "type": "function",
-        "z": "2e56a74c132aeaaf",
-        "name": "function 36",
-        "func": "msg.payload = {\n    grant_type: 'client_credentials'\n}\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 370,
-        "y": 840,
-        "wires": [
-            [
-                "168fbfa298ff7f6c"
-            ]
-        ]
-    },
-    {
-        "id": "168fbfa298ff7f6c",
-        "type": "http request",
-        "z": "2e56a74c132aeaaf",
-        "name": "Hino get vehicles",
-        "method": "GET",
-        "ret": "txt",
-        "paytoqs": "ignore",
-        "url": "https://api-sandbox.hino.co.id/hmsi/hmsi-std-api/vehicles?size=2000",
-        "tls": "",
-        "persist": false,
-        "proxy": "",
-        "insecureHTTPParser": false,
-        "authType": "bearer",
-        "senderr": false,
-        "headers": [
-            {
-                "keyType": "other",
-                "keyValue": "X-IBM-Client-Id",
-                "valueType": "other",
-                "valueValue": "6823e121-a1ec-4fff-8711-b5c18486b57b"
-            },
-            {
-                "keyType": "other",
-                "keyValue": "accept",
-                "valueType": "other",
-                "valueValue": "application/json"
-            }
-        ],
-        "x": 390,
-        "y": 880,
-        "wires": [
-            [
-                "5e9ec7f910fd338c"
-            ]
-        ]
-    },
-    {
-        "id": "5e9ec7f910fd338c",
-        "type": "debug",
-        "z": "2e56a74c132aeaaf",
-        "name": "debug 30",
-        "active": false,
-        "tosidebar": true,
-        "console": true,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 690,
-        "y": 880,
-        "wires": []
-    },
-    {
-        "id": "b580bd52b036db83",
-        "type": "function",
-        "z": "2e56a74c132aeaaf",
-        "name": "Insert query ",
-        "func": "let payload = msg.payload;\nmsg.data = payload;\nlet query = `INSERT INTO smart.hino_vehicle_position_v2 \n        (vin, vehicleStatus, odometer, engineHours, longitude, heading, speed, \n        positionDateTime, createdDateTime, latitude, altitude, provinceName) VALUES`;\nlet params = [];\npayload.data.forEach(x => {\n    let datePosition = (x.positiondatetime) ? `STR_TO_DATE('${x.positiondatetime}','%Y-%m-%dT%H:%i:%sZ')` : null;\n    let dateCreated = (x.createddatetime) ? `STR_TO_DATE('${x.createddatetime}','%Y-%m-%dT%H:%i:%sZ')` : null;\n    // let printedTimezone = (x.printed_timezone) ? `STR_TO_DATE('${x.printed_timezone}','%Y-%m-%dT%H:%i:%sZ')` : null;\n    let item = `('${x.vin}', '${x.vehiclestatus}', ${x.odometer}, ${x.enginehours}, ${x.longitude}, \n                ${x.heading}, ${x.speed}, ${datePosition}, ${dateCreated}, ${x.latitude}, \n                ${x.altitude}, ${x.province_name})`;\n    params.push(item.replace(/\\n/gm, \" \"));\n});\nquery = query.replace(/\\n/gm, \" \");\nquery = query + ' ' + params.join(', ');\nmsg.params = params;\nmsg.payload = null;\nmsg.topic = query;\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 670,
-        "y": 660,
-        "wires": [
-            [
-                "3fb94211bde8c0ca"
-            ]
-        ]
-    },
-    {
-        "id": "3fb94211bde8c0ca",
-        "type": "mysql2",
-        "z": "2e56a74c132aeaaf",
-        "name": "",
-        "server": "9dc2644ec5b51cb2",
-        "bind": "",
-        "topic": "",
-        "x": 660,
-        "y": 700,
-        "wires": [
-            [
-                "11ceb0b05dae2fd5"
-            ]
-        ]
-    },
-    {
-        "id": "aac3c124176255ee",
-        "type": "debug",
-        "z": "2e56a74c132aeaaf",
-        "name": "debug 31",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 660,
-        "y": 760,
-        "wires": []
-    },
-    {
         "id": "3481a142ffe4728a",
         "type": "http in",
         "z": "2e56a74c132aeaaf",
@@ -7516,8 +5882,8 @@
         "method": "post",
         "upload": false,
         "swaggerDoc": "",
-        "x": 160,
-        "y": 1180,
+        "x": 180,
+        "y": 60,
         "wires": [
             [
                 "5d1d1785d97cfd03"
@@ -7536,8 +5902,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 480,
-        "y": 1180,
+        "x": 500,
+        "y": 60,
         "wires": [
             [
                 "68959d8ccd71ba7e"
@@ -7562,8 +5928,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 490,
-        "y": 1220,
+        "x": 510,
+        "y": 100,
         "wires": [
             [
                 "8eb99b916ce6d2fc"
@@ -7572,17 +5938,6 @@
                 "2d1f4e2d4f03cdb2"
             ]
         ]
-    },
-    {
-        "id": "2d1f4e2d4f03cdb2",
-        "type": "http response",
-        "z": "2e56a74c132aeaaf",
-        "name": "",
-        "statusCode": "400",
-        "headers": {},
-        "x": 680,
-        "y": 1300,
-        "wires": []
     },
     {
         "id": "8eb99b916ce6d2fc",
@@ -7596,8 +5951,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 700,
-        "y": 1180,
+        "x": 720,
+        "y": 60,
         "wires": [
             [
                 "b53e64d5921eb2a0"
@@ -7605,12 +5960,23 @@
         ]
     },
     {
+        "id": "2d1f4e2d4f03cdb2",
+        "type": "http response",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "statusCode": "400",
+        "headers": {},
+        "x": 700,
+        "y": 180,
+        "wires": []
+    },
+    {
         "id": "b53e64d5921eb2a0",
         "type": "subflow:d7ccf53b2b9fe097",
         "z": "2e56a74c132aeaaf",
         "name": "",
-        "x": 740,
-        "y": 1220,
+        "x": 760,
+        "y": 100,
         "wires": [
             [
                 "3b0178327882674b"
@@ -7629,8 +5995,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 790,
-        "y": 1260,
+        "x": 810,
+        "y": 140,
         "wires": [
             [
                 "111064bac481c50d"
@@ -7644,8 +6010,8 @@
         "name": "",
         "statusCode": "200",
         "headers": {},
-        "x": 960,
-        "y": 1260,
+        "x": 980,
+        "y": 140,
         "wires": []
     },
     {
@@ -7657,8 +6023,8 @@
         "method": "post",
         "upload": false,
         "swaggerDoc": "",
-        "x": 190,
-        "y": 1380,
+        "x": 210,
+        "y": 260,
         "wires": [
             [
                 "55ab8873929c560e"
@@ -7677,8 +6043,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 480,
-        "y": 1380,
+        "x": 500,
+        "y": 260,
         "wires": [
             [
                 "0ac883d7aebc8035"
@@ -7703,8 +6069,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 490,
-        "y": 1420,
+        "x": 510,
+        "y": 300,
         "wires": [
             [
                 "1b30919edbf12a6b"
@@ -7726,8 +6092,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 730,
-        "y": 1380,
+        "x": 750,
+        "y": 260,
         "wires": [
             [
                 "5bb6c04558e2a4d6"
@@ -7741,8 +6107,8 @@
         "name": "",
         "statusCode": "400",
         "headers": {},
-        "x": 680,
-        "y": 1500,
+        "x": 700,
+        "y": 380,
         "wires": []
     },
     {
@@ -7750,8 +6116,8 @@
         "type": "subflow:d7ccf53b2b9fe097",
         "z": "2e56a74c132aeaaf",
         "name": "",
-        "x": 740,
-        "y": 1420,
+        "x": 760,
+        "y": 300,
         "wires": [
             [
                 "96cfaf331bb8bed0"
@@ -7770,8 +6136,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 790,
-        "y": 1460,
+        "x": 810,
+        "y": 340,
         "wires": [
             [
                 "5907ac349973e246"
@@ -7785,42 +6151,9 @@
         "name": "",
         "statusCode": "200",
         "headers": {},
-        "x": 960,
-        "y": 1460,
+        "x": 980,
+        "y": 340,
         "wires": []
-    },
-    {
-        "id": "15be92f129517a7c",
-        "type": "function",
-        "z": "2e56a74c132aeaaf",
-        "name": "vehiclepositions-by-date",
-        "func": "let { type, vin, startkey, endkey } = msg.payload;\nlet view = 'hino-position-by-vin-date';\nif(type == 'vehicle') view = 'hino-vehicle-by-vin-date';\nmsg.sub = {\n    database: 'smart-bucket',\n    design: 'filter',\n    view,\n    key: null,\n    startkey: [vin, startkey],\n    endkey: [vin, endkey]\n}\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 690,
-        "y": 1580,
-        "wires": [
-            [
-                "c0caa60652aaf55a"
-            ]
-        ]
-    },
-    {
-        "id": "c0caa60652aaf55a",
-        "type": "subflow:d7ccf53b2b9fe097",
-        "z": "2e56a74c132aeaaf",
-        "name": "",
-        "x": 700,
-        "y": 1620,
-        "wires": [
-            [
-                "c81357b45bd12f3c"
-            ]
-        ]
     },
     {
         "id": "4e9e4288d8aa8420",
@@ -7831,8 +6164,8 @@
         "method": "post",
         "upload": false,
         "swaggerDoc": "",
-        "x": 170,
-        "y": 1580,
+        "x": 190,
+        "y": 460,
         "wires": [
             [
                 "5f26c7e45011f372"
@@ -7851,8 +6184,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 440,
-        "y": 1580,
+        "x": 460,
+        "y": 460,
         "wires": [
             [
                 "742976742322e249"
@@ -7877,14 +6210,58 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 450,
-        "y": 1620,
+        "x": 470,
+        "y": 500,
         "wires": [
             [
                 "15be92f129517a7c"
             ],
             [
                 "b80de8b64d322efa"
+            ]
+        ]
+    },
+    {
+        "id": "15be92f129517a7c",
+        "type": "function",
+        "z": "2e56a74c132aeaaf",
+        "name": "vehiclepositions-by-date",
+        "func": "let { type, vin, startkey, endkey } = msg.payload;\nlet view = 'hino-position-by-vin-date';\nif(type == 'vehicle') view = 'hino-vehicle-by-vin-date';\nmsg.sub = {\n    database: 'smart-bucket',\n    design: 'filter',\n    view,\n    key: null,\n    startkey: [vin, startkey],\n    endkey: [vin, endkey]\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 710,
+        "y": 460,
+        "wires": [
+            [
+                "c0caa60652aaf55a"
+            ]
+        ]
+    },
+    {
+        "id": "b80de8b64d322efa",
+        "type": "http response",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "statusCode": "400",
+        "headers": {},
+        "x": 660,
+        "y": 580,
+        "wires": []
+    },
+    {
+        "id": "c0caa60652aaf55a",
+        "type": "subflow:d7ccf53b2b9fe097",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "x": 720,
+        "y": 500,
+        "wires": [
+            [
+                "c81357b45bd12f3c"
             ]
         ]
     },
@@ -7900,8 +6277,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 750,
-        "y": 1660,
+        "x": 770,
+        "y": 540,
         "wires": [
             [
                 "f0e2c81202321666"
@@ -7915,53 +6292,9 @@
         "name": "",
         "statusCode": "200",
         "headers": {},
-        "x": 920,
-        "y": 1660,
+        "x": 940,
+        "y": 540,
         "wires": []
-    },
-    {
-        "id": "b80de8b64d322efa",
-        "type": "http response",
-        "z": "2e56a74c132aeaaf",
-        "name": "",
-        "statusCode": "400",
-        "headers": {},
-        "x": 640,
-        "y": 1700,
-        "wires": []
-    },
-    {
-        "id": "6227314bdcb4e657",
-        "type": "function",
-        "z": "2e56a74c132aeaaf",
-        "name": "function 57",
-        "func": "msg.sub = {\n    database: 'smart-bucket',\n    design: 'sort',\n    view: 'by-vin-positiondatetime',\n    key: null,\n    startkey: [msg.payload, {}],\n    endkey: [msg.payload],\n    limit: 1,\n    descending: true\n}\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 650,
-        "y": 1800,
-        "wires": [
-            [
-                "131a1cbfc433ca95"
-            ]
-        ]
-    },
-    {
-        "id": "131a1cbfc433ca95",
-        "type": "subflow:d7ccf53b2b9fe097",
-        "z": "2e56a74c132aeaaf",
-        "name": "",
-        "x": 680,
-        "y": 1840,
-        "wires": [
-            [
-                "b7beef6ff37fb02b"
-            ]
-        ]
     },
     {
         "id": "e196a92911d08688",
@@ -7972,8 +6305,8 @@
         "method": "get",
         "upload": false,
         "swaggerDoc": "",
-        "x": 170,
-        "y": 1820,
+        "x": 190,
+        "y": 700,
         "wires": [
             [
                 "2f8f9bba77106467"
@@ -7992,8 +6325,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 440,
-        "y": 1820,
+        "x": 460,
+        "y": 700,
         "wires": [
             [
                 "3dbf0cd28d2a3454"
@@ -8018,8 +6351,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 450,
-        "y": 1860,
+        "x": 470,
+        "y": 740,
         "wires": [
             [
                 "6227314bdcb4e657"
@@ -8030,26 +6363,48 @@
         ]
     },
     {
+        "id": "6227314bdcb4e657",
+        "type": "function",
+        "z": "2e56a74c132aeaaf",
+        "name": "function 57",
+        "func": "msg.sub = {\n    database: 'smart-bucket',\n    design: 'sort',\n    view: 'by-vin-positiondatetime',\n    key: null,\n    startkey: [msg.payload, {}],\n    endkey: [msg.payload],\n    limit: 1,\n    descending: true\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 670,
+        "y": 680,
+        "wires": [
+            [
+                "131a1cbfc433ca95"
+            ]
+        ]
+    },
+    {
         "id": "6f4f31e7bf67b9eb",
         "type": "http response",
         "z": "2e56a74c132aeaaf",
         "name": "",
         "statusCode": "400",
         "headers": {},
-        "x": 640,
-        "y": 1920,
+        "x": 660,
+        "y": 800,
         "wires": []
     },
     {
-        "id": "27395882df31bab2",
-        "type": "http response",
+        "id": "131a1cbfc433ca95",
+        "type": "subflow:d7ccf53b2b9fe097",
         "z": "2e56a74c132aeaaf",
         "name": "",
-        "statusCode": "200",
-        "headers": {},
-        "x": 900,
-        "y": 1880,
-        "wires": []
+        "x": 700,
+        "y": 720,
+        "wires": [
+            [
+                "b7beef6ff37fb02b"
+            ]
+        ]
     },
     {
         "id": "b7beef6ff37fb02b",
@@ -8063,13 +6418,24 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 730,
-        "y": 1880,
+        "x": 750,
+        "y": 760,
         "wires": [
             [
                 "27395882df31bab2"
             ]
         ]
+    },
+    {
+        "id": "27395882df31bab2",
+        "type": "http response",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 920,
+        "y": 760,
+        "wires": []
     },
     {
         "id": "ac083b48bc2518ab",
@@ -8825,218 +7191,6 @@
                 "cbd8e03460019ecd"
             ]
         ]
-    },
-    {
-        "id": "b904771d917ffb93",
-        "type": "cronplus",
-        "z": "522bd2fdb3945ed1",
-        "d": true,
-        "name": "",
-        "outputField": "payload",
-        "timeZone": "",
-        "persistDynamic": false,
-        "commandResponseMsgOutput": "output1",
-        "outputs": 1,
-        "options": [
-            {
-                "name": "schedule1",
-                "topic": "topic1",
-                "payloadType": "default",
-                "payload": "",
-                "expressionType": "cron",
-                "expression": "0 */1 * * * * *",
-                "location": "",
-                "offset": "0",
-                "solarType": "all",
-                "solarEvents": "sunrise,sunset"
-            }
-        ],
-        "x": 120,
-        "y": 280,
-        "wires": [
-            [
-                "7b87edb20a5df6d5",
-                "136f16525d8f27f2"
-            ]
-        ]
-    },
-    {
-        "id": "7b87edb20a5df6d5",
-        "type": "http request",
-        "z": "522bd2fdb3945ed1",
-        "name": "",
-        "method": "GET",
-        "ret": "txt",
-        "paytoqs": "ignore",
-        "url": "https://apigateway.ktbfuso.id/ddpservice/device/viewrealtime?chassis_number=MHMFN62GPNK000965",
-        "tls": "",
-        "persist": false,
-        "proxy": "",
-        "insecureHTTPParser": false,
-        "authType": "bearer",
-        "senderr": false,
-        "headers": [],
-        "x": 350,
-        "y": 280,
-        "wires": [
-            [
-                "8511ac6941148b62"
-            ]
-        ]
-    },
-    {
-        "id": "136f16525d8f27f2",
-        "type": "http request",
-        "z": "522bd2fdb3945ed1",
-        "name": "",
-        "method": "GET",
-        "ret": "txt",
-        "paytoqs": "ignore",
-        "url": "https://apigateway.ktbfuso.id/ddpservice/device/viewrealtime?chassis_number=MHMFN62GPNK000834",
-        "tls": "",
-        "persist": false,
-        "proxy": "",
-        "insecureHTTPParser": false,
-        "authType": "bearer",
-        "senderr": false,
-        "headers": [],
-        "x": 350,
-        "y": 360,
-        "wires": [
-            [
-                "8511ac6941148b62"
-            ]
-        ]
-    },
-    {
-        "id": "5b1229989398ca35",
-        "type": "inject",
-        "z": "522bd2fdb3945ed1",
-        "name": "",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 120,
-        "y": 360,
-        "wires": [
-            [
-                "7b87edb20a5df6d5",
-                "136f16525d8f27f2"
-            ]
-        ]
-    },
-    {
-        "id": "8511ac6941148b62",
-        "type": "switch",
-        "z": "522bd2fdb3945ed1",
-        "name": "",
-        "property": "statusCode",
-        "propertyType": "msg",
-        "rules": [
-            {
-                "t": "eq",
-                "v": "200",
-                "vt": "num"
-            },
-            {
-                "t": "else"
-            }
-        ],
-        "checkall": "true",
-        "repair": false,
-        "outputs": 2,
-        "x": 530,
-        "y": 320,
-        "wires": [
-            [
-                "c813f5e88d533cf6"
-            ],
-            [
-                "c3ff63c244fc26f7"
-            ]
-        ]
-    },
-    {
-        "id": "c813f5e88d533cf6",
-        "type": "function",
-        "z": "522bd2fdb3945ed1",
-        "name": "function 39",
-        "func": "let payload = JSON.parse(msg.payload);\nlet rs = payload.result;\nlet query = \n`INSERT INTO smart.ktb_vehicles_positions \n    (ChassisNumber, Vehiclename, Time, Sat, Speed, Alt, Heading, Ignition, \n    Lat, Lon, Mileage, Location)\nVALUES \n    ('${rs.ChassisNumber}', '${rs.Vehiclename}', '${rs.Time}', ${rs.Sat}, ${rs.Speed}, ${rs.Alt}, \n    ${rs.Heading}, ${rs.Ignition}, ${rs.Lat}, ${rs.Lon}, ${rs.Mileage}, '${rs.Location}')`;\n\nmsg.payload = null;\nmsg.topic = query;\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 770,
-        "y": 280,
-        "wires": [
-            [
-                "d4bcf4c9b61fc814"
-            ]
-        ]
-    },
-    {
-        "id": "c3ff63c244fc26f7",
-        "type": "debug",
-        "z": "522bd2fdb3945ed1",
-        "name": "debug 42",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 760,
-        "y": 400,
-        "wires": []
-    },
-    {
-        "id": "d4bcf4c9b61fc814",
-        "type": "mysql2",
-        "z": "522bd2fdb3945ed1",
-        "name": "",
-        "server": "9dc2644ec5b51cb2",
-        "bind": "",
-        "topic": "",
-        "x": 760,
-        "y": 320,
-        "wires": [
-            [
-                "c35213511cddb829"
-            ]
-        ]
-    },
-    {
-        "id": "c35213511cddb829",
-        "type": "debug",
-        "z": "522bd2fdb3945ed1",
-        "name": "debug 41",
-        "active": false,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 960,
-        "y": 320,
-        "wires": []
     },
     {
         "id": "5b97d92a9bb49e05",
