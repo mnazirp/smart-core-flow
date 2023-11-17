@@ -586,8 +586,8 @@
         ],
         "out": [
             {
-                "x": 320,
-                "y": 160,
+                "x": 520,
+                "y": 120,
                 "wires": [
                     {
                         "id": "7af2625f0ad3a7a3",
@@ -864,15 +864,15 @@
     {
         "id": "784d89e62dfb5070",
         "type": "cloudantplus",
-        "host": "${DOCKER_COUCHDB}",
-        "name": "docker-couchdb",
+        "host": "${DOCS_MASTER}",
+        "name": "DOCS_MASTER",
         "useapikey": false
     },
     {
         "id": "0fb96b870afb5c15",
         "type": "redis-config",
-        "name": "DOCKER_REDIS",
-        "options": "DOCKER_REDIS_URL",
+        "name": "REDIS_URL",
+        "options": "REDIS_URL",
         "cluster": false,
         "optionsType": "env"
     },
@@ -1920,7 +1920,7 @@
         "type": "function",
         "z": "d7ccf53b2b9fe097",
         "name": "read sub",
-        "func": "msg.backup = msg.payload;\n\nlet {\n    database,\n    design,\n    view,\n    key,\n    startkey,\n    endkey,\n    limit,\n    descending,\n    group\n} = msg.sub;\n\nlet url = `${env.get('DOCKER_COUCHDB_DOMAIN')}/${database}/_design/${design}/_view/${view}?`;\nif (key) {\n    let keyStr = (Array.isArray(key)) ? `[${key.map(x => `\"${x}\"`).join(',')}]` : `\"${key}\"`;\n    url = `${url}key=${keyStr}`;\n} else if (startkey && endkey) {\n    if (Array.isArray(startkey) && Array.isArray(endkey)) {\n        url = `${url}startkey=[${startkey.map(x => {\n            if (typeof x === 'string') return `\"${x}\"`;\n            if (typeof x === 'object') return `{}`;\n            return `${x}`;\n        })}]&endkey=[${endkey.map(x => {\n            if (typeof x === 'string') return `\"${x}\"`;\n            if (typeof x === 'object') return `{}`;\n            return `${x}`;\n        })}]`;\n    } else {\n        url = `${url}startkey=\"${startkey}\"&endkey=\"${endkey}\"`;\n    }\n}\nif (group === true && !key && !startkey && !endkey) url = `${url}group=true`;\nelse if (group === true) url = `${url}&group=true`;\n\nif (limit && typeof limit == 'number') {\n    url = `${url}&limit=${limit}`\n}\nif (descending !== undefined) {\n    url = `${url}&descending=${descending}`;\n}\n\nmsg.url = url;\nmsg.headers = {\n    \"Authorization\": \"Basic \" +\n        Buffer.from(`${env.get('DOCKER_COUCHDB_USER')}:${env.get('DOCKER_COUCHDB_PASSWORD')}`).toString(\"base64\"),\n    \"Content-Type\": \"application/json; charset=utf-8\"\n}\nreturn msg;",
+        "func": "msg.backup = msg.payload;\n\nlet {\n    database,\n    design,\n    view,\n    key,\n    startkey,\n    endkey,\n    limit,\n    descending,\n    group\n} = msg.sub;\n\nlet url = `${env.get('DOC_MASTER_DOMAIN')}/${database}/_design/${design}/_view/${view}?`;\nif (key) {\n    let keyStr = (Array.isArray(key)) ? `[${key.map(x => `\"${x}\"`).join(',')}]` : `\"${key}\"`;\n    url = `${url}key=${keyStr}`;\n} else if (startkey && endkey) {\n    if (Array.isArray(startkey) && Array.isArray(endkey)) {\n        url = `${url}startkey=[${startkey.map(x => {\n            if (typeof x === 'string') return `\"${x}\"`;\n            if (typeof x === 'object') return `{}`;\n            return `${x}`;\n        })}]&endkey=[${endkey.map(x => {\n            if (typeof x === 'string') return `\"${x}\"`;\n            if (typeof x === 'object') return `{}`;\n            return `${x}`;\n        })}]`;\n    } else {\n        url = `${url}startkey=\"${startkey}\"&endkey=\"${endkey}\"`;\n    }\n}\nif (group === true && !key && !startkey && !endkey) url = `${url}group=true`;\nelse if (group === true) url = `${url}&group=true`;\n\nif (limit && typeof limit == 'number') {\n    url = `${url}&limit=${limit}`\n}\nif (descending !== undefined) {\n    url = `${url}&descending=${descending}`;\n}\n\nmsg.url = url;\nmsg.headers = {\n    \"Authorization\": \"Basic \" +\n        Buffer.from(`${env.get('DOCS_MASTER_USER')}:${env.get('DOCS_MASTER_PASSWORD')}`).toString(\"base64\"),\n    \"Content-Type\": \"application/json; charset=utf-8\"\n}\nreturn msg;",
         "outputs": 1,
         "timeout": "",
         "noerr": 0,
@@ -1948,7 +1948,7 @@
         "persist": false,
         "proxy": "",
         "insecureHTTPParser": false,
-        "authType": "basic",
+        "authType": "",
         "senderr": false,
         "headers": [],
         "x": 210,
@@ -1971,8 +1971,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 190,
-        "y": 160,
+        "x": 390,
+        "y": 120,
         "wires": [
             []
         ]
@@ -2325,7 +2325,7 @@
         "type": "function",
         "z": "3c790259a2397aef",
         "name": "prepare docs id for delete",
-        "func": "msg.payload = {\n    docs: msg.payload.map(x => {\n        return { ...x, _deleted: true }\n    })\n}; \nmsg.url = `${env.get('DOCKER_COUCHDB_DOMAIN')}/smart-geojson/_bulk_docs`\nmsg.headers = {\n    \"Authorization\": \"Basic \" +\n        Buffer.from(`${env.get('DOCKER_COUCHDB_USER')}:${env.get('DOCKER_COUCHDB_PASSWORD')}`).toString(\"base64\"),\n    \"Content-Type\": \"application/json; charset=utf-8\"\n}\nreturn msg;",
+        "func": "msg.payload = {\n    docs: msg.payload.map(x => {\n        return { ...x, _deleted: true }\n    })\n}; \nmsg.url = `${env.get('DOC_MASTER_DOMAIN')}/smart-geojson/_bulk_docs`\nmsg.headers = {\n    \"Authorization\": \"Basic \" +\n        Buffer.from(`${env.get('DOCS_MASTER_USER')}:${env.get('DOCS_MASTER_PASSWORD')}`).toString(\"base64\"),\n    \"Content-Type\": \"application/json; charset=utf-8\"\n}\nreturn msg;",
         "outputs": 1,
         "timeout": "",
         "noerr": 0,
@@ -2548,7 +2548,7 @@
         "type": "function",
         "z": "3c790259a2397aef",
         "name": "prepare docs to insert",
-        "func": "msg.payload = msg.documents;\nmsg.url = `${env.get('DOCKER_COUCHDB_DOMAIN')}/smart-geojson/_bulk_docs`\nmsg.headers = {\n    \"Authorization\": \"Basic \" +\n        Buffer.from(`${env.get('DOCKER_COUCHDB_USER')}:${env.get('DOCKER_COUCHDB_PASSWORD')}`).toString(\"base64\"),\n    \"Content-Type\": \"application/json; charset=utf-8\"\n}\nreturn msg;",
+        "func": "msg.payload = msg.documents;\nmsg.url = `${env.get('DOC_MASTER_DOMAIN')}/smart-geojson/_bulk_docs`\nmsg.headers = {\n    \"Authorization\": \"Basic \" +\n        Buffer.from(`${env.get('DOCS_MASTER_USER')}:${env.get('DOCS_MASTER_PASSWORD')}`).toString(\"base64\"),\n    \"Content-Type\": \"application/json; charset=utf-8\"\n}\nreturn msg;",
         "outputs": 1,
         "timeout": "",
         "noerr": 0,
@@ -7314,7 +7314,7 @@
         "type": "function",
         "z": "c5b9039a5fc48f97",
         "name": "groupBy ?",
-        "func": "let { geoType, keys } = msg.payload;\nlet {psm, estate, division, block} = keys;\nlet view;\nswitch(keys.length){\n    case 1: view = 'geo-by-psm';\n    break;\n    case 2: view = 'geo-by-estate';\n    break;\n    case 3: view = 'geo-by-division';\n    break;\n    case 4: view = 'geo-by-block';\n    break;\n}\nmsg.sub = {\n    database: 'smart-geojson',\n    design: geoType,\n    view,\n    key: keys\n}\nreturn msg;",
+        "func": "let { geoType, keys } = msg.payload;\nlet {psm, estate, division, block} = keys;\nlet view;\nswitch(keys.length){\n    case 1: view = 'geo-by-psm';\n    break;\n    case 2: view = 'geo-by-estate';\n    break;\n    case 3: view = 'geo-by-division';\n    break;\n    case 4: view = 'geo-by-block';\n    break;\n}\nmsg.sub = {\n    database: 'smart-geojson',\n    design: geoType,\n    view,\n    key: keys\n}\nnode.warn(msg.sub);\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
