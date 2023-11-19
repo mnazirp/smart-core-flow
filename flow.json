@@ -152,6 +152,22 @@
         "env": []
     },
     {
+        "id": "4ca14813db2167a1",
+        "type": "tab",
+        "label": "Smart: Assets",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "b4fec06fae5f2c3e",
+        "type": "tab",
+        "label": "Broker: Subscriber",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
         "id": "77002254b872fa8e",
         "type": "subflow",
         "name": "algo: jwt-sign",
@@ -862,6 +878,43 @@
         "color": "#DDAA99"
     },
     {
+        "id": "9f264fd91be71cc1",
+        "type": "subflow",
+        "name": "SQL Query",
+        "info": "## Input\r\n\r\n### msg.sub\r\n\r\n    {\r\n        db: 'digaportal',\r\n        query: `SELECT * FROM table_name`\r\n    }\r\n",
+        "category": "",
+        "in": [
+            {
+                "x": 60,
+                "y": 80,
+                "wires": [
+                    {
+                        "id": "ad0e98c93b4218dc"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 600,
+                "y": 160,
+                "wires": [
+                    {
+                        "id": "e4c684627c20750a",
+                        "port": 0
+                    },
+                    {
+                        "id": "e96ce540f86a4a12",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [],
+        "meta": {},
+        "color": "#DDAA99"
+    },
+    {
         "id": "784d89e62dfb5070",
         "type": "cloudantplus",
         "host": "${DOCS_MASTER}",
@@ -875,6 +928,24 @@
         "options": "REDIS_URL",
         "cluster": false,
         "optionsType": "env"
+    },
+    {
+        "id": "e907ba5364e5896f",
+        "type": "amqp-server",
+        "host": "localhost",
+        "port": "5630",
+        "vhost": "",
+        "keepalive": "30",
+        "usetls": false,
+        "verifyservercert": true,
+        "useca": false,
+        "ca": "",
+        "usetopology": false,
+        "topology": "{\n\t\"exchanges\": [\n\t\t{\"name\": \"exchange1\", \"type\": \"direct\", \"options\": {\"durable\": false}},\n\t\t{\"name\": \"exchange2\"}\n\t],\n\t\"queues\": [\n\t\t{\"name\": \"queue1\", \"options\": {\"messageTtl\": 60000}},\n\t\t{\"name\": \"queue2\"}\n\t],\n\t\"bindings\": [\n\t\t{\"source\": \"exchange1\", \"queue\": \"queue1\", \"pattern\": \"debug\", \"args\": {}},\n\t\t{\"source\": \"exchange1\", \"exchange\": \"exchange2\", \"pattern\": \"error\"},\n\t\t{\"source\": \"exchange2\", \"queue\": \"queue2\"}\n\t]\n}",
+        "prefetch": false,
+        "prefetchvalue": "1",
+        "prefetchack": false,
+        "prefetchvalueack": "1"
     },
     {
         "id": "156f4bd7081013b2",
@@ -2749,6 +2820,95 @@
             [
                 "a67d312e91796514"
             ]
+        ]
+    },
+    {
+        "id": "f00883427c74c989",
+        "type": "mysql2",
+        "z": "9f264fd91be71cc1",
+        "name": "",
+        "server": "",
+        "bind": "",
+        "topic": "",
+        "x": 200,
+        "y": 120,
+        "wires": [
+            [
+                "e4c684627c20750a"
+            ]
+        ]
+    },
+    {
+        "id": "ad0e98c93b4218dc",
+        "type": "function",
+        "z": "9f264fd91be71cc1",
+        "name": "prepare database & query",
+        "func": "msg.backup = msg.payload;\nlet { db, query } = msg.sub;\nmsg.server = {\n\thost: env.get('SQL_HOST'),\n\tport: env.get('SQL_PORT'),\n\tusername: env.get('SQL_USER'),\n\tpassword: env.get('SQL_PASSWORD'),\n\tdb: (db) ? db : 'digaportal'\n}\nmsg.topic = query;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 250,
+        "y": 80,
+        "wires": [
+            [
+                "f00883427c74c989"
+            ]
+        ]
+    },
+    {
+        "id": "e4c684627c20750a",
+        "type": "function",
+        "z": "9f264fd91be71cc1",
+        "name": "result",
+        "func": "msg.sub = msg.payload;\nmsg.payload = msg.backup;\ndelete msg.backup;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 190,
+        "y": 160,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "c505e360eaa32294",
+        "type": "catch",
+        "z": "9f264fd91be71cc1",
+        "name": "",
+        "scope": [
+            "f00883427c74c989"
+        ],
+        "uncaught": false,
+        "x": 190,
+        "y": 200,
+        "wires": [
+            [
+                "e96ce540f86a4a12"
+            ]
+        ]
+    },
+    {
+        "id": "e96ce540f86a4a12",
+        "type": "function",
+        "z": "9f264fd91be71cc1",
+        "name": "catch error",
+        "func": "msg.sub = msg.error;\nmsg.payload = msg.backup;\ndelete msg.backup;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 200,
+        "wires": [
+            []
         ]
     },
     {
@@ -9053,7 +9213,7 @@
         "type": "debug",
         "z": "c5b9039a5fc48f97",
         "name": "debug 90",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -10504,5 +10664,203 @@
                 "0f47ab34463c0043"
             ]
         ]
+    },
+    {
+        "id": "7a603f11899ae208",
+        "type": "inject",
+        "z": "4ca14813db2167a1",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 100,
+        "wires": [
+            [
+                "09c29f5e124a8313"
+            ]
+        ]
+    },
+    {
+        "id": "60c084e595986b28",
+        "type": "function",
+        "z": "4ca14813db2167a1",
+        "name": "publish ",
+        "func": "if (Array.isArray(msg.sub) && msg.sub.length > 0) {\n    msg.sub.forEach(payload => {\n        let { iAssetID, vin, iOrgToServe, unitTransport } = payload;\n        node.send({\n            payload: {\n                type: 'truck',\n                assetID: iAssetID,\n                vin,\n                unit: unitTransport,\n                unitID: iOrgToServe\n            },\n            amqpfields: {\n                redelivered: true\n            }\n        });\n    });\n}\nreturn null;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 360,
+        "y": 140,
+        "wires": [
+            [
+                "7684ea084c500ab9"
+            ]
+        ]
+    },
+    {
+        "id": "7684ea084c500ab9",
+        "type": "amqp out",
+        "z": "4ca14813db2167a1",
+        "name": "",
+        "routingkey": "bind.master.scope",
+        "iotype": "3",
+        "ioname": "amq.topic",
+        "server": "e907ba5364e5896f",
+        "x": 540,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "b68bd83ff5bc5ae6",
+        "type": "amqp in",
+        "z": "4ca14813db2167a1",
+        "name": "",
+        "topic": "",
+        "iotype": "4",
+        "ioname": "docs.master.insert",
+        "server": "e907ba5364e5896f",
+        "x": 390,
+        "y": 360,
+        "wires": [
+            [
+                "18e286ef5c1bb19d"
+            ]
+        ]
+    },
+    {
+        "id": "18e286ef5c1bb19d",
+        "type": "debug",
+        "z": "4ca14813db2167a1",
+        "name": "debug 93",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 600,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "1d5c13cd86c6763a",
+        "type": "amqp in",
+        "z": "4ca14813db2167a1",
+        "name": "",
+        "topic": "",
+        "iotype": "4",
+        "ioname": "docs.master.scope",
+        "server": "e907ba5364e5896f",
+        "x": 390,
+        "y": 420,
+        "wires": [
+            [
+                "ccc64458bd828322"
+            ]
+        ]
+    },
+    {
+        "id": "ccc64458bd828322",
+        "type": "debug",
+        "z": "4ca14813db2167a1",
+        "name": "debug 94",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 600,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "09c29f5e124a8313",
+        "type": "function",
+        "z": "4ca14813db2167a1",
+        "name": "function 59",
+        "func": "msg.sub = {\n    db: 'digaportal',\n    query: `SELECT\n                a.iAssetID,\n                a.szPhysicalNo2 AS vin,\n                a.iOrgToServe,\n                b.szOrgName AS unitTransport\n            FROM\n                am_hasset a\n            LEFT JOIN \n                oa_organization b ON a.iOrgToServe = b.iOrgID\n            WHERE\n                    a.szPhysicalNo2 IS NOT NULL\n                AND\n                    a.szPhysicalNo2 <> ''\n                AND\n                    LENGTH(a.szPhysicalNo2) >= 16\n            GROUP BY a.szPhysicalNo2`\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 60,
+        "wires": [
+            [
+                "3519a042d25bec07"
+            ]
+        ]
+    },
+    {
+        "id": "3519a042d25bec07",
+        "type": "subflow:9f264fd91be71cc1",
+        "z": "4ca14813db2167a1",
+        "name": "",
+        "x": 370,
+        "y": 100,
+        "wires": [
+            [
+                "60c084e595986b28"
+            ]
+        ]
+    },
+    {
+        "id": "c37302fd18458efc",
+        "type": "cloudantplus out",
+        "z": "b4fec06fae5f2c3e",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-asset",
+        "service": "_ext_",
+        "payonly": true,
+        "operation": "insert",
+        "x": 390,
+        "y": 60,
+        "wires": [
+            [
+                "8af4a5bb91cedaa0"
+            ]
+        ]
+    },
+    {
+        "id": "8af4a5bb91cedaa0",
+        "type": "debug",
+        "z": "b4fec06fae5f2c3e",
+        "name": "debug 91",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 600,
+        "y": 60,
+        "wires": []
     }
 ]
