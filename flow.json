@@ -11991,7 +11991,7 @@
         "type": "debug",
         "z": "c5b9039a5fc48f97",
         "name": "debug 139",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -12600,7 +12600,7 @@
         "finalize": "",
         "libs": [],
         "x": 1110,
-        "y": 720,
+        "y": 760,
         "wires": [
             [
                 "bb1d7d4a787c483e"
@@ -12617,7 +12617,7 @@
         "ioname": "job.geojson.get.psm",
         "server": "e907ba5364e5896f",
         "x": 1360,
-        "y": 720,
+        "y": 760,
         "wires": []
     },
     {
@@ -12700,9 +12700,7 @@
         "x": 170,
         "y": 1860,
         "wires": [
-            [
-                "397a00ebb1f7042c"
-            ]
+            []
         ]
     },
     {
@@ -12798,7 +12796,7 @@
         "finalize": "",
         "libs": [],
         "x": 1110,
-        "y": 960,
+        "y": 1000,
         "wires": [
             [
                 "d64e653e6f9d7875"
@@ -12815,7 +12813,7 @@
         "ioname": "job.geojson.get.estate",
         "server": "e907ba5364e5896f",
         "x": 1360,
-        "y": 960,
+        "y": 1000,
         "wires": []
     },
     {
@@ -12975,7 +12973,7 @@
         "finalize": "",
         "libs": [],
         "x": 1100,
-        "y": 1200,
+        "y": 1240,
         "wires": [
             [
                 "513468c6df9d25a7"
@@ -12992,7 +12990,7 @@
         "ioname": "job.geojson.get.division",
         "server": "e907ba5364e5896f",
         "x": 1350,
-        "y": 1200,
+        "y": 1240,
         "wires": []
     },
     {
@@ -13117,8 +13115,7 @@
                 "ec9a86eade8354b8"
             ],
             [
-                "5be04efeb2fa596b",
-                "f5b12ef32b789126"
+                "5be04efeb2fa596b"
             ]
         ]
     },
@@ -13226,27 +13223,8 @@
             [
                 "1fee81b8e5e7092e"
             ],
-            [
-                "126b2b9c9bdca791"
-            ]
+            []
         ]
-    },
-    {
-        "id": "126b2b9c9bdca791",
-        "type": "debug",
-        "z": "b4fec06fae5f2c3e",
-        "name": "debug 124",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 650,
-        "y": 1940,
-        "wires": []
     },
     {
         "id": "5be04efeb2fa596b",
@@ -13282,23 +13260,6 @@
         "wires": []
     },
     {
-        "id": "f5b12ef32b789126",
-        "type": "debug",
-        "z": "b4fec06fae5f2c3e",
-        "name": "debug 125",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 1110,
-        "y": 1960,
-        "wires": []
-    },
-    {
         "id": "12296b7f1591993c",
         "type": "amqp in",
         "z": "b4fec06fae5f2c3e",
@@ -13320,7 +13281,7 @@
         "type": "function",
         "z": "b4fec06fae5f2c3e",
         "name": "check response",
-        "func": "let status = 'error';\nlet payload = msg.sub;\nif (payload.status == true) {\n    status = 'success';\n} else if (payload.status == false && payload.message.success == false) {\n    status = 'pnmp-error'\n}\n    msg.pnmpStatus = status\nreturn msg;",
+        "func": "let status = 'error';\nlet payload = msg.sub;\nif (payload.status == true) {\n    status = 'success';\n} else if (payload.message.message && payload.message.message == \"You don't have permission\") {\n    status = 'token-expire'\n} else if (payload.status == false && payload.message.success == false) {\n    status = 'pnmp-error'\n}\nmsg.pnmpStatus = status\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -13350,6 +13311,11 @@
             },
             {
                 "t": "eq",
+                "v": "token-expire",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
                 "v": "pnmp-error",
                 "vt": "str"
             },
@@ -13361,12 +13327,15 @@
         ],
         "checkall": "true",
         "repair": false,
-        "outputs": 3,
+        "outputs": 4,
         "x": 870,
         "y": 720,
         "wires": [
             [
                 "165f5444a0f7415c"
+            ],
+            [
+                "5bc38663faa7fd94"
             ],
             [
                 "33a47806a2e56ae9"
@@ -13389,7 +13358,7 @@
         "finalize": "",
         "libs": [],
         "x": 1110,
-        "y": 760,
+        "y": 800,
         "wires": [
             [
                 "a0d30b5f89b7e773"
@@ -13402,7 +13371,7 @@
         "z": "b4fec06fae5f2c3e",
         "name": "",
         "x": 1350,
-        "y": 760,
+        "y": 800,
         "wires": [
             []
         ]
@@ -13432,8 +13401,8 @@
         "type": "subflow:ef0e7b589320b81a",
         "z": "b4fec06fae5f2c3e",
         "name": "",
-        "x": 890,
-        "y": 780,
+        "x": 650,
+        "y": 820,
         "wires": [
             []
         ]
@@ -13443,7 +13412,7 @@
         "type": "debug",
         "z": "b4fec06fae5f2c3e",
         "name": "debug 136",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -13460,7 +13429,7 @@
         "type": "debug",
         "z": "b4fec06fae5f2c3e",
         "name": "debug 118",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -13477,7 +13446,7 @@
         "type": "function",
         "z": "b4fec06fae5f2c3e",
         "name": "check response",
-        "func": "let status = 'error';\nlet payload = msg.sub;\nif (payload.status == true) {\n    status = 'success';\n} else if (payload.status == false && payload.message.success == false) {\n    status = 'pnmp-error'\n}\n    msg.pnmpStatus = status\nreturn msg;",
+        "func": "let status = 'error';\nlet payload = msg.sub;\nif (payload.status == true) {\n    status = 'success';\n} else if (payload.message.message && payload.message.message == \"You don't have permission\") {\n    status = 'token-expire'\n} else if (payload.status == false && payload.message.success == false) {\n    status = 'pnmp-error'\n}\nmsg.pnmpStatus = status\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -13507,6 +13476,11 @@
             },
             {
                 "t": "eq",
+                "v": "token-expire",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
                 "v": "pnmp-error",
                 "vt": "str"
             },
@@ -13518,12 +13492,15 @@
         ],
         "checkall": "true",
         "repair": false,
-        "outputs": 3,
+        "outputs": 4,
         "x": 870,
         "y": 960,
         "wires": [
             [
                 "2b31894578c02ffa"
+            ],
+            [
+                "57f4568d6cd64397"
             ],
             [
                 "f54d589292be7bb5"
@@ -13546,7 +13523,7 @@
         "finalize": "",
         "libs": [],
         "x": 1110,
-        "y": 1000,
+        "y": 1040,
         "wires": [
             [
                 "cb6d35d0308eae60"
@@ -13559,7 +13536,7 @@
         "z": "b4fec06fae5f2c3e",
         "name": "",
         "x": 1350,
-        "y": 1000,
+        "y": 1040,
         "wires": [
             []
         ]
@@ -13589,8 +13566,8 @@
         "type": "subflow:ef0e7b589320b81a",
         "z": "b4fec06fae5f2c3e",
         "name": "",
-        "x": 890,
-        "y": 1020,
+        "x": 650,
+        "y": 1060,
         "wires": [
             []
         ]
@@ -13600,7 +13577,7 @@
         "type": "debug",
         "z": "b4fec06fae5f2c3e",
         "name": "debug 119",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -13617,7 +13594,7 @@
         "type": "function",
         "z": "b4fec06fae5f2c3e",
         "name": "check response",
-        "func": "let status = 'error';\nlet payload = msg.sub;\nif (payload.status == true) {\n    status = 'success';\n} else if (payload.status == false && payload.message.success == false) {\n    status = 'pnmp-error'\n}\n    msg.pnmpStatus = status\nreturn msg;",
+        "func": "let status = 'error';\nlet payload = msg.sub;\nif (payload.status == true) {\n    status = 'success';\n} else if (payload.message.message && payload.message.message == \"You don't have permission\") {\n    status = 'token-expire'\n} else if (payload.status == false && payload.message.success == false) {\n    status = 'pnmp-error'\n}\nmsg.pnmpStatus = status\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -13647,6 +13624,11 @@
             },
             {
                 "t": "eq",
+                "v": "token-expire",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
                 "v": "pnmp-error",
                 "vt": "str"
             },
@@ -13658,12 +13640,15 @@
         ],
         "checkall": "true",
         "repair": false,
-        "outputs": 3,
+        "outputs": 4,
         "x": 850,
         "y": 1200,
         "wires": [
             [
                 "2252336895a4d119"
+            ],
+            [
+                "58cf3ab041f50ce1"
             ],
             [
                 "e7f36edfd375b0bb"
@@ -13686,7 +13671,7 @@
         "finalize": "",
         "libs": [],
         "x": 1090,
-        "y": 1240,
+        "y": 1280,
         "wires": [
             [
                 "1a3b7ce32cfc73c5"
@@ -13699,7 +13684,7 @@
         "z": "b4fec06fae5f2c3e",
         "name": "",
         "x": 1330,
-        "y": 1240,
+        "y": 1280,
         "wires": [
             []
         ]
@@ -13729,28 +13714,11 @@
         "type": "subflow:ef0e7b589320b81a",
         "z": "b4fec06fae5f2c3e",
         "name": "",
-        "x": 890,
-        "y": 1260,
+        "x": 650,
+        "y": 1300,
         "wires": [
             []
         ]
-    },
-    {
-        "id": "397a00ebb1f7042c",
-        "type": "debug",
-        "z": "b4fec06fae5f2c3e",
-        "name": "debug 135",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 410,
-        "y": 1860,
-        "wires": []
     },
     {
         "id": "b64a7a6653f7f8af",
@@ -13796,7 +13764,7 @@
         "finalize": "",
         "libs": [],
         "x": 1090,
-        "y": 1440,
+        "y": 1480,
         "wires": [
             [
                 "2c3e4bec2a2f10df"
@@ -13813,7 +13781,7 @@
         "ioname": "job.geojson.get.block",
         "server": "e907ba5364e5896f",
         "x": 1340,
-        "y": 1440,
+        "y": 1480,
         "wires": []
     },
     {
@@ -13854,7 +13822,7 @@
         "type": "debug",
         "z": "b4fec06fae5f2c3e",
         "name": "debug 137",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -13871,7 +13839,7 @@
         "type": "function",
         "z": "b4fec06fae5f2c3e",
         "name": "check response",
-        "func": "let status = 'error';\nlet payload = msg.sub;\nif (payload.status == true) {\n    status = 'success';\n} else if (payload.status == false && payload.message.success == false) {\n    status = 'pnmp-error'\n}\n    msg.pnmpStatus = status\nreturn msg;",
+        "func": "let status = 'error';\nlet payload = msg.sub;\nif (payload.status == true) {\n    status = 'success';\n} else if (payload.message.message && payload.message.message == \"You don't have permission\") {\n    status = 'token-expire'\n} else if (payload.status == false && payload.message.success == false) {\n    status = 'pnmp-error'\n}\nmsg.pnmpStatus = status\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -13901,6 +13869,11 @@
             },
             {
                 "t": "eq",
+                "v": "token-expire",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
                 "v": "pnmp-error",
                 "vt": "str"
             },
@@ -13912,12 +13885,15 @@
         ],
         "checkall": "true",
         "repair": false,
-        "outputs": 3,
+        "outputs": 4,
         "x": 850,
         "y": 1440,
         "wires": [
             [
                 "c4f850d887baac2e"
+            ],
+            [
+                "d6eb830f0c4805f4"
             ],
             [
                 "1686221885626ef3"
@@ -13940,7 +13916,7 @@
         "finalize": "",
         "libs": [],
         "x": 1090,
-        "y": 1480,
+        "y": 1520,
         "wires": [
             [
                 "50ee50d2aa2ef4ea"
@@ -13953,7 +13929,7 @@
         "z": "b4fec06fae5f2c3e",
         "name": "",
         "x": 1330,
-        "y": 1480,
+        "y": 1520,
         "wires": [
             []
         ]
@@ -13983,8 +13959,8 @@
         "type": "subflow:ef0e7b589320b81a",
         "z": "b4fec06fae5f2c3e",
         "name": "",
-        "x": 890,
-        "y": 1500,
+        "x": 650,
+        "y": 1540,
         "wires": [
             []
         ]
@@ -14150,23 +14126,6 @@
         ]
     },
     {
-        "id": "4eb4cf8a5e417ce7",
-        "type": "debug",
-        "z": "b4fec06fae5f2c3e",
-        "name": "debug 138",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 410,
-        "y": 1720,
-        "wires": []
-    },
-    {
         "id": "56d8efd55642ba06",
         "type": "function",
         "z": "b4fec06fae5f2c3e",
@@ -14224,8 +14183,8 @@
         "type": "subflow:ef0e7b589320b81a",
         "z": "b4fec06fae5f2c3e",
         "name": "",
-        "x": 890,
-        "y": 1740,
+        "x": 650,
+        "y": 1780,
         "wires": [
             []
         ]
@@ -14235,7 +14194,7 @@
         "type": "function",
         "z": "b4fec06fae5f2c3e",
         "name": "check response",
-        "func": "let status = 'error';\nlet payload = msg.sub;\nif (payload.status == true) {\n    status = 'success';\n} else if (payload.status == false && payload.message.success == false) {\n    status = 'pnmp-error'\n}\n    msg.pnmpStatus = status\nreturn msg;",
+        "func": "let status = 'error';\nlet payload = msg.sub;\nif (payload.status == true) {\n    status = 'success';\n} else if (payload.message.message && payload.message.message == \"You don't have permission\") {\n    status = 'token-expire'\n} else if (payload.status == false && payload.message.success == false) {\n    status = 'pnmp-error'\n}\nmsg.pnmpStatus = status\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -14265,6 +14224,11 @@
             },
             {
                 "t": "eq",
+                "v": "token-expire",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
                 "v": "pnmp-error",
                 "vt": "str"
             },
@@ -14276,12 +14240,15 @@
         ],
         "checkall": "true",
         "repair": false,
-        "outputs": 3,
+        "outputs": 4,
         "x": 850,
         "y": 1680,
         "wires": [
             [
                 "5c5d72ee397205a2"
+            ],
+            [
+                "d252808056d3134e"
             ],
             [
                 "06235ba3fb91c3e6"
@@ -14304,7 +14271,7 @@
         "finalize": "",
         "libs": [],
         "x": 1090,
-        "y": 1680,
+        "y": 1720,
         "wires": [
             [
                 "4466071f81ee03e0"
@@ -14324,7 +14291,7 @@
         "finalize": "",
         "libs": [],
         "x": 1090,
-        "y": 1720,
+        "y": 1760,
         "wires": [
             [
                 "b54a971686593ff9"
@@ -14341,7 +14308,7 @@
         "ioname": "job.geojson.get.road",
         "server": "e907ba5364e5896f",
         "x": 1340,
-        "y": 1680,
+        "y": 1720,
         "wires": []
     },
     {
@@ -14350,7 +14317,7 @@
         "z": "b4fec06fae5f2c3e",
         "name": "",
         "x": 1330,
-        "y": 1720,
+        "y": 1760,
         "wires": [
             []
         ]
@@ -14385,6 +14352,233 @@
         "wires": [
             []
         ]
+    },
+    {
+        "id": "4eb4cf8a5e417ce7",
+        "type": "debug",
+        "z": "b4fec06fae5f2c3e",
+        "name": "debug 138",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 410,
+        "y": 1720,
+        "wires": []
+    },
+    {
+        "id": "5bc38663faa7fd94",
+        "type": "http request",
+        "z": "b4fec06fae5f2c3e",
+        "name": "renew pnmp token",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "https://digistage.sinarmas-agri.com/api-app-portal-beta/api/pnmp_token",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 1110,
+        "y": 720,
+        "wires": [
+            [
+                "33a47806a2e56ae9",
+                "e08c0e6c4bf3f631"
+            ]
+        ]
+    },
+    {
+        "id": "57f4568d6cd64397",
+        "type": "http request",
+        "z": "b4fec06fae5f2c3e",
+        "name": "renew pnmp token",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "https://digistage.sinarmas-agri.com/api-app-portal-beta/api/pnmp_token",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 1110,
+        "y": 960,
+        "wires": [
+            [
+                "814d3d9576d6a782",
+                "f54d589292be7bb5"
+            ]
+        ]
+    },
+    {
+        "id": "e08c0e6c4bf3f631",
+        "type": "debug",
+        "z": "b4fec06fae5f2c3e",
+        "name": "debug 140",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1330,
+        "y": 720,
+        "wires": []
+    },
+    {
+        "id": "814d3d9576d6a782",
+        "type": "debug",
+        "z": "b4fec06fae5f2c3e",
+        "name": "debug 141",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1330,
+        "y": 960,
+        "wires": []
+    },
+    {
+        "id": "58cf3ab041f50ce1",
+        "type": "http request",
+        "z": "b4fec06fae5f2c3e",
+        "name": "renew pnmp token",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "https://digistage.sinarmas-agri.com/api-app-portal-beta/api/pnmp_token",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 1090,
+        "y": 1200,
+        "wires": [
+            [
+                "b04547dd9766689a",
+                "e7f36edfd375b0bb"
+            ]
+        ]
+    },
+    {
+        "id": "b04547dd9766689a",
+        "type": "debug",
+        "z": "b4fec06fae5f2c3e",
+        "name": "debug 142",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1310,
+        "y": 1200,
+        "wires": []
+    },
+    {
+        "id": "d6eb830f0c4805f4",
+        "type": "http request",
+        "z": "b4fec06fae5f2c3e",
+        "name": "renew pnmp token",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "https://digistage.sinarmas-agri.com/api-app-portal-beta/api/pnmp_token",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 1090,
+        "y": 1440,
+        "wires": [
+            [
+                "7bf58eade6d07b47",
+                "1686221885626ef3"
+            ]
+        ]
+    },
+    {
+        "id": "7bf58eade6d07b47",
+        "type": "debug",
+        "z": "b4fec06fae5f2c3e",
+        "name": "debug 143",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1310,
+        "y": 1440,
+        "wires": []
+    },
+    {
+        "id": "d252808056d3134e",
+        "type": "http request",
+        "z": "b4fec06fae5f2c3e",
+        "name": "renew pnmp token",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "https://digistage.sinarmas-agri.com/api-app-portal-beta/api/pnmp_token",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 1090,
+        "y": 1680,
+        "wires": [
+            [
+                "63c94cd896c627cd",
+                "06235ba3fb91c3e6"
+            ]
+        ]
+    },
+    {
+        "id": "63c94cd896c627cd",
+        "type": "debug",
+        "z": "b4fec06fae5f2c3e",
+        "name": "debug 144",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1310,
+        "y": 1680,
+        "wires": []
     },
     {
         "id": "2158300e6fc8788f",
