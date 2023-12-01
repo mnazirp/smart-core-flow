@@ -130,9 +130,9 @@
     {
         "id": "b4fec06fae5f2c3e",
         "type": "tab",
-        "label": "Broker: Subscriber",
+        "label": "Broker: Subscriber GeoJSON",
         "disabled": false,
-        "info": "// nrlint function-eslint:off\n",
+        "info": "// nrlint function-eslint:off, max-flow-size:off\n",
         "env": []
     },
     {
@@ -171,6 +171,22 @@
         "id": "d27f5b11c2fa7b08",
         "type": "tab",
         "label": "Smart: Migration",
+        "disabled": false,
+        "info": "// nrlint function-eslint:off\n",
+        "env": []
+    },
+    {
+        "id": "b5ec5e315779d1ba",
+        "type": "tab",
+        "label": "Broker: Subscriber Tracker",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "00e8f612af910d91",
+        "type": "tab",
+        "label": "Tracker",
         "disabled": false,
         "info": "// nrlint function-eslint:off\n",
         "env": []
@@ -650,7 +666,7 @@
         "id": "f0ae825b26a06b48",
         "type": "subflow",
         "name": "sub: couch-bulk-insert",
-        "info": "## Input\r\n\r\nmsg.sub\r\n\r\n    {\r\n        database: 'smart-tracking',\r\n        docs: docs\r\n    }\n\n// nrlint function-eslint:off\n",
+        "info": "## Input\r\n\r\nmsg.sub\r\n\r\n    {\r\n        database: 'smart-tracking',\r\n        docs: docs\r\n    }\r\n\r\n// nrlint function-eslint:off\r\n",
         "category": "",
         "in": [
             {
@@ -2065,7 +2081,7 @@
         "type": "function",
         "z": "d7ccf53b2b9fe097",
         "name": "read sub",
-        "func": "msg.backup = msg.payload;\n\nlet {\n    database,\n    design,\n    view,\n    key,\n    startkey,\n    endkey,\n    limit,\n    descending,\n    group\n} = msg.sub;\n\nlet url = `${env.get('DOC_MASTER_DOMAIN')}/${database}/_design/${design}/_view/${view}?`;\nif (key) {\n    let keyStr = (Array.isArray(key)) ? `[${key.map(x => `\"${x}\"`).join(',')}]` : `\"${key}\"`;\n    url = `${url}key=${keyStr}`;\n} else if (startkey && endkey) {\n    if (Array.isArray(startkey) && Array.isArray(endkey)) {\n        url = `${url}startkey=[${startkey.map(x => {\n            if (typeof x === 'string') return `\"${x}\"`;\n            if (typeof x === 'object') return `{}`;\n            return `${x}`;\n        })}]&endkey=[${endkey.map(x => {\n            if (typeof x === 'string') return `\"${x}\"`;\n            if (typeof x === 'object') return `{}`;\n            return `${x}`;\n        })}]`;\n    } else {\n        url = `${url}startkey=\"${startkey}\"&endkey=\"${endkey}\"`;\n    }\n}\nif (group === true && !key && !startkey && !endkey) url = `${url}group=true`;\nelse if (group === true) url = `${url}&group=true`;\n\nif (limit && typeof limit == 'number') {\n    url = `${url}&limit=${limit}`\n}\nif (descending !== undefined) {\n    url = `${url}&descending=${descending}`;\n}\n\nmsg.url = url;\nmsg.headers = {\n    \"Authorization\": \"Basic \" +\n        Buffer.from(`${env.get('DOCS_MASTER_USER')}:${env.get('DOCS_MASTER_PASSWORD')}`).toString(\"base64\"),\n    \"Content-Type\": \"application/json; charset=utf-8\"\n}\nreturn msg;",
+        "func": "msg.backup = msg.payload;\n\nlet {\n    database,\n    design,\n    view,\n    key,\n    keys,\n    startkey,\n    endkey,\n    limit,\n    descending,\n    group\n} = msg.sub;\n\nlet url = `${env.get('DOC_MASTER_DOMAIN')}/${database}/_design/${design}/_view/${view}?`;\nif (key) {\n    let keyStr = (Array.isArray(key)) ? `[${key.map(x => `\"${x}\"`).join(',')}]` : `\"${key}\"`;\n    url = `${url}key=${keyStr}`;\n} else if (keys && Array.isArray(keys)) {\n    url = `${url}keys=[${keys}]`;\n} else if (startkey && endkey) {\n    if (Array.isArray(startkey) && Array.isArray(endkey)) {\n        url = `${url}startkey=[${startkey.map(x => {\n            if (typeof x === 'string') return `\"${x}\"`;\n            if (typeof x === 'object') return `{}`;\n            return `${x}`;\n        })}]&endkey=[${endkey.map(x => {\n            if (typeof x === 'string') return `\"${x}\"`;\n            if (typeof x === 'object') return `{}`;\n            return `${x}`;\n        })}]`;\n    } else {\n        url = `${url}startkey=\"${startkey}\"&endkey=\"${endkey}\"`;\n    }\n}\n\nif (group === true && !key && !startkey && !endkey) url = `${url}group=true`;\nelse if (group === true) url = `${url}&group=true`;\n\nif (limit && typeof limit == 'number') {\n    url = `${url}&limit=${limit}`\n}\nif (descending !== undefined) {\n    url = `${url}&descending=${descending}`;\n}\n\nmsg.url = url;\n// node.warn(url);\nmsg.headers = {\n    \"Authorization\": \"Basic \" +\n        Buffer.from(`${env.get('DOCS_MASTER_USER')}:${env.get('DOCS_MASTER_PASSWORD')}`).toString(\"base64\"),\n    \"Content-Type\": \"application/json; charset=utf-8\"\n}\nreturn msg;",
         "outputs": 1,
         "timeout": "",
         "noerr": 0,
@@ -6279,30 +6295,10 @@
         "y": 100,
         "wires": [
             [
-                "8eb99b916ce6d2fc"
+                "b09fc91849bb45ff"
             ],
             [
                 "2d1f4e2d4f03cdb2"
-            ]
-        ]
-    },
-    {
-        "id": "8eb99b916ce6d2fc",
-        "type": "function",
-        "z": "2e56a74c132aeaaf",
-        "name": "vehicles-by-date",
-        "func": "let { startkey, endkey } = msg.payload;\nmsg.sub = {\n    database: 'smart-bucket',\n    design: 'filter',\n    view: 'vehicle-by-date',\n    key: null,\n    startkey: startkey,\n    endkey: endkey\n}\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 720,
-        "y": 60,
-        "wires": [
-            [
-                "b53e64d5921eb2a0"
             ]
         ]
     },
@@ -6315,50 +6311,6 @@
         "headers": {},
         "x": 700,
         "y": 180,
-        "wires": []
-    },
-    {
-        "id": "b53e64d5921eb2a0",
-        "type": "subflow:d7ccf53b2b9fe097",
-        "z": "2e56a74c132aeaaf",
-        "name": "",
-        "x": 760,
-        "y": 100,
-        "wires": [
-            [
-                "3b0178327882674b"
-            ]
-        ]
-    },
-    {
-        "id": "3b0178327882674b",
-        "type": "function",
-        "z": "2e56a74c132aeaaf",
-        "name": "result",
-        "func": "msg.payload = msg.sub.rows?.map(x => x.value);\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 810,
-        "y": 140,
-        "wires": [
-            [
-                "111064bac481c50d"
-            ]
-        ]
-    },
-    {
-        "id": "111064bac481c50d",
-        "type": "http response",
-        "z": "2e56a74c132aeaaf",
-        "name": "",
-        "statusCode": "200",
-        "headers": {},
-        "x": 980,
-        "y": 140,
         "wires": []
     },
     {
@@ -6531,7 +6483,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 460,
+        "x": 500,
         "y": 460,
         "wires": [
             [
@@ -6557,34 +6509,14 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 470,
+        "x": 510,
         "y": 500,
         "wires": [
             [
-                "15be92f129517a7c"
+                "75fe72fb8ee6401f"
             ],
             [
                 "b80de8b64d322efa"
-            ]
-        ]
-    },
-    {
-        "id": "15be92f129517a7c",
-        "type": "function",
-        "z": "2e56a74c132aeaaf",
-        "name": "vehiclepositions-by-date",
-        "func": "let { type, vin, startkey, endkey } = msg.payload;\nlet view = 'hino-position-by-vin-date';\nif(type == 'vehicle') view = 'hino-vehicle-by-vin-date';\nmsg.sub = {\n    database: 'smart-bucket',\n    design: 'filter',\n    view,\n    key: null,\n    startkey: [vin, startkey],\n    endkey: [vin, endkey]\n}\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 710,
-        "y": 460,
-        "wires": [
-            [
-                "c0caa60652aaf55a"
             ]
         ]
     },
@@ -6595,52 +6527,8 @@
         "name": "",
         "statusCode": "400",
         "headers": {},
-        "x": 660,
+        "x": 700,
         "y": 580,
-        "wires": []
-    },
-    {
-        "id": "c0caa60652aaf55a",
-        "type": "subflow:d7ccf53b2b9fe097",
-        "z": "2e56a74c132aeaaf",
-        "name": "",
-        "x": 720,
-        "y": 500,
-        "wires": [
-            [
-                "c81357b45bd12f3c"
-            ]
-        ]
-    },
-    {
-        "id": "c81357b45bd12f3c",
-        "type": "function",
-        "z": "2e56a74c132aeaaf",
-        "name": "result",
-        "func": "msg.payload = msg.sub.rows?.map(x => x.value);\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 770,
-        "y": 540,
-        "wires": [
-            [
-                "f0e2c81202321666"
-            ]
-        ]
-    },
-    {
-        "id": "f0e2c81202321666",
-        "type": "http response",
-        "z": "2e56a74c132aeaaf",
-        "name": "",
-        "statusCode": "200",
-        "headers": {},
-        "x": 940,
-        "y": 540,
         "wires": []
     },
     {
@@ -6783,6 +6671,366 @@
         "x": 920,
         "y": 760,
         "wires": []
+    },
+    {
+        "id": "b09fc91849bb45ff",
+        "type": "function",
+        "z": "2e56a74c132aeaaf",
+        "name": "get vin by unit-transport",
+        "func": "msg.ori = msg.payload;\nlet { unittransport } = msg.payload;\nif (unittransport && Array.isArray(unittransport)) {\n    msg.sub = {\n        database: 'smart-asset',\n        design: 'truck',\n        view: 'by-unitID',\n        keys: unittransport.map(x => `[${x}]`),\n    }\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 750,
+        "y": 60,
+        "wires": [
+            [
+                "ff30828c898f3db9"
+            ]
+        ]
+    },
+    {
+        "id": "ff30828c898f3db9",
+        "type": "subflow:d7ccf53b2b9fe097",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "x": 740,
+        "y": 100,
+        "wires": [
+            [
+                "95961de557ecb8fb"
+            ]
+        ]
+    },
+    {
+        "id": "212d39b498c44943",
+        "type": "http response",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 1300,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "95961de557ecb8fb",
+        "type": "function",
+        "z": "2e56a74c132aeaaf",
+        "name": "map vin's",
+        "func": "msg.payload = msg.sub.rows.map(x => x.value.vin);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 800,
+        "y": 140,
+        "wires": [
+            [
+                "c4cad5d71a0fdc34"
+            ]
+        ]
+    },
+    {
+        "id": "c4cad5d71a0fdc34",
+        "type": "split",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "splt": "\\n",
+        "spltType": "str",
+        "arraySplt": 1,
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "x": 990,
+        "y": 60,
+        "wires": [
+            [
+                "a85cd1c0a79bbe97"
+            ]
+        ]
+    },
+    {
+        "id": "a85cd1c0a79bbe97",
+        "type": "function",
+        "z": "2e56a74c132aeaaf",
+        "name": "hino-by-vin-createdAt",
+        "func": "let { startkey, endkey } = msg.ori;\nmsg.sub = {\n    database: 'smart-tracking',\n    design: 'query',\n    view: 'hino-by-vin-createdAt',\n    key: null,\n    startkey: [msg.payload, startkey],\n    endkey: [msg.payload, endkey]\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1040,
+        "y": 100,
+        "wires": [
+            [
+                "793ab5717917a731"
+            ]
+        ]
+    },
+    {
+        "id": "793ab5717917a731",
+        "type": "subflow:d7ccf53b2b9fe097",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "x": 1040,
+        "y": 140,
+        "wires": [
+            [
+                "0b7381b13c15520c"
+            ]
+        ]
+    },
+    {
+        "id": "0b7381b13c15520c",
+        "type": "function",
+        "z": "2e56a74c132aeaaf",
+        "name": "function 63",
+        "func": "if(msg.sub.rows && msg.sub.rows.length > 0) msg.payload = msg.sub.rows?.map(x => x.value);\nelse msg.payload = null;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1070,
+        "y": 180,
+        "wires": [
+            [
+                "01346aa85ad3a50e"
+            ]
+        ]
+    },
+    {
+        "id": "01346aa85ad3a50e",
+        "type": "join",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "mode": "auto",
+        "build": "object",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "accumulate": "false",
+        "timeout": "",
+        "count": "",
+        "reduceRight": false,
+        "x": 1290,
+        "y": 60,
+        "wires": [
+            [
+                "0c16d714c61d3c58"
+            ]
+        ]
+    },
+    {
+        "id": "0c16d714c61d3c58",
+        "type": "function",
+        "z": "2e56a74c132aeaaf",
+        "name": "flating array inside array",
+        "func": "let payload = msg.payload.filter(x => x != null);\nmsg.payload = [].concat(...payload)\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1350,
+        "y": 100,
+        "wires": [
+            [
+                "212d39b498c44943"
+            ]
+        ]
+    },
+    {
+        "id": "75fe72fb8ee6401f",
+        "type": "function",
+        "z": "2e56a74c132aeaaf",
+        "name": "get vin by unit-transport",
+        "func": "msg.ori = msg.payload;\nlet { unittransport } = msg.payload;\nif (unittransport && Array.isArray(unittransport)) {\n    msg.sub = {\n        database: 'smart-asset',\n        design: 'truck',\n        view: 'by-unitID',\n        keys: unittransport.map(x => `[${x}]`),\n    }\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 750,
+        "y": 460,
+        "wires": [
+            [
+                "cf72194d3e874f9b"
+            ]
+        ]
+    },
+    {
+        "id": "cf72194d3e874f9b",
+        "type": "subflow:d7ccf53b2b9fe097",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "x": 740,
+        "y": 500,
+        "wires": [
+            [
+                "adffeabf66999ede"
+            ]
+        ]
+    },
+    {
+        "id": "adffeabf66999ede",
+        "type": "function",
+        "z": "2e56a74c132aeaaf",
+        "name": "map vin's",
+        "func": "msg.payload = msg.sub.rows.map(x => x.value.vin);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 800,
+        "y": 540,
+        "wires": [
+            [
+                "3910a48067ab4c16"
+            ]
+        ]
+    },
+    {
+        "id": "fd28d180d6a14654",
+        "type": "http response",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 1340,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "3910a48067ab4c16",
+        "type": "split",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "splt": "\\n",
+        "spltType": "str",
+        "arraySplt": 1,
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "x": 1010,
+        "y": 460,
+        "wires": [
+            [
+                "61662001471c04f4"
+            ]
+        ]
+    },
+    {
+        "id": "61662001471c04f4",
+        "type": "function",
+        "z": "2e56a74c132aeaaf",
+        "name": "hino-by-vin-positiondatetime",
+        "func": "let { startkey, endkey } = msg.ori;\nmsg.sub = {\n    database: 'smart-tracking',\n    design: 'query',\n    view: 'hino-by-vin-positiondatetime',\n    key: null,\n    startkey: [msg.payload, startkey],\n    endkey: [msg.payload, endkey]\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1080,
+        "y": 500,
+        "wires": [
+            [
+                "f1d0ae1aa893c789"
+            ]
+        ]
+    },
+    {
+        "id": "f1d0ae1aa893c789",
+        "type": "subflow:d7ccf53b2b9fe097",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "x": 1060,
+        "y": 540,
+        "wires": [
+            [
+                "a1e0b7c435f66a9b"
+            ]
+        ]
+    },
+    {
+        "id": "a1e0b7c435f66a9b",
+        "type": "function",
+        "z": "2e56a74c132aeaaf",
+        "name": "function 64",
+        "func": "if(msg.sub.rows && msg.sub.rows.length > 0) msg.payload = msg.sub.rows?.map(x => x.value);\nelse msg.payload = null;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1130,
+        "y": 580,
+        "wires": [
+            [
+                "b7980f9e660825c6"
+            ]
+        ]
+    },
+    {
+        "id": "b7980f9e660825c6",
+        "type": "join",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "mode": "auto",
+        "build": "object",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "accumulate": "false",
+        "timeout": "",
+        "count": "",
+        "reduceRight": false,
+        "x": 1330,
+        "y": 460,
+        "wires": [
+            [
+                "d8decae84a1cb8e4"
+            ]
+        ]
+    },
+    {
+        "id": "d8decae84a1cb8e4",
+        "type": "function",
+        "z": "2e56a74c132aeaaf",
+        "name": "flating array inside array",
+        "func": "let payload = msg.payload.filter(x => x != null);\nmsg.payload = [].concat(...payload)\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1390,
+        "y": 500,
+        "wires": [
+            [
+                "fd28d180d6a14654"
+            ]
+        ]
     },
     {
         "id": "ac083b48bc2518ab",
@@ -9259,6 +9507,212 @@
                 "d5772c81eebc1980"
             ]
         ]
+    },
+    {
+        "id": "161d71ee3022dbbd",
+        "type": "inject",
+        "z": "f26db8e574ea05fe",
+        "name": "smart-tracking views",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 150,
+        "y": 3040,
+        "wires": [
+            [
+                "2a9a9ad37946a41f",
+                "5194ecc60ad5b1da",
+                "932e0c5b353de87c"
+            ]
+        ]
+    },
+    {
+        "id": "2a9a9ad37946a41f",
+        "type": "template",
+        "z": "f26db8e574ea05fe",
+        "name": "_design/hino",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "{\n  \"_id\": \"_design/hino\",\n  \"views\": {\n    \"hino-vehicle\": {\n      \"map\": \"function (doc) {\\n  if(doc.dataType == 'hino-vehicle')emit(doc._id, doc);\\n}\"\n    },\n    \"hino-vehiclepositions\": {\n      \"map\": \"function (doc) {\\n  if(doc.dataType == 'hino-vehiclepositions')emit(doc._id, doc);\\n}\"\n    },\n    \"hinoTracking-20231107\": {\n      \"map\": \"function (doc) {\\n  if(doc.dataType == 'hino-vehiclepositions' && doc.createdAt.indexOf('2023-11-07T') >=0 ){\\n    emit(doc._id, doc);\\n  }\\n}\"\n    },\n    \"hinoTracking-20231108\": {\n      \"map\": \"function (doc) {\\n  if(doc.dataType == 'hino-vehiclepositions' && doc.createdAt.indexOf('2023-11-08T') >=0 ){\\n    emit(doc._id, doc);\\n  }\\n}\"\n    },\n    \"hinoTracking-20231117\": {\n      \"map\": \"function (doc) {\\n  if(doc.dataType == 'hino-vehiclepositions' && doc.createdAt.indexOf('2023-11-17T') >=0  && doc.vin=='MJEFM2PL2PJM10382'){\\n    emit(doc._id, doc);\\n  }\\n}\"\n    }\n  },\n  \"language\": \"javascript\"\n}",
+        "output": "str",
+        "x": 450,
+        "y": 3040,
+        "wires": [
+            [
+                "301892036ecb1271"
+            ]
+        ]
+    },
+    {
+        "id": "5194ecc60ad5b1da",
+        "type": "template",
+        "z": "f26db8e574ea05fe",
+        "name": "_design/filter",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "{\n  \"_id\": \"_design/filter\",\n  \"views\": {\n    \"vehiclepositions-by-date\": {\n      \"map\": \"function (doc) {\\n  if(doc.dataType == 'hino-vehiclepositions'){\\n    let d = new Date(doc.createdAt);\\n    emit([`${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`], doc);\\n  }\\n}\"\n    },\n    \"vehicle-by-date\": {\n      \"map\": \"function (doc) {\\n  if(doc.dataType == 'hino-vehicle'){\\n    let d = new Date(doc.createdAt);\\n    emit([`${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`], doc);\\n  }\\n}\"\n    },\n    \"hino-vehiclepositions-longlat\": {\n      \"map\": \"function (doc) {\\n  if(doc.dataType == 'hino-vehiclepositions'){\\n    let d = new Date(doc.createdAt);\\n    emit(`${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`, {\\n      vin: doc.vin, \\n      longitude: doc.longitude, \\n      latitude : doc.latitude,\\n      odometer: doc.odometer,\\n      createddatetime: doc.createddatetime\\n    });\\n  }\\n}\"\n    },\n    \"hino-position-by-vin-date\": {\n      \"map\": \"function (doc) {\\n  if(doc.dataType == 'hino-vehiclepositions'){\\n    let d = new Date(doc.positiondatetime);\\n    emit([doc.vin, `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`], {\\n      vin: doc.vin, \\n      longitude: doc.longitude, \\n      latitude : doc.latitude,\\n      odometer: doc.odometer,\\n      positiondatetime: doc.positiondatetime\\n    });\\n  }\\n}\"\n    },\n    \"hino-vehicle-by-vin-date\": {\n      \"map\": \"function (doc) {\\n  if(doc.dataType == 'hino-vehicle'){\\n    let d = new Date(doc.createdAt);\\n    emit([doc.vin, `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`], {\\n      vin: doc.vin, \\n      plate: doc.plate, \\n      name : doc.name,\\n      imei: doc.imei,\\n      model: doc.model\\n    });\\n  }\\n}\"\n    },\n    \"list-date\": {\n      \"map\": \"function (doc) {\\n  if(doc.dataType == 'hino-vehiclepositions'){\\n    emit([doc.positiondatetime.split('T')[0]], 1);\\n  }\\n}\",\n      \"reduce\": \"function (keys, values, rereduce) {\\n  if (rereduce) {\\n    return sum(values);\\n  } else {\\n    return values.length;\\n  }\\n}\"\n    }\n  },\n  \"language\": \"javascript\"\n}",
+        "output": "str",
+        "x": 450,
+        "y": 3000,
+        "wires": [
+            [
+                "301892036ecb1271"
+            ]
+        ]
+    },
+    {
+        "id": "932e0c5b353de87c",
+        "type": "template",
+        "z": "f26db8e574ea05fe",
+        "name": "_design/sort",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "{\n  \"_id\": \"_design/sort\",\n  \"views\": {\n    \"by-vin-positiondatetime\": {\n      \"map\": \"function (doc) {\\n  if(doc.vin && doc.dataType == 'hino-vehiclepositions' && doc.positiondatetime){\\n    let datetime = new Date(doc.positiondatetime)\\n    emit([doc.vin, datetime], {\\n      vin: doc.vin, \\n      longitude: doc.longitude, \\n      latitude : doc.latitude,\\n      vehiclestatus: doc.vehiclestatus,\\n      speed: doc.speed,\\n      odometer: doc.odometer,\\n      heading: doc.heading,\\n      province_name: doc.province_name,\\n      positiondatetime: doc.positiondatetime,\\n      printed_timezone: doc.printed_timezone\\n    });\\n  }\\n}\"\n    }\n  },\n  \"language\": \"javascript\"\n}",
+        "output": "str",
+        "x": 450,
+        "y": 3080,
+        "wires": [
+            [
+                "301892036ecb1271"
+            ]
+        ]
+    },
+    {
+        "id": "301892036ecb1271",
+        "type": "cloudantplus out",
+        "z": "f26db8e574ea05fe",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-tracking",
+        "service": "_ext_",
+        "payonly": true,
+        "operation": "insert",
+        "x": 740,
+        "y": 3040,
+        "wires": [
+            [
+                "a312f33834b224d4"
+            ]
+        ]
+    },
+    {
+        "id": "a312f33834b224d4",
+        "type": "debug",
+        "z": "f26db8e574ea05fe",
+        "name": "debug 152",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 970,
+        "y": 3040,
+        "wires": []
+    },
+    {
+        "id": "736ea98acb0615dd",
+        "type": "inject",
+        "z": "f26db8e574ea05fe",
+        "name": "smart-asset views",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 150,
+        "y": 3220,
+        "wires": [
+            [
+                "e1e2ee3d1aa8f5fd"
+            ]
+        ]
+    },
+    {
+        "id": "e1e2ee3d1aa8f5fd",
+        "type": "template",
+        "z": "f26db8e574ea05fe",
+        "name": "_design/hino",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "{\n  \"_id\": \"_design/truck\",\n  \"views\": {\n    \"by-unit\": {\n      \"map\": \"function (doc) {\\n  if(doc.type == 'truck' && doc.unit)emit([doc.unit], doc);\\n}\"\n    },\n    \"by-unit-vin\": {\n      \"map\": \"function (doc) {\\n  if(doc.type == 'truck' && doc.unit)emit([doc.unit, doc.vin], doc);\\n}\"\n    },\n    \"by-vin\": {\n      \"map\": \"function (doc) {\\n  if(doc.type == 'truck' && doc.unit)emit([doc.vin], doc);\\n}\"\n    },\n    \"by-unitID\": {\n      \"map\": \"function (doc) {\\n  if(doc.type == 'truck' && doc.unitID)emit([doc.unitID], doc);\\n}\"\n    }\n  },\n  \"language\": \"javascript\"\n}",
+        "output": "str",
+        "x": 450,
+        "y": 3220,
+        "wires": [
+            [
+                "5dda968259d7aae0"
+            ]
+        ]
+    },
+    {
+        "id": "5dda968259d7aae0",
+        "type": "cloudantplus out",
+        "z": "f26db8e574ea05fe",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-asset",
+        "service": "_ext_",
+        "payonly": true,
+        "operation": "insert",
+        "x": 730,
+        "y": 3220,
+        "wires": [
+            [
+                "8a305d7a89738505"
+            ]
+        ]
+    },
+    {
+        "id": "8a305d7a89738505",
+        "type": "debug",
+        "z": "f26db8e574ea05fe",
+        "name": "debug 155",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 970,
+        "y": 3220,
+        "wires": []
     },
     {
         "id": "5b97d92a9bb49e05",
@@ -12001,173 +12455,6 @@
         "statusType": "auto",
         "x": 390,
         "y": 1880,
-        "wires": []
-    },
-    {
-        "id": "5a883c474f0d2850",
-        "type": "inject",
-        "z": "c5b9039a5fc48f97",
-        "name": "get PNMP Tracker",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 150,
-        "y": 1980,
-        "wires": [
-            [
-                "74cd250b448102f4"
-            ]
-        ]
-    },
-    {
-        "id": "74cd250b448102f4",
-        "type": "http request",
-        "z": "c5b9039a5fc48f97",
-        "name": "renew pnmp token",
-        "method": "GET",
-        "ret": "txt",
-        "paytoqs": "ignore",
-        "url": "https://digistage.sinarmas-agri.com/api-app-portal-beta/api/pnmp_token",
-        "tls": "",
-        "persist": false,
-        "proxy": "",
-        "insecureHTTPParser": false,
-        "authType": "",
-        "senderr": false,
-        "headers": [],
-        "x": 150,
-        "y": 2020,
-        "wires": [
-            [
-                "e7386d744d9b0111"
-            ]
-        ]
-    },
-    {
-        "id": "e7386d744d9b0111",
-        "type": "switch",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "property": "statusCode",
-        "propertyType": "msg",
-        "rules": [
-            {
-                "t": "gte",
-                "v": "200",
-                "vt": "num"
-            },
-            {
-                "t": "else"
-            }
-        ],
-        "checkall": "true",
-        "repair": false,
-        "outputs": 2,
-        "x": 190,
-        "y": 2060,
-        "wires": [
-            [
-                "f8360ff7db454e88"
-            ],
-            [
-                "4f4a08035746267a"
-            ]
-        ]
-    },
-    {
-        "id": "4f4a08035746267a",
-        "type": "debug",
-        "z": "c5b9039a5fc48f97",
-        "name": "debug 145",
-        "active": false,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 390,
-        "y": 2120,
-        "wires": []
-    },
-    {
-        "id": "f8360ff7db454e88",
-        "type": "function",
-        "z": "c5b9039a5fc48f97",
-        "name": "get DIG01-AREA-PNMP",
-        "func": "msg.sub = {\n    database: 'smart-geojson',\n    design: 'list',\n    view: 'block',\n    key: null\n}\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 430,
-        "y": 2000,
-        "wires": [
-            [
-                "be30c137015edd6a"
-            ]
-        ]
-    },
-    {
-        "id": "be30c137015edd6a",
-        "type": "subflow:d7ccf53b2b9fe097",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "x": 440,
-        "y": 2040,
-        "wires": [
-            [
-                "b0d9a66b4bd2b79f"
-            ]
-        ]
-    },
-    {
-        "id": "b0d9a66b4bd2b79f",
-        "type": "function",
-        "z": "c5b9039a5fc48f97",
-        "name": "spawn BLOCK",
-        "func": "let counter = 0;\nlet data = msg.sub.rows.map(x => {\n    let [psm, estate, division] = x.key;\n    let block = x.value;\n    return { psm, estate, division, block }\n});\nlet payload = data.filter(x => x.estate == 'SMSE');\nsplit();\nreturn null;\n\nfunction split() {\n    if (counter < payload.length) {\n        let { psm, estate, division, block } = payload[counter];\n        node.send({\n            payload: {\n                psm,\n                estate,\n                division,\n                block,\n                attempt: 0\n            },\n            options: {\n                persistent: true\n            }\n        });\n        counter++;\n        setTimeout(split, 12000);\n    }\n}",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 440,
-        "y": 2080,
-        "wires": [
-            [
-                "370bb3ac65508a3b"
-            ]
-        ]
-    },
-    {
-        "id": "370bb3ac65508a3b",
-        "type": "amqp out",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "routingkey": "",
-        "iotype": "4",
-        "ioname": "job.geojson.get.tree",
-        "server": "e907ba5364e5896f",
-        "x": 690,
-        "y": 2080,
         "wires": []
     },
     {
@@ -16153,7 +16440,7 @@
         "payload": "",
         "payloadType": "date",
         "x": 140,
-        "y": 140,
+        "y": 80,
         "wires": [
             [
                 "dff6f131eb6b9ce1"
@@ -16166,10 +16453,10 @@
         "z": "d27f5b11c2fa7b08",
         "name": "",
         "x": 400,
-        "y": 180,
+        "y": 120,
         "wires": [
             [
-                "a531f0b2f21dcd97"
+                "7846669aeb8a077f"
             ]
         ]
     },
@@ -16186,7 +16473,7 @@
         "finalize": "",
         "libs": [],
         "x": 370,
-        "y": 140,
+        "y": 80,
         "wires": [
             [
                 "043473ad0e8bbd67"
@@ -16194,36 +16481,378 @@
         ]
     },
     {
-        "id": "a531f0b2f21dcd97",
+        "id": "d00fdc40fed65f47",
+        "type": "debug",
+        "z": "d27f5b11c2fa7b08",
+        "name": "debug 150",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 910,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "7846669aeb8a077f",
         "type": "function",
         "z": "d27f5b11c2fa7b08",
-        "name": "split vehiclepositions date",
-        "func": "let payload = msg.sub.rows[0].value.data;\nlet counter = 0;\nsplit();\ndelete msg.payload;\nreturn null;\n\nfunction split() {\n    if (counter < payload.length) {\n        let data = payload[counter];\n        node.send({\n            payload: {\n                data,\n                command: 'migrate',\n                topic: 'vehiclepositions'\n            }\n        });\n        counter++;\n        setTimeout(split, 10 * 60000); // in minutes\n    }\n}",
+        "name": "function 60",
+        "func": "let payload = msg.sub.rows[0].value.data.sort((a, b) => (a.date > b.date) ? -1 : ((b.date > a.date) ? 1 : 0));\nmsg.payload = payload.filter((x, i) => {\n    if (i < 1) return x;\n})\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 410,
-        "y": 220,
+        "x": 430,
+        "y": 160,
         "wires": [
             [
-                "7e960a1463fc68c0"
+                "9f97b10291c9f880"
             ]
         ]
     },
     {
-        "id": "7e960a1463fc68c0",
-        "type": "amqp out",
+        "id": "b4b9f0c8a4eb410f",
+        "type": "inject",
         "z": "d27f5b11c2fa7b08",
         "name": "",
-        "routingkey": "bind.job.migrate.bucket",
-        "iotype": "3",
-        "ioname": "smart.jobs",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "2023-11-9",
+        "payloadType": "str",
+        "x": 140,
+        "y": 280,
+        "wires": [
+            [
+                "3b453c768f98dc75"
+            ]
+        ]
+    },
+    {
+        "id": "1e818bcf1e5ea555",
+        "type": "subflow:d7ccf53b2b9fe097",
+        "z": "d27f5b11c2fa7b08",
+        "name": "",
+        "x": 400,
+        "y": 320,
+        "wires": [
+            [
+                "85298adfbaca2569"
+            ]
+        ]
+    },
+    {
+        "id": "3b453c768f98dc75",
+        "type": "function",
+        "z": "d27f5b11c2fa7b08",
+        "name": "query view",
+        "func": "msg.sub = {\n    database: 'smart-bucket',\n    design: 'filter',\n    view: 'vehicle-by-date',\n    key: [msg.payload]\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 280,
+        "wires": [
+            [
+                "1e818bcf1e5ea555"
+            ]
+        ]
+    },
+    {
+        "id": "85298adfbaca2569",
+        "type": "debug",
+        "z": "d27f5b11c2fa7b08",
+        "name": "debug 151",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 650,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "2e363ba10edd726f",
+        "type": "subflow:d7ccf53b2b9fe097",
+        "z": "d27f5b11c2fa7b08",
+        "name": "",
+        "x": 680,
+        "y": 160,
+        "wires": [
+            [
+                "04ed4601d9e5cac0"
+            ]
+        ]
+    },
+    {
+        "id": "54b6735a866d7134",
+        "type": "function",
+        "z": "d27f5b11c2fa7b08",
+        "name": "query view",
+        "func": "msg.sub = {\n    database: 'smart-bucket',\n    design: 'filter',\n    view: 'vehicle-by-date',\n    key: [msg.payload.date]\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 650,
+        "y": 120,
+        "wires": [
+            [
+                "2e363ba10edd726f"
+            ]
+        ]
+    },
+    {
+        "id": "9f97b10291c9f880",
+        "type": "split",
+        "z": "d27f5b11c2fa7b08",
+        "name": "",
+        "splt": "\\n",
+        "spltType": "str",
+        "arraySplt": 1,
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "x": 630,
+        "y": 80,
+        "wires": [
+            [
+                "54b6735a866d7134"
+            ]
+        ]
+    },
+    {
+        "id": "c5ca8e4123d83820",
+        "type": "join",
+        "z": "d27f5b11c2fa7b08",
+        "name": "",
+        "mode": "auto",
+        "build": "object",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "accumulate": "false",
+        "timeout": "",
+        "count": "",
+        "reduceRight": false,
+        "x": 890,
+        "y": 120,
+        "wires": [
+            [
+                "d00fdc40fed65f47"
+            ]
+        ]
+    },
+    {
+        "id": "04ed4601d9e5cac0",
+        "type": "function",
+        "z": "d27f5b11c2fa7b08",
+        "name": "function 62",
+        "func": "msg.payload = msg.sub.rows;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 910,
+        "y": 80,
+        "wires": [
+            [
+                "c5ca8e4123d83820"
+            ]
+        ]
+    },
+    {
+        "id": "5a883c474f0d2850",
+        "type": "inject",
+        "z": "00e8f612af910d91",
+        "name": "get PNMP Tracker",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 150,
+        "y": 60,
+        "wires": [
+            [
+                "74cd250b448102f4"
+            ]
+        ]
+    },
+    {
+        "id": "74cd250b448102f4",
+        "type": "http request",
+        "z": "00e8f612af910d91",
+        "name": "renew pnmp token",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "https://digistage.sinarmas-agri.com/api-app-portal-beta/api/pnmp_token",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 150,
+        "y": 100,
+        "wires": [
+            [
+                "e7386d744d9b0111"
+            ]
+        ]
+    },
+    {
+        "id": "e7386d744d9b0111",
+        "type": "switch",
+        "z": "00e8f612af910d91",
+        "name": "",
+        "property": "statusCode",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "gte",
+                "v": "200",
+                "vt": "num"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 190,
+        "y": 140,
+        "wires": [
+            [
+                "f8360ff7db454e88"
+            ],
+            [
+                "4f4a08035746267a"
+            ]
+        ]
+    },
+    {
+        "id": "f8360ff7db454e88",
+        "type": "function",
+        "z": "00e8f612af910d91",
+        "name": "get DIG01-AREA-PNMP",
+        "func": "msg.sub = {\n    database: 'smart-geojson',\n    design: 'list',\n    view: 'block',\n    key: null\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 80,
+        "wires": [
+            [
+                "be30c137015edd6a"
+            ]
+        ]
+    },
+    {
+        "id": "4f4a08035746267a",
+        "type": "debug",
+        "z": "00e8f612af910d91",
+        "name": "debug 145",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 390,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "be30c137015edd6a",
+        "type": "subflow:d7ccf53b2b9fe097",
+        "z": "00e8f612af910d91",
+        "name": "",
+        "x": 440,
+        "y": 120,
+        "wires": [
+            [
+                "b0d9a66b4bd2b79f"
+            ]
+        ]
+    },
+    {
+        "id": "b0d9a66b4bd2b79f",
+        "type": "function",
+        "z": "00e8f612af910d91",
+        "name": "spawn BLOCK",
+        "func": "let counter = 0;\nlet data = msg.sub.rows.map(x => {\n    let [psm, estate, division] = x.key;\n    let block = x.value;\n    return { psm, estate, division, block }\n});\nlet payload = data.filter(x => x.estate == 'SMSE');\nsplit();\nreturn null;\n\nfunction split() {\n    if (counter < payload.length) {\n        let { psm, estate, division, block } = payload[counter];\n        node.send({\n            payload: {\n                psm,\n                estate,\n                division,\n                block,\n                attempt: 0\n            },\n            options: {\n                persistent: true\n            }\n        });\n        counter++;\n        setTimeout(split, 12000);\n    }\n}",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 460,
+        "y": 160,
+        "wires": [
+            [
+                "370bb3ac65508a3b"
+            ]
+        ]
+    },
+    {
+        "id": "370bb3ac65508a3b",
+        "type": "amqp out",
+        "z": "00e8f612af910d91",
+        "name": "",
+        "routingkey": "",
+        "iotype": "4",
+        "ioname": "job.geojson.get.tree",
         "server": "e907ba5364e5896f",
-        "x": 670,
-        "y": 220,
+        "x": 690,
+        "y": 160,
         "wires": []
     }
 ]
