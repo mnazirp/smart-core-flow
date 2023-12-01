@@ -6476,7 +6476,7 @@
         "type": "function",
         "z": "2e56a74c132aeaaf",
         "name": "validated",
-        "func": "let valid = false;\nlet { type, vin, startkey, endkey } = msg.payload;\nlet option = ['position', 'vehicle'];\nif (type && option.includes(type) && vin && msg.payload && startkey && endkey) valid = true;\nmsg.valid = true;\nif (!valid) {\n    msg.payload = \"parameter is not valid\"\n}\nreturn msg;",
+        "func": "let valid = false;\nlet { type, startkey, endkey, unittransport } = msg.payload;\nlet option = ['position', 'vehicle'];\nif (type && option.includes(type) && msg.payload && startkey && endkey && unittransport) valid = true;\nmsg.valid = valid;\nif (!valid) {\n    msg.payload = \"parameter is not valid\"\n}\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
