@@ -9535,7 +9535,8 @@
             [
                 "2a9a9ad37946a41f",
                 "5194ecc60ad5b1da",
-                "932e0c5b353de87c"
+                "932e0c5b353de87c",
+                "82ce6eecefa4b0b8"
             ]
         ]
     },
@@ -9713,6 +9714,25 @@
         "x": 970,
         "y": 3220,
         "wires": []
+    },
+    {
+        "id": "82ce6eecefa4b0b8",
+        "type": "template",
+        "z": "f26db8e574ea05fe",
+        "name": "_design/query",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "{\n  \"_id\": \"_design/query\",\n  \"views\": {\n    \"hino-by-vin-positiondatetime\": {\n      \"map\": \"function (doc) {\\n if(doc.dataType == 'hino-vehiclepositions' && doc.vin && doc.positiondatetime) emit([doc.vin, doc.positiondatetime.split('T')[0]], doc);\\n}\"\n    },\n    \"hino-by-vin-createdAt\": {\n      \"map\": \"function (doc) {\\n if(doc.dataType == 'hino-vehicle' && doc.vin && doc.createdAt) emit([doc.vin, doc.createdAt.split('T')[0]], doc);\\n}\"\n    }\n  },\n  \"language\": \"javascript\"\n}",
+        "output": "str",
+        "x": 460,
+        "y": 3120,
+        "wires": [
+            [
+                "301892036ecb1271"
+            ]
+        ]
     },
     {
         "id": "5b97d92a9bb49e05",
