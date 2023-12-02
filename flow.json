@@ -6602,7 +6602,7 @@
         "type": "function",
         "z": "2e56a74c132aeaaf",
         "name": "function 57",
-        "func": "msg.sub = {\n    database: 'smart-bucket',\n    design: 'sort',\n    view: 'by-vin-positiondatetime',\n    key: null,\n    startkey: [msg.payload, {}],\n    endkey: [msg.payload],\n    limit: 1,\n    descending: true\n}\nreturn msg;",
+        "func": "msg.sub = {\n    database: 'smart-tracking',\n    design: 'sort',\n    view: 'by-vin-positiondatetime',\n    key: null,\n    startkey: [msg.payload, {}],\n    endkey: [msg.payload],\n    limit: 1,\n    descending: true\n}\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -6973,7 +6973,7 @@
         "id": "a1e0b7c435f66a9b",
         "type": "function",
         "z": "2e56a74c132aeaaf",
-        "name": "function 64",
+        "name": "map resul",
         "func": "if(msg.sub.rows && msg.sub.rows.length > 0) msg.payload = msg.sub.rows?.map(x => x.value);\nelse msg.payload = null;\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
@@ -6981,7 +6981,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1330,
+        "x": 1340,
         "y": 580,
         "wires": [
             [
@@ -7067,7 +7067,7 @@
         "id": "2d78a901f74585a3",
         "type": "function",
         "z": "2e56a74c132aeaaf",
-        "name": "get on redis",
+        "name": "get from redis",
         "func": "msg.topic = msg.redisKey;\nmsg.payload = null;\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
@@ -7075,7 +7075,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 710,
+        "x": 720,
         "y": 460,
         "wires": [
             [
