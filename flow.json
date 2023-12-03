@@ -1038,6 +1038,14 @@
         "prefetchvalueack": "1"
     },
     {
+        "id": "8ca322e6bc2d554c",
+        "type": "redis-config",
+        "name": "REDIS_TS_URL",
+        "options": "REDIS_TS_URL",
+        "cluster": false,
+        "optionsType": "env"
+    },
+    {
         "id": "156f4bd7081013b2",
         "type": "function",
         "z": "77002254b872fa8e",
@@ -7291,6 +7299,108 @@
         "x": 1140,
         "y": 180,
         "wires": []
+    },
+    {
+        "id": "6a842d3a4682d0db",
+        "type": "inject",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 280,
+        "y": 900,
+        "wires": [
+            [
+                "9980a16d9f0bcf2f"
+            ]
+        ]
+    },
+    {
+        "id": "dcd28c5b3baceef9",
+        "type": "debug",
+        "z": "2e56a74c132aeaaf",
+        "name": "debug 156",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 690,
+        "y": 940,
+        "wires": []
+    },
+    {
+        "id": "9980a16d9f0bcf2f",
+        "type": "redis-lua-script",
+        "z": "2e56a74c132aeaaf",
+        "server": "8ca322e6bc2d554c",
+        "name": "",
+        "keyval": 0,
+        "func": "redis.call('TS.CREATE', 'vin:longitude', 3600000,'LABELS', 'label1', 'value1', 'UNCOMPRESSED', 'true' );\nreturn redis;",
+        "stored": false,
+        "block": false,
+        "x": 480,
+        "y": 900,
+        "wires": [
+            [
+                "dcd28c5b3baceef9"
+            ]
+        ]
+    },
+    {
+        "id": "1f807260d8cef038",
+        "type": "function",
+        "z": "2e56a74c132aeaaf",
+        "name": "function 64",
+        "func": "// Sample code for the function node\nmsg.payload = {\n    key: 'your_timeseries_key',\n    retention: 3600000, // 1 hour retention (in milliseconds)\n    labels: ['label1', 'label2'], // Optional: add labels as needed\n    uncompressed: true // Optional: set to true if you want to store data uncompressed\n};\nmsg.Command = 'TS.CREATE'\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 510,
+        "y": 1040,
+        "wires": [
+            [
+                "104c4128b04c6c24"
+            ]
+        ]
+    },
+    {
+        "id": "104c4128b04c6c24",
+        "type": "redis-command",
+        "z": "2e56a74c132aeaaf",
+        "server": "8ca322e6bc2d554c",
+        "command": "set",
+        "name": "",
+        "topic": "",
+        "params": "[]",
+        "paramsType": "json",
+        "payloadType": "json",
+        "block": false,
+        "x": 500,
+        "y": 1080,
+        "wires": [
+            []
+        ]
     },
     {
         "id": "ac083b48bc2518ab",
