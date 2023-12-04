@@ -1005,6 +1005,43 @@
         "color": "#FFAAAA"
     },
     {
+        "id": "943c8c2749f2d9d3",
+        "type": "subflow",
+        "name": "sub: redis-ts:CREATE",
+        "info": "# INPUT\r\n\r\n### msg.sub\r\n\r\n    {\r\n        key: 'vin:longitude',\r\n        retention: 3600000,\r\n        duplicatePolicy: 'LAST',\r\n        labels: [],\r\n        encoding: 'UNCOMPRESSED'\r\n    }\r\n\r\n### success msg.sub\r\n\r\n    {sub: \"OK\"}\r\n\r\n### error\r\n\r\n    {\r\n        message: '',\r\n        source: object,\r\n        stack: 'string'\r\n    }",
+        "category": "",
+        "in": [
+            {
+                "x": 60,
+                "y": 80,
+                "wires": [
+                    {
+                        "id": "1f807260d8cef038"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 520,
+                "y": 160,
+                "wires": [
+                    {
+                        "id": "949aed1cdce032ec",
+                        "port": 0
+                    },
+                    {
+                        "id": "cb4caff598416a5f",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [],
+        "meta": {},
+        "color": "#c13212"
+    },
+    {
         "id": "784d89e62dfb5070",
         "type": "cloudantplus",
         "host": "${DOCS_MASTER}",
@@ -3118,6 +3155,99 @@
         "libs": [],
         "x": 190,
         "y": 160,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "1f807260d8cef038",
+        "type": "function",
+        "z": "943c8c2749f2d9d3",
+        "name": "build payload",
+        "func": "msg.backup = msg.payload;\nlet duplicateOptions = ['BLOCK', 'FIRST', 'LAST', 'MIN', 'MAX', 'SUM'];\nlet encodingOptions = ['COMPRESSED', 'UNCOMPRESSED'];\nlet { key, retention, duplicatePolicy, labels, encoding } = msg.sub;\n\nlet payload = [key];\nif (retention == undefined) retention = 0;\npayload.push('RETENTION');\npayload.push(retention);\n\nif (duplicatePolicy != undefined && duplicateOptions.includes(duplicatePolicy)) {\n    payload.push('DUPLICATE_POLICY');\n    payload.push(duplicatePolicy);\n}\n\nif (labels && Array.isArray(labels)) {\n    payload.push('LABELS');\n    labels.forEach(x => payload.push(x));\n}\n\nif (encoding != undefined && encodingOptions.includes(encoding)) {\n    payload.push('ENCODING');\n    payload.push(encoding);\n}\n\nmsg.payload = payload;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 210,
+        "y": 80,
+        "wires": [
+            [
+                "104c4128b04c6c24"
+            ]
+        ]
+    },
+    {
+        "id": "104c4128b04c6c24",
+        "type": "redis-command",
+        "z": "943c8c2749f2d9d3",
+        "server": "8ca322e6bc2d554c",
+        "command": "TS.CREATE",
+        "name": "",
+        "topic": "",
+        "params": "[]",
+        "paramsType": "json",
+        "payloadType": "json",
+        "block": false,
+        "x": 230,
+        "y": 120,
+        "wires": [
+            [
+                "949aed1cdce032ec"
+            ]
+        ]
+    },
+    {
+        "id": "949aed1cdce032ec",
+        "type": "function",
+        "z": "943c8c2749f2d9d3",
+        "name": "result msg.sub",
+        "func": "msg.sub = msg.payload;\nmsg.payload = msg.backup;\ndelete msg.backup;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 220,
+        "y": 160,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "797dac20fcb6aa2c",
+        "type": "catch",
+        "z": "943c8c2749f2d9d3",
+        "name": "",
+        "scope": [
+            "104c4128b04c6c24"
+        ],
+        "uncaught": false,
+        "x": 190,
+        "y": 200,
+        "wires": [
+            [
+                "cb4caff598416a5f"
+            ]
+        ]
+    },
+    {
+        "id": "cb4caff598416a5f",
+        "type": "function",
+        "z": "943c8c2749f2d9d3",
+        "name": "msg.error",
+        "func": "msg.sub = msg.error;\nmsg.payload = msg.backup;\ndelete msg.backup;\ndelete msg.error;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 340,
+        "y": 200,
         "wires": [
             []
         ]
@@ -7321,11 +7451,11 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 280,
-        "y": 900,
+        "x": 140,
+        "y": 840,
         "wires": [
             [
-                "9980a16d9f0bcf2f"
+                "4e943fe85da0a713"
             ]
         ]
     },
@@ -7342,64 +7472,299 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 690,
-        "y": 940,
+        "x": 830,
+        "y": 840,
         "wires": []
     },
     {
-        "id": "9980a16d9f0bcf2f",
-        "type": "redis-lua-script",
+        "id": "120f4c33f36983ce",
+        "type": "inject",
         "z": "2e56a74c132aeaaf",
-        "server": "8ca322e6bc2d554c",
         "name": "",
-        "keyval": 0,
-        "func": "redis.call('TS.CREATE', 'vin:longitude', 3600000,'LABELS', 'label1', 'value1', 'UNCOMPRESSED', 'true' );\nreturn redis;",
-        "stored": false,
-        "block": false,
-        "x": 480,
-        "y": 900,
-        "wires": [
-            [
-                "dcd28c5b3baceef9"
-            ]
-        ]
-    },
-    {
-        "id": "1f807260d8cef038",
-        "type": "function",
-        "z": "2e56a74c132aeaaf",
-        "name": "function 64",
-        "func": "// Sample code for the function node\nmsg.payload = {\n    key: 'your_timeseries_key',\n    retention: 3600000, // 1 hour retention (in milliseconds)\n    labels: ['label1', 'label2'], // Optional: add labels as needed\n    uncompressed: true // Optional: set to true if you want to store data uncompressed\n};\nmsg.Command = 'TS.CREATE'\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 510,
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 140,
         "y": 1040,
         "wires": [
             [
-                "104c4128b04c6c24"
+                "73fb419f68eae399"
             ]
         ]
     },
     {
-        "id": "104c4128b04c6c24",
+        "id": "741ee659fa19cf39",
+        "type": "debug",
+        "z": "2e56a74c132aeaaf",
+        "name": "debug 157",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 590,
+        "y": 1080,
+        "wires": []
+    },
+    {
+        "id": "aa3c701a6612b04b",
         "type": "redis-command",
         "z": "2e56a74c132aeaaf",
         "server": "8ca322e6bc2d554c",
-        "command": "set",
+        "command": "TS.GET",
         "name": "",
         "topic": "",
         "params": "[]",
         "paramsType": "json",
         "payloadType": "json",
         "block": false,
-        "x": 500,
+        "x": 360,
         "y": 1080,
         "wires": [
-            []
+            [
+                "741ee659fa19cf39"
+            ]
+        ]
+    },
+    {
+        "id": "73fb419f68eae399",
+        "type": "function",
+        "z": "2e56a74c132aeaaf",
+        "name": "function 65",
+        "func": "msg.topic = 'vin:longitude'\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 1040,
+        "wires": [
+            [
+                "aa3c701a6612b04b"
+            ]
+        ]
+    },
+    {
+        "id": "ddeeb20f56555852",
+        "type": "inject",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 140,
+        "y": 940,
+        "wires": [
+            [
+                "a73caf61015979aa"
+            ]
+        ]
+    },
+    {
+        "id": "a73caf61015979aa",
+        "type": "function",
+        "z": "2e56a74c132aeaaf",
+        "name": "function 66",
+        "func": "msg.payload = ['vin:longitude', (new Date()).getTime(), 124]\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 940,
+        "wires": [
+            [
+                "12765c99b537c8df"
+            ]
+        ]
+    },
+    {
+        "id": "12765c99b537c8df",
+        "type": "redis-command",
+        "z": "2e56a74c132aeaaf",
+        "server": "8ca322e6bc2d554c",
+        "command": "TS.ADD",
+        "name": "",
+        "topic": "",
+        "params": "[]",
+        "paramsType": "json",
+        "payloadType": "json",
+        "block": false,
+        "x": 360,
+        "y": 980,
+        "wires": [
+            [
+                "fa020e32b650340d"
+            ]
+        ]
+    },
+    {
+        "id": "fa020e32b650340d",
+        "type": "debug",
+        "z": "2e56a74c132aeaaf",
+        "name": "debug 158",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 590,
+        "y": 980,
+        "wires": []
+    },
+    {
+        "id": "6515bcc2e0ea9b86",
+        "type": "inject",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 140,
+        "y": 1140,
+        "wires": [
+            [
+                "9c1d1f18095b2241"
+            ]
+        ]
+    },
+    {
+        "id": "9c1d1f18095b2241",
+        "type": "function",
+        "z": "2e56a74c132aeaaf",
+        "name": "function 67",
+        "func": "msg.payload = ['vin:longitude', '-', '+']\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 1140,
+        "wires": [
+            [
+                "f30c4306fc54d776"
+            ]
+        ]
+    },
+    {
+        "id": "f30c4306fc54d776",
+        "type": "redis-command",
+        "z": "2e56a74c132aeaaf",
+        "server": "8ca322e6bc2d554c",
+        "command": "TS.RANGE",
+        "name": "",
+        "topic": "",
+        "params": "[]",
+        "paramsType": "json",
+        "payloadType": "json",
+        "block": false,
+        "x": 370,
+        "y": 1180,
+        "wires": [
+            [
+                "1a1f21f59a8be356"
+            ]
+        ]
+    },
+    {
+        "id": "1a1f21f59a8be356",
+        "type": "debug",
+        "z": "2e56a74c132aeaaf",
+        "name": "debug 159",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 590,
+        "y": 1180,
+        "wires": []
+    },
+    {
+        "id": "4e943fe85da0a713",
+        "type": "function",
+        "z": "2e56a74c132aeaaf",
+        "name": "function 68",
+        "func": "msg.sub = {\n    key: 'vin:longitude',\n    retention: 3600000,\n    duplicatePolicy: 'LAST',\n    labels: [],\n    encoding: 'UNCOMPRESSED'\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 840,
+        "wires": [
+            [
+                "59f246b2a62c781a"
+            ]
+        ]
+    },
+    {
+        "id": "59f246b2a62c781a",
+        "type": "subflow:943c8c2749f2d9d3",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "x": 580,
+        "y": 840,
+        "wires": [
+            [
+                "dcd28c5b3baceef9"
+            ]
         ]
     },
     {
@@ -9960,7 +10325,7 @@
         "template": "{\n  \"_id\": \"_design/sort\",\n  \"views\": {\n    \"by-vin-positiondatetime\": {\n      \"map\": \"function (doc) {\\n  if(doc.vin && doc.dataType == 'hino-vehiclepositions' && doc.positiondatetime){\\n    let datetime = new Date(doc.positiondatetime)\\n    emit([doc.vin, datetime], {\\n      vin: doc.vin, \\n      longitude: doc.longitude, \\n      latitude : doc.latitude,\\n      vehiclestatus: doc.vehiclestatus,\\n      speed: doc.speed,\\n      odometer: doc.odometer,\\n      heading: doc.heading,\\n      province_name: doc.province_name,\\n      positiondatetime: doc.positiondatetime,\\n      printed_timezone: doc.printed_timezone\\n    });\\n  }\\n}\"\n    }\n  },\n  \"language\": \"javascript\"\n}",
         "output": "str",
         "x": 450,
-        "y": 3080,
+        "y": 3120,
         "wires": [
             [
                 "301892036ecb1271"
@@ -10097,7 +10462,7 @@
         "template": "{\n  \"_id\": \"_design/query\",\n  \"views\": {\n    \"hino-by-vin-positiondatetime\": {\n      \"map\": \"function (doc) {\\n if(doc.dataType == 'hino-vehiclepositions' && doc.vin && doc.positiondatetime) emit([doc.vin, doc.positiondatetime.split('T')[0]], doc);\\n}\"\n    },\n    \"hino-by-vin-createdAt\": {\n      \"map\": \"function (doc) {\\n if(doc.dataType == 'hino-vehicle' && doc.vin && doc.createdAt) emit([doc.vin, doc.createdAt.split('T')[0]], doc);\\n}\"\n    }\n  },\n  \"language\": \"javascript\"\n}",
         "output": "str",
         "x": 460,
-        "y": 3120,
+        "y": 3080,
         "wires": [
             [
                 "301892036ecb1271"
@@ -16892,7 +17257,7 @@
         "type": "function",
         "z": "d27f5b11c2fa7b08",
         "name": "function 60",
-        "func": "let payload = msg.sub.rows[0].value.data.sort((a, b) => (a.date > b.date) ? -1 : ((b.date > a.date) ? 1 : 0));\nmsg.payload = payload.filter((x, i) => {\n    if (i < 1) return x;\n})\nreturn msg;",
+        "func": "let payload = msg.sub.rows[0].value.data.sort((a, b) => (a.date > b.date) ?\n    -1 : ((b.date > a.date) ? 1 : 0));\n    node.warn(payload);\nmsg.payload = payload.filter((x, i) => {\n    if (i < 1) return x;\n})\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -16922,13 +17287,14 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "payload": "2023-11-9",
+        "payload": "2023-11-7",
         "payloadType": "str",
         "x": 140,
         "y": 280,
         "wires": [
             [
-                "3b453c768f98dc75"
+                "3b453c768f98dc75",
+                "31a9069ea1d3f060"
             ]
         ]
     },
@@ -16941,7 +17307,7 @@
         "y": 320,
         "wires": [
             [
-                "85298adfbaca2569"
+                "eed9d02d27e5a7d5"
             ]
         ]
     },
@@ -16978,8 +17344,8 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 650,
-        "y": 320,
+        "x": 670,
+        "y": 400,
         "wires": []
     },
     {
@@ -17077,6 +17443,122 @@
                 "c5ca8e4123d83820"
             ]
         ]
+    },
+    {
+        "id": "eed9d02d27e5a7d5",
+        "type": "function",
+        "z": "d27f5b11c2fa7b08",
+        "name": "prepare documents",
+        "func": "let docs = msg.sub.rows.map(x => {\n    let obj = { ...x.value };\n    delete obj[\"_id\"];\n    delete obj[\"_rev\"];\n    return obj;\n});\nmsg.sub = {\n    database: 'smart-tracking',\n    docs: docs\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 390,
+        "y": 360,
+        "wires": [
+            [
+                "475b75264cb6cdf1"
+            ]
+        ]
+    },
+    {
+        "id": "475b75264cb6cdf1",
+        "type": "subflow:f0ae825b26a06b48",
+        "z": "d27f5b11c2fa7b08",
+        "name": "",
+        "x": 400,
+        "y": 400,
+        "wires": [
+            [
+                "85298adfbaca2569"
+            ]
+        ]
+    },
+    {
+        "id": "24fd880139ce6a0f",
+        "type": "subflow:d7ccf53b2b9fe097",
+        "z": "d27f5b11c2fa7b08",
+        "name": "",
+        "x": 400,
+        "y": 480,
+        "wires": [
+            [
+                "061aed2cdbdfc4a0"
+            ]
+        ]
+    },
+    {
+        "id": "31a9069ea1d3f060",
+        "type": "function",
+        "z": "d27f5b11c2fa7b08",
+        "name": "query view",
+        "func": "msg.sub = {\n    database: 'smart-bucket',\n    design: 'filter',\n    view: 'vehiclepositions-by-date',\n    key: [msg.payload]\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 440,
+        "wires": [
+            [
+                "24fd880139ce6a0f"
+            ]
+        ]
+    },
+    {
+        "id": "061aed2cdbdfc4a0",
+        "type": "function",
+        "z": "d27f5b11c2fa7b08",
+        "name": "prepare documents",
+        "func": "let docs = msg.sub.rows.map(x => {\n    let obj = { ...x.value };\n    delete obj[\"_id\"];\n    delete obj[\"_rev\"];\n    return obj;\n});\nmsg.sub = {\n    database: 'smart-tracking',\n    docs: docs\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 390,
+        "y": 520,
+        "wires": [
+            [
+                "418ca53c76237170"
+            ]
+        ]
+    },
+    {
+        "id": "418ca53c76237170",
+        "type": "subflow:f0ae825b26a06b48",
+        "z": "d27f5b11c2fa7b08",
+        "name": "",
+        "x": 400,
+        "y": 560,
+        "wires": [
+            [
+                "f51adf91dd42246d"
+            ]
+        ]
+    },
+    {
+        "id": "f51adf91dd42246d",
+        "type": "debug",
+        "z": "d27f5b11c2fa7b08",
+        "name": "debug 160",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 670,
+        "y": 560,
+        "wires": []
     },
     {
         "id": "5a883c474f0d2850",
