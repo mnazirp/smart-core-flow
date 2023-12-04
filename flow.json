@@ -1042,6 +1042,80 @@
         "color": "#c13212"
     },
     {
+        "id": "a7f86da2f9168cf7",
+        "type": "subflow",
+        "name": "sub: redis-ts:ADD",
+        "info": "# INPUT\r\n\r\n### msg.sub\r\n\r\n    {\r\n        key: 'vin:longitude',\r\n        timestamp: (new Date()).getTime(),\r\n        value: 124\r\n    }",
+        "category": "",
+        "in": [
+            {
+                "x": 60,
+                "y": 80,
+                "wires": [
+                    {
+                        "id": "a73caf61015979aa"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 520,
+                "y": 160,
+                "wires": [
+                    {
+                        "id": "1679c5fd616e22b2",
+                        "port": 0
+                    },
+                    {
+                        "id": "8c28b39a95d2a1a4",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [],
+        "meta": {},
+        "color": "#c13212"
+    },
+    {
+        "id": "a4fb02ca445b7482",
+        "type": "subflow",
+        "name": "sub: redis-ts:RANGE",
+        "info": "# INPUT\r\n\r\n### msg.sub\r\n\r\n     {\r\n        key: 'vin:longitude',\r\n        start: '-',\r\n        end: '+',\r\n    }\r\n\r\n     {\r\n        key: 'vin:longitude',\r\n        start: 1701685322000,\r\n        end: 1701688183000,\r\n    }\r\n\r\nstart & end using timestamp",
+        "category": "",
+        "in": [
+            {
+                "x": 60,
+                "y": 80,
+                "wires": [
+                    {
+                        "id": "9c1d1f18095b2241"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 520,
+                "y": 160,
+                "wires": [
+                    {
+                        "id": "1858a8ceff0983b4",
+                        "port": 0
+                    },
+                    {
+                        "id": "88e03ac2641d4d13",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [],
+        "meta": {},
+        "color": "#c13212"
+    },
+    {
         "id": "784d89e62dfb5070",
         "type": "cloudantplus",
         "host": "${DOCS_MASTER}",
@@ -3238,6 +3312,192 @@
         "id": "cb4caff598416a5f",
         "type": "function",
         "z": "943c8c2749f2d9d3",
+        "name": "msg.error",
+        "func": "msg.sub = msg.error;\nmsg.payload = msg.backup;\ndelete msg.backup;\ndelete msg.error;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 340,
+        "y": 200,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "a73caf61015979aa",
+        "type": "function",
+        "z": "a7f86da2f9168cf7",
+        "name": "read msg.sub",
+        "func": "msg.backup = msg.payload;\nlet { key, timestamp, value } = msg.sub;\nmsg.payload = [key, timestamp, value]\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 220,
+        "y": 80,
+        "wires": [
+            [
+                "12765c99b537c8df"
+            ]
+        ]
+    },
+    {
+        "id": "12765c99b537c8df",
+        "type": "redis-command",
+        "z": "a7f86da2f9168cf7",
+        "server": "8ca322e6bc2d554c",
+        "command": "TS.ADD",
+        "name": "",
+        "topic": "",
+        "params": "[]",
+        "paramsType": "json",
+        "payloadType": "json",
+        "block": false,
+        "x": 220,
+        "y": 120,
+        "wires": [
+            [
+                "8c28b39a95d2a1a4"
+            ]
+        ]
+    },
+    {
+        "id": "76b967303f31139b",
+        "type": "catch",
+        "z": "a7f86da2f9168cf7",
+        "name": "",
+        "scope": [
+            "12765c99b537c8df"
+        ],
+        "uncaught": false,
+        "x": 190,
+        "y": 200,
+        "wires": [
+            [
+                "1679c5fd616e22b2"
+            ]
+        ]
+    },
+    {
+        "id": "1679c5fd616e22b2",
+        "type": "function",
+        "z": "a7f86da2f9168cf7",
+        "name": "msg.error",
+        "func": "msg.sub = msg.error;\nmsg.payload = msg.backup;\ndelete msg.backup;\ndelete msg.error;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 340,
+        "y": 200,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "8c28b39a95d2a1a4",
+        "type": "function",
+        "z": "a7f86da2f9168cf7",
+        "name": "result msg.sub",
+        "func": "msg.sub = msg.payload;\nmsg.payload = msg.backup;\ndelete msg.backup;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 220,
+        "y": 160,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "9c1d1f18095b2241",
+        "type": "function",
+        "z": "a4fb02ca445b7482",
+        "name": "function 67",
+        "func": "msg.backup = msg.payload;\nlet { key, start, end } = msg.sub;\nlet payload = [key];\n\nif (start && end) {\n    payload.push(start);\n    payload.push(end);\n} else {\n    payload.push('-');\n    payload.push('+');\n}\n\nmsg.payload = payload;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 210,
+        "y": 80,
+        "wires": [
+            [
+                "f30c4306fc54d776"
+            ]
+        ]
+    },
+    {
+        "id": "f30c4306fc54d776",
+        "type": "redis-command",
+        "z": "a4fb02ca445b7482",
+        "server": "8ca322e6bc2d554c",
+        "command": "TS.RANGE",
+        "name": "",
+        "topic": "",
+        "params": "[]",
+        "paramsType": "json",
+        "payloadType": "json",
+        "block": false,
+        "x": 230,
+        "y": 120,
+        "wires": [
+            [
+                "1858a8ceff0983b4"
+            ]
+        ]
+    },
+    {
+        "id": "1858a8ceff0983b4",
+        "type": "function",
+        "z": "a4fb02ca445b7482",
+        "name": "result msg.sub",
+        "func": "msg.sub = msg.payload;\nmsg.payload = msg.backup;\ndelete msg.backup;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 220,
+        "y": 160,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "3b197dbf6fffc5be",
+        "type": "catch",
+        "z": "a4fb02ca445b7482",
+        "name": "",
+        "scope": [
+            "f30c4306fc54d776"
+        ],
+        "uncaught": false,
+        "x": 190,
+        "y": 200,
+        "wires": [
+            [
+                "88e03ac2641d4d13"
+            ]
+        ]
+    },
+    {
+        "id": "88e03ac2641d4d13",
+        "type": "function",
+        "z": "a4fb02ca445b7482",
         "name": "msg.error",
         "func": "msg.sub = msg.error;\nmsg.payload = msg.backup;\ndelete msg.backup;\ndelete msg.error;\nreturn msg;",
         "outputs": 1,
@@ -7450,7 +7710,7 @@
         "payload": "",
         "payloadType": "date",
         "x": 140,
-        "y": 840,
+        "y": 880,
         "wires": [
             [
                 "4e943fe85da0a713"
@@ -7470,95 +7730,9 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 830,
-        "y": 840,
+        "x": 810,
+        "y": 880,
         "wires": []
-    },
-    {
-        "id": "120f4c33f36983ce",
-        "type": "inject",
-        "z": "2e56a74c132aeaaf",
-        "name": "",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 140,
-        "y": 1040,
-        "wires": [
-            [
-                "73fb419f68eae399"
-            ]
-        ]
-    },
-    {
-        "id": "741ee659fa19cf39",
-        "type": "debug",
-        "z": "2e56a74c132aeaaf",
-        "name": "debug 157",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 590,
-        "y": 1080,
-        "wires": []
-    },
-    {
-        "id": "aa3c701a6612b04b",
-        "type": "redis-command",
-        "z": "2e56a74c132aeaaf",
-        "server": "8ca322e6bc2d554c",
-        "command": "TS.GET",
-        "name": "",
-        "topic": "",
-        "params": "[]",
-        "paramsType": "json",
-        "payloadType": "json",
-        "block": false,
-        "x": 360,
-        "y": 1080,
-        "wires": [
-            [
-                "741ee659fa19cf39"
-            ]
-        ]
-    },
-    {
-        "id": "73fb419f68eae399",
-        "type": "function",
-        "z": "2e56a74c132aeaaf",
-        "name": "function 65",
-        "func": "msg.topic = 'vin:longitude'\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 350,
-        "y": 1040,
-        "wires": [
-            [
-                "aa3c701a6612b04b"
-            ]
-        ]
     },
     {
         "id": "ddeeb20f56555852",
@@ -7585,47 +7759,7 @@
         "y": 940,
         "wires": [
             [
-                "a73caf61015979aa"
-            ]
-        ]
-    },
-    {
-        "id": "a73caf61015979aa",
-        "type": "function",
-        "z": "2e56a74c132aeaaf",
-        "name": "function 66",
-        "func": "msg.payload = ['vin:longitude', (new Date()).getTime(), 124]\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 350,
-        "y": 940,
-        "wires": [
-            [
-                "12765c99b537c8df"
-            ]
-        ]
-    },
-    {
-        "id": "12765c99b537c8df",
-        "type": "redis-command",
-        "z": "2e56a74c132aeaaf",
-        "server": "8ca322e6bc2d554c",
-        "command": "TS.ADD",
-        "name": "",
-        "topic": "",
-        "params": "[]",
-        "paramsType": "json",
-        "payloadType": "json",
-        "block": false,
-        "x": 360,
-        "y": 980,
-        "wires": [
-            [
-                "fa020e32b650340d"
+                "189ea4f965072a7d"
             ]
         ]
     },
@@ -7642,8 +7776,8 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 590,
-        "y": 980,
+        "x": 790,
+        "y": 940,
         "wires": []
     },
     {
@@ -7668,50 +7802,10 @@
         "payload": "",
         "payloadType": "date",
         "x": 140,
-        "y": 1140,
+        "y": 1000,
         "wires": [
             [
-                "9c1d1f18095b2241"
-            ]
-        ]
-    },
-    {
-        "id": "9c1d1f18095b2241",
-        "type": "function",
-        "z": "2e56a74c132aeaaf",
-        "name": "function 67",
-        "func": "msg.payload = ['vin:longitude', '-', '+']\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 350,
-        "y": 1140,
-        "wires": [
-            [
-                "f30c4306fc54d776"
-            ]
-        ]
-    },
-    {
-        "id": "f30c4306fc54d776",
-        "type": "redis-command",
-        "z": "2e56a74c132aeaaf",
-        "server": "8ca322e6bc2d554c",
-        "command": "TS.RANGE",
-        "name": "",
-        "topic": "",
-        "params": "[]",
-        "paramsType": "json",
-        "payloadType": "json",
-        "block": false,
-        "x": 370,
-        "y": 1180,
-        "wires": [
-            [
-                "1a1f21f59a8be356"
+                "6f6409a541437abe"
             ]
         ]
     },
@@ -7728,8 +7822,8 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 590,
-        "y": 1180,
+        "x": 790,
+        "y": 1000,
         "wires": []
     },
     {
@@ -7745,7 +7839,7 @@
         "finalize": "",
         "libs": [],
         "x": 350,
-        "y": 840,
+        "y": 880,
         "wires": [
             [
                 "59f246b2a62c781a"
@@ -7758,7 +7852,7 @@
         "z": "2e56a74c132aeaaf",
         "name": "",
         "x": 580,
-        "y": 840,
+        "y": 880,
         "wires": [
             [
                 "dcd28c5b3baceef9"
@@ -7850,6 +7944,72 @@
         "x": 1860,
         "y": 620,
         "wires": []
+    },
+    {
+        "id": "189ea4f965072a7d",
+        "type": "function",
+        "z": "2e56a74c132aeaaf",
+        "name": "function 69",
+        "func": "msg.sub = {\n    key: 'vin:longitude',\n    timestamp: (new Date()).getTime(),\n    value: 47\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 940,
+        "wires": [
+            [
+                "a591df81928baa4c"
+            ]
+        ]
+    },
+    {
+        "id": "a591df81928baa4c",
+        "type": "subflow:a7f86da2f9168cf7",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "x": 570,
+        "y": 940,
+        "wires": [
+            [
+                "fa020e32b650340d"
+            ]
+        ]
+    },
+    {
+        "id": "6f6409a541437abe",
+        "type": "function",
+        "z": "2e56a74c132aeaaf",
+        "name": "function 70",
+        "func": "\nmsg.sub = {\n    key: 'vin:longitude',\n    start: '-',\n    end: '+',\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 1000,
+        "wires": [
+            [
+                "45afd05c2e620b86"
+            ]
+        ]
+    },
+    {
+        "id": "45afd05c2e620b86",
+        "type": "subflow:a4fb02ca445b7482",
+        "z": "2e56a74c132aeaaf",
+        "name": "",
+        "x": 580,
+        "y": 1000,
+        "wires": [
+            [
+                "1a1f21f59a8be356"
+            ]
+        ]
     },
     {
         "id": "ac083b48bc2518ab",
