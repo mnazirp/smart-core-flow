@@ -184,6 +184,14 @@
         "env": []
     },
     {
+        "id": "ebd3eb3a630da0d4",
+        "type": "tab",
+        "label": "Pulling External ",
+        "disabled": false,
+        "info": "// nrlint function-eslint:off\n",
+        "env": []
+    },
+    {
         "id": "77002254b872fa8e",
         "type": "subflow",
         "name": "algo: jwt-sign",
@@ -17900,6 +17908,529 @@
         "wires": [
             [
                 "4c3910f7e2c9af31"
+            ]
+        ]
+    },
+    {
+        "id": "7df67e16ee1f868d",
+        "type": "cronplus",
+        "z": "ebd3eb3a630da0d4",
+        "name": "",
+        "outputField": "payload",
+        "timeZone": "",
+        "persistDynamic": false,
+        "commandResponseMsgOutput": "output1",
+        "outputs": 1,
+        "options": [
+            {
+                "name": "schedule1",
+                "topic": "topic1",
+                "payloadType": "default",
+                "payload": "",
+                "expressionType": "cron",
+                "expression": "0 */5 * * * * *",
+                "location": "",
+                "offset": "0",
+                "solarType": "all",
+                "solarEvents": "sunrise,sunset"
+            }
+        ],
+        "x": 120,
+        "y": 80,
+        "wires": [
+            [
+                "8471d71e824cd51b"
+            ]
+        ]
+    },
+    {
+        "id": "8471d71e824cd51b",
+        "type": "function",
+        "z": "ebd3eb3a630da0d4",
+        "name": "set cron info",
+        "func": "msg.cron = msg.payload;\nmsg.payload = {\n    grant_type: 'client_credentials'\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 80,
+        "wires": [
+            [
+                "68d5324960f4893b"
+            ]
+        ]
+    },
+    {
+        "id": "99b0b0182e94d605",
+        "type": "inject",
+        "z": "ebd3eb3a630da0d4",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 120,
+        "wires": [
+            [
+                "8471d71e824cd51b"
+            ]
+        ]
+    },
+    {
+        "id": "68d5324960f4893b",
+        "type": "http request",
+        "z": "ebd3eb3a630da0d4",
+        "name": "Hino get vehiclepositions",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "https://api-sandbox.hino.co.id/hmsi/hmsi-std-api/v2/vehiclepositions",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "bearer",
+        "senderr": false,
+        "headers": [
+            {
+                "keyType": "other",
+                "keyValue": "X-IBM-Client-Id",
+                "valueType": "other",
+                "valueValue": "6823e121-a1ec-4fff-8711-b5c18486b57b"
+            },
+            {
+                "keyType": "other",
+                "keyValue": "accept",
+                "valueType": "other",
+                "valueValue": "application/json"
+            }
+        ],
+        "x": 410,
+        "y": 120,
+        "wires": [
+            [
+                "68101d728a76f12b"
+            ]
+        ]
+    },
+    {
+        "id": "68101d728a76f12b",
+        "type": "function",
+        "z": "ebd3eb3a630da0d4",
+        "name": "validation",
+        "func": "let payload = JSON.parse(msg.payload);\nlet buffer = Buffer.from(msg.payload);\nmsg.payloadSize = buffer.length / 2014; // in kilobyte\nmsg.isValid = false;\nif (payload.data) {\n    msg.isValid = true;\n    msg.payload = payload.data;\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "Blob",
+                "module": "Blob"
+            }
+        ],
+        "x": 640,
+        "y": 80,
+        "wires": [
+            [
+                "6aab8f9fe8bd0489"
+            ]
+        ]
+    },
+    {
+        "id": "6aab8f9fe8bd0489",
+        "type": "switch",
+        "z": "ebd3eb3a630da0d4",
+        "name": "is valid?",
+        "property": "isValid",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 640,
+        "y": 120,
+        "wires": [
+            [
+                "285c6af84592f4ef"
+            ],
+            [
+                "854476030843689b"
+            ]
+        ]
+    },
+    {
+        "id": "854476030843689b",
+        "type": "function",
+        "z": "ebd3eb3a630da0d4",
+        "name": "error",
+        "func": "msg.payload = JSON.parse(msg.payload);\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 830,
+        "y": 160,
+        "wires": [
+            [
+                "4bb587c0dd75ae53"
+            ]
+        ]
+    },
+    {
+        "id": "130b5f18fe7c41f9",
+        "type": "cronplus",
+        "z": "ebd3eb3a630da0d4",
+        "name": "",
+        "outputField": "payload",
+        "timeZone": "",
+        "persistDynamic": false,
+        "commandResponseMsgOutput": "output1",
+        "outputs": 1,
+        "options": [
+            {
+                "name": "schedule1",
+                "topic": "topic1",
+                "payloadType": "default",
+                "payload": "",
+                "expressionType": "cron",
+                "expression": "0 0 */1 * * * *",
+                "location": "",
+                "offset": "0",
+                "solarType": "all",
+                "solarEvents": "sunrise,sunset"
+            }
+        ],
+        "x": 120,
+        "y": 260,
+        "wires": [
+            [
+                "a670b10d53b6a43f"
+            ]
+        ]
+    },
+    {
+        "id": "a670b10d53b6a43f",
+        "type": "function",
+        "z": "ebd3eb3a630da0d4",
+        "name": "set cron info",
+        "func": "msg.cron = msg.payload;\nmsg.payload = {\n    grant_type: 'client_credentials'\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 260,
+        "wires": [
+            [
+                "ef8e679dd29ba5f6"
+            ]
+        ]
+    },
+    {
+        "id": "2cbe1a5b08b9c560",
+        "type": "inject",
+        "z": "ebd3eb3a630da0d4",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 300,
+        "wires": [
+            [
+                "a670b10d53b6a43f"
+            ]
+        ]
+    },
+    {
+        "id": "ef8e679dd29ba5f6",
+        "type": "http request",
+        "z": "ebd3eb3a630da0d4",
+        "name": "Hino get vehicles",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "https://api-sandbox.hino.co.id/hmsi/hmsi-std-api/vehicles?size=2000",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "bearer",
+        "senderr": false,
+        "headers": [
+            {
+                "keyType": "other",
+                "keyValue": "X-IBM-Client-Id",
+                "valueType": "other",
+                "valueValue": "6823e121-a1ec-4fff-8711-b5c18486b57b"
+            },
+            {
+                "keyType": "other",
+                "keyValue": "accept",
+                "valueType": "other",
+                "valueValue": "application/json"
+            }
+        ],
+        "x": 390,
+        "y": 300,
+        "wires": [
+            [
+                "5c813b8d8a980d09"
+            ]
+        ]
+    },
+    {
+        "id": "5c813b8d8a980d09",
+        "type": "function",
+        "z": "ebd3eb3a630da0d4",
+        "name": "validation",
+        "func": "let payload = JSON.parse(msg.payload);\nlet buffer = Buffer.from(msg.payload);\nmsg.payloadSize = buffer.length / 2014; // in kilobyte\nmsg.isValid = false;\nif (payload.data) {\n    msg.isValid = true;\n    msg.payload = payload.data;\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 620,
+        "y": 260,
+        "wires": [
+            [
+                "6ba58952f6accbd1"
+            ]
+        ]
+    },
+    {
+        "id": "6ba58952f6accbd1",
+        "type": "switch",
+        "z": "ebd3eb3a630da0d4",
+        "name": "",
+        "property": "isValid",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 630,
+        "y": 300,
+        "wires": [
+            [
+                "bee74fdcd4a1937e"
+            ],
+            [
+                "4c7032d4eecc23ac"
+            ]
+        ]
+    },
+    {
+        "id": "4c7032d4eecc23ac",
+        "type": "function",
+        "z": "ebd3eb3a630da0d4",
+        "name": "error",
+        "func": "msg.payload = JSON.parse(msg.payload);\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 810,
+        "y": 340,
+        "wires": [
+            [
+                "d53f7a9f3ec4ceaf"
+            ]
+        ]
+    },
+    {
+        "id": "4bb587c0dd75ae53",
+        "type": "debug",
+        "z": "ebd3eb3a630da0d4",
+        "name": "debug 48",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1020,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "c0a1bdb7205057ec",
+        "type": "debug",
+        "z": "ebd3eb3a630da0d4",
+        "name": "debug 50",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1020,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "bee74fdcd4a1937e",
+        "type": "function",
+        "z": "ebd3eb3a630da0d4",
+        "name": "prepare log document",
+        "func": "let doc = {\n    logType: 'cron-pulling-external',\n    topic: 'hino-vehicle',\n    cron: msg.cron,\n    source: {\n        party: 'hino',\n        url: msg.responseUrl,\n        headers: msg.headers\n    },\n    statusCode: msg.statusCode,\n    payloadSize: msg.payloadSize,\n    payload: msg.payload\n}\n\nmsg.payload = doc;\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 860,
+        "y": 260,
+        "wires": [
+            [
+                "958d6cf1c4619281"
+            ]
+        ]
+    },
+    {
+        "id": "d53f7a9f3ec4ceaf",
+        "type": "debug",
+        "z": "ebd3eb3a630da0d4",
+        "name": "debug 51",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1020,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "285c6af84592f4ef",
+        "type": "function",
+        "z": "ebd3eb3a630da0d4",
+        "name": "prepare log document",
+        "func": "let doc = {\n    logType: 'cron-pulling-external',\n    topic: 'hino-vehicle-position',\n    cron: msg.cron,\n    source: {\n        party: 'hino',\n        url: msg.responseUrl,\n        headers: msg.headers\n    },\n    statusCode: msg.statusCode,\n    payloadSize: msg.payloadSize,\n    payload: msg.payload\n}\n\nmsg.payload = doc;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 880,
+        "y": 80,
+        "wires": [
+            [
+                "0fb9b22e54e20306"
+            ]
+        ]
+    },
+    {
+        "id": "0fb9b22e54e20306",
+        "type": "cloudantplus out",
+        "z": "ebd3eb3a630da0d4",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-bucket",
+        "service": "_ext_",
+        "payonly": true,
+        "operation": "insert",
+        "x": 850,
+        "y": 120,
+        "wires": [
+            [
+                "aff0633562680ef6"
+            ]
+        ]
+    },
+    {
+        "id": "aff0633562680ef6",
+        "type": "debug",
+        "z": "ebd3eb3a630da0d4",
+        "name": "debug 166",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1030,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "958d6cf1c4619281",
+        "type": "cloudantplus out",
+        "z": "ebd3eb3a630da0d4",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-bucket",
+        "service": "_ext_",
+        "payonly": true,
+        "operation": "insert",
+        "x": 830,
+        "y": 300,
+        "wires": [
+            [
+                "c0a1bdb7205057ec"
             ]
         ]
     }
