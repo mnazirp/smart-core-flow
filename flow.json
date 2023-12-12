@@ -1127,13 +1127,11 @@
         "nodes": [
             "7df67e16ee1f868d",
             "8471d71e824cd51b",
-            "99b0b0182e94d605",
             "68d5324960f4893b",
             "68101d728a76f12b",
             "6aab8f9fe8bd0489",
             "130b5f18fe7c41f9",
             "a670b10d53b6a43f",
-            "2cbe1a5b08b9c560",
             "ef8e679dd29ba5f6",
             "5c813b8d8a980d09",
             "6ba58952f6accbd1",
@@ -1142,18 +1140,18 @@
             "bee74fdcd4a1937e",
             "d53f7a9f3ec4ceaf",
             "285c6af84592f4ef",
-            "0fb9b22e54e20306",
             "aff0633562680ef6",
-            "958d6cf1c4619281",
             "1e6a06f1454ec878",
-            "0305e231c8cb752f",
             "103a3d1e8bbeacb7",
-            "80ac8f4654f15686"
+            "6f0a87c2949b4b0b",
+            "0a167b0e3a964a92",
+            "88a7108af85c3919",
+            "d6165c1f299c9aee"
         ],
         "x": 54,
         "y": 59,
         "w": 1172,
-        "h": 442
+        "h": 382
     },
     {
         "id": "784d89e62dfb5070",
@@ -17955,6 +17953,7 @@
         "id": "7df67e16ee1f868d",
         "type": "cronplus",
         "z": "ebd3eb3a630da0d4",
+        "d": true,
         "g": "d68d7a5bd488e2d7",
         "name": "",
         "outputField": "payload",
@@ -18002,36 +18001,6 @@
         "wires": [
             [
                 "68d5324960f4893b"
-            ]
-        ]
-    },
-    {
-        "id": "99b0b0182e94d605",
-        "type": "inject",
-        "z": "ebd3eb3a630da0d4",
-        "g": "d68d7a5bd488e2d7",
-        "name": "",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 160,
-        "y": 140,
-        "wires": [
-            [
-                "8471d71e824cd51b"
             ]
         ]
     },
@@ -18128,6 +18097,7 @@
         "id": "130b5f18fe7c41f9",
         "type": "cronplus",
         "z": "ebd3eb3a630da0d4",
+        "d": true,
         "g": "d68d7a5bd488e2d7",
         "name": "",
         "outputField": "payload",
@@ -18150,7 +18120,7 @@
             }
         ],
         "x": 160,
-        "y": 320,
+        "y": 280,
         "wires": [
             [
                 "a670b10d53b6a43f"
@@ -18171,40 +18141,10 @@
         "finalize": "",
         "libs": [],
         "x": 410,
-        "y": 320,
+        "y": 280,
         "wires": [
             [
                 "ef8e679dd29ba5f6"
-            ]
-        ]
-    },
-    {
-        "id": "2cbe1a5b08b9c560",
-        "type": "inject",
-        "z": "ebd3eb3a630da0d4",
-        "g": "d68d7a5bd488e2d7",
-        "name": "",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 160,
-        "y": 360,
-        "wires": [
-            [
-                "a670b10d53b6a43f"
             ]
         ]
     },
@@ -18239,7 +18179,7 @@
             }
         ],
         "x": 430,
-        "y": 360,
+        "y": 320,
         "wires": [
             [
                 "5c813b8d8a980d09"
@@ -18260,7 +18200,7 @@
         "finalize": "",
         "libs": [],
         "x": 660,
-        "y": 320,
+        "y": 280,
         "wires": [
             [
                 "6ba58952f6accbd1"
@@ -18287,7 +18227,7 @@
         "repair": false,
         "outputs": 2,
         "x": 670,
-        "y": 360,
+        "y": 320,
         "wires": [
             [
                 "bee74fdcd4a1937e"
@@ -18303,7 +18243,7 @@
         "z": "ebd3eb3a630da0d4",
         "g": "d68d7a5bd488e2d7",
         "name": "debug 48",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -18312,7 +18252,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 1100,
-        "y": 240,
+        "y": 220,
         "wires": []
     },
     {
@@ -18330,7 +18270,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 1060,
-        "y": 360,
+        "y": 320,
         "wires": []
     },
     {
@@ -18339,7 +18279,7 @@
         "z": "ebd3eb3a630da0d4",
         "g": "d68d7a5bd488e2d7",
         "name": "prepare log document",
-        "func": "let doc = {\n    logType: 'cron-pulling-external',\n    topic: 'hino-vehicle',\n    cron: msg.cron,\n    state: 'success',\n    source: {\n        party: 'hino',\n        url: msg.responseUrl,\n        headers: msg.headers\n    },\n    statusCode: msg.statusCode,\n    payloadSize: msg.payloadSize,\n    payload: msg.payload\n}\n\nmsg.payload = doc;\nreturn msg;",
+        "func": "let doc = {\n    logType: 'cron-pulling-external',\n    topic: 'vehicle',\n    cron: msg.cron,\n    state: 'success',\n    source: {\n        party: 'hino',\n        url: msg.responseUrl,\n        headers: msg.headers\n    },\n    statusCode: msg.statusCode,\n    payloadSize: msg.payloadSize,\n    payload: msg.payload\n}\n\nmsg.payload = doc;\nreturn msg;",
         "outputs": 1,
         "timeout": "",
         "noerr": 0,
@@ -18347,10 +18287,10 @@
         "finalize": "",
         "libs": [],
         "x": 900,
-        "y": 320,
+        "y": 280,
         "wires": [
             [
-                "958d6cf1c4619281"
+                "88a7108af85c3919"
             ]
         ]
     },
@@ -18360,7 +18300,7 @@
         "z": "ebd3eb3a630da0d4",
         "g": "d68d7a5bd488e2d7",
         "name": "debug 51",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -18369,7 +18309,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 1060,
-        "y": 460,
+        "y": 400,
         "wires": []
     },
     {
@@ -18378,7 +18318,7 @@
         "z": "ebd3eb3a630da0d4",
         "g": "d68d7a5bd488e2d7",
         "name": "prepare log document",
-        "func": "let doc = {\n    logType: 'cron-pulling-external',\n    topic: 'hino-vehicle-position',\n    cron: msg.cron,\n    state: 'success',\n    source: {\n        party: 'hino',\n        url: msg.responseUrl,\n        headers: msg.headers\n    },\n    statusCode: msg.statusCode,\n    payloadSize: msg.payloadSize,\n    payload: msg.payload\n}\n\nmsg.payload = doc;\nreturn msg;",
+        "func": "let doc = {\n    logType: 'cron-pulling-external',\n    topic: 'vehicle-position',\n    cron: msg.cron,\n    state: 'success',\n    source: {\n        party: 'hino',\n        url: msg.responseUrl,\n        headers: msg.headers\n    },\n    statusCode: msg.statusCode,\n    payloadSize: msg.payloadSize,\n    payload: msg.payload\n}\n\nmsg.payload = doc;\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -18389,26 +18329,7 @@
         "y": 100,
         "wires": [
             [
-                "0fb9b22e54e20306"
-            ]
-        ]
-    },
-    {
-        "id": "0fb9b22e54e20306",
-        "type": "cloudantplus out",
-        "z": "ebd3eb3a630da0d4",
-        "g": "d68d7a5bd488e2d7",
-        "name": "",
-        "cloudant": "784d89e62dfb5070",
-        "database": "smart-bucket",
-        "service": "_ext_",
-        "payonly": true,
-        "operation": "insert",
-        "x": 910,
-        "y": 140,
-        "wires": [
-            [
-                "aff0633562680ef6"
+                "6f0a87c2949b4b0b"
             ]
         ]
     },
@@ -18431,25 +18352,6 @@
         "wires": []
     },
     {
-        "id": "958d6cf1c4619281",
-        "type": "cloudantplus out",
-        "z": "ebd3eb3a630da0d4",
-        "g": "d68d7a5bd488e2d7",
-        "name": "",
-        "cloudant": "784d89e62dfb5070",
-        "database": "smart-bucket",
-        "service": "_ext_",
-        "payonly": true,
-        "operation": "insert",
-        "x": 870,
-        "y": 360,
-        "wires": [
-            [
-                "c0a1bdb7205057ec"
-            ]
-        ]
-    },
-    {
         "id": "1e6a06f1454ec878",
         "type": "function",
         "z": "ebd3eb3a630da0d4",
@@ -18463,29 +18365,10 @@
         "finalize": "",
         "libs": [],
         "x": 870,
-        "y": 420,
+        "y": 360,
         "wires": [
             [
-                "0305e231c8cb752f"
-            ]
-        ]
-    },
-    {
-        "id": "0305e231c8cb752f",
-        "type": "cloudantplus out",
-        "z": "ebd3eb3a630da0d4",
-        "g": "d68d7a5bd488e2d7",
-        "name": "",
-        "cloudant": "784d89e62dfb5070",
-        "database": "smart-bucket",
-        "service": "_ext_",
-        "payonly": true,
-        "operation": "insert",
-        "x": 870,
-        "y": 460,
-        "wires": [
-            [
-                "d53f7a9f3ec4ceaf"
+                "d6165c1f299c9aee"
             ]
         ]
     },
@@ -18503,29 +18386,110 @@
         "finalize": "",
         "libs": [],
         "x": 910,
-        "y": 200,
+        "y": 180,
         "wires": [
             [
-                "80ac8f4654f15686"
+                "0a167b0e3a964a92"
             ]
         ]
     },
     {
-        "id": "80ac8f4654f15686",
-        "type": "cloudantplus out",
+        "id": "6f0a87c2949b4b0b",
+        "type": "http request",
         "z": "ebd3eb3a630da0d4",
         "g": "d68d7a5bd488e2d7",
-        "name": "",
-        "cloudant": "784d89e62dfb5070",
-        "database": "smart-bucket",
-        "service": "_ext_",
-        "payonly": true,
-        "operation": "insert",
+        "name": "smart-bucket",
+        "method": "POST",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "https://digistage.sinarmas-agri.com/sp-docs-master/smart-bucket",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "basic",
+        "senderr": false,
+        "headers": [],
         "x": 910,
-        "y": 240,
+        "y": 140,
+        "wires": [
+            [
+                "aff0633562680ef6"
+            ]
+        ]
+    },
+    {
+        "id": "0a167b0e3a964a92",
+        "type": "http request",
+        "z": "ebd3eb3a630da0d4",
+        "g": "d68d7a5bd488e2d7",
+        "name": "smart-bucket",
+        "method": "POST",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "https://digistage.sinarmas-agri.com/sp-docs-master/smart-bucket",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "basic",
+        "senderr": false,
+        "headers": [],
+        "x": 910,
+        "y": 220,
         "wires": [
             [
                 "4bb587c0dd75ae53"
+            ]
+        ]
+    },
+    {
+        "id": "88a7108af85c3919",
+        "type": "http request",
+        "z": "ebd3eb3a630da0d4",
+        "g": "d68d7a5bd488e2d7",
+        "name": "smart-bucket",
+        "method": "POST",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "https://digistage.sinarmas-agri.com/sp-docs-master/smart-bucket",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "basic",
+        "senderr": false,
+        "headers": [],
+        "x": 870,
+        "y": 320,
+        "wires": [
+            [
+                "c0a1bdb7205057ec"
+            ]
+        ]
+    },
+    {
+        "id": "d6165c1f299c9aee",
+        "type": "http request",
+        "z": "ebd3eb3a630da0d4",
+        "g": "d68d7a5bd488e2d7",
+        "name": "smart-bucket",
+        "method": "POST",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "https://digistage.sinarmas-agri.com/sp-docs-master/smart-bucket",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "basic",
+        "senderr": false,
+        "headers": [],
+        "x": 870,
+        "y": 400,
+        "wires": [
+            [
+                "d53f7a9f3ec4ceaf"
             ]
         ]
     }
