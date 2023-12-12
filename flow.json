@@ -18085,12 +18085,7 @@
         "noerr": 0,
         "initialize": "",
         "finalize": "",
-        "libs": [
-            {
-                "var": "Blob",
-                "module": "Blob"
-            }
-        ],
+        "libs": [],
         "x": 700,
         "y": 100,
         "wires": [
