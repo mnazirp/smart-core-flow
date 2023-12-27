@@ -10448,7 +10448,7 @@
         "fieldType": "msg",
         "format": "handlebars",
         "syntax": "mustache",
-        "template": "{\n  \"_id\": \"_design/truck\",\n  \"views\": {\n    \"by-unit\": {\n      \"map\": \"function (doc) {\\n  if(doc.type == 'truck' && doc.unit)emit([doc.unit], doc);\\n}\"\n    },\n    \"by-unit-vin\": {\n      \"map\": \"function (doc) {\\n  if(doc.type == 'truck' && doc.unit)emit([doc.unit, doc.vin], doc);\\n}\"\n    },\n    \"by-vin\": {\n      \"map\": \"function (doc) {\\n  if(doc.type == 'truck' && doc.unit)emit([doc.vin], doc);\\n}\"\n    },\n    \"by-unitID\": {\n      \"map\": \"function (doc) {\\n  if(doc.type == 'truck' && doc.unitID)emit([doc.unitID], doc);\\n}\"\n    }\n  },\n  \"language\": \"javascript\"\n}",
+        "template": "{\n  \"_id\": \"_design/truck\",\n  \"views\": {\n    \"by-unit\": {\n      \"map\": \"function (doc) {\\n  if(doc.type == 'truck' && doc.szOrgName)emit([doc.szOrgName], doc);\\n}\"\n    },\n    \"by-unit-vin\": {\n      \"map\": \"function (doc) {\\n  if(doc.type == 'truck' && doc.szOrgName)emit([doc.szOrgName, doc.szPhysicalNo2], doc);\\n}\"\n    },\n    \"by-vin\": {\n      \"map\": \"function (doc) {\\n  if(doc.type == 'truck')emit([doc.szPhysicalNo2], doc);\\n}\"\n    },\n    \"by-unitID\": {\n      \"map\": \"function (doc) {\\n  if(doc.type == 'truck' && doc.iOrgToServe)emit([doc.iOrgToServe], {\\n    vin: doc.szPhysicalNo2\\n  });\\n}\"\n    }\n  },\n  \"language\": \"javascript\"\n}",
         "output": "str",
         "x": 450,
         "y": 3220,
