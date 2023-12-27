@@ -17121,12 +17121,12 @@
         "type": "http in",
         "z": "d13820078197e616",
         "name": "",
-        "url": "/api/tracking",
+        "url": "/api/tracking/n-days",
         "method": "post",
         "upload": false,
         "swaggerDoc": "",
-        "x": 150,
-        "y": 760,
+        "x": 170,
+        "y": 960,
         "wires": [
             [
                 "2cc36b53281ba6eb"
@@ -17145,8 +17145,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 630,
-        "y": 760,
+        "x": 650,
+        "y": 960,
         "wires": [
             [
                 "824969ebadb47508"
@@ -17158,11 +17158,11 @@
         "type": "subflow:d7ccf53b2b9fe097",
         "z": "d13820078197e616",
         "name": "",
-        "x": 620,
-        "y": 800,
+        "x": 640,
+        "y": 1000,
         "wires": [
             [
-                "04a987df988db9c4"
+                "3e135750a524e585"
             ]
         ]
     },
@@ -17171,15 +17171,15 @@
         "type": "function",
         "z": "d13820078197e616",
         "name": "validated",
-        "func": "let valid = false;\nlet { unittransport, numDays } = msg.payload;\nif (unittransport && numDays && typeof numDays == 'number') {\n    msg.ori = msg.payload;\n    valid = true;\n}\nmsg.valid = valid;\nif (!valid) {\n    msg.payload = \"parameter is not valid\"\n}\nreturn msg;",
+        "func": "let valid = false;\nlet { unittransport, numDays } = msg.payload;\nif (unittransport \n    && numDays \n    && Array.isArray(unittransport)\n    && unittransport.length > 0\n    && typeof numDays == 'number') {\n    msg.ori = msg.payload;\n    valid = true;\n}\nmsg.valid = valid;\nif (!valid) {\n    msg.payload = \"parameter is not valid\"\n}\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 360,
-        "y": 760,
+        "x": 400,
+        "y": 960,
         "wires": [
             [
                 "bae0267480b28293"
@@ -17204,8 +17204,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 370,
-        "y": 800,
+        "x": 410,
+        "y": 1000,
         "wires": [
             [
                 "9174f2987092e55d"
@@ -17222,29 +17222,9 @@
         "name": "",
         "statusCode": "400",
         "headers": {},
-        "x": 360,
-        "y": 840,
+        "x": 600,
+        "y": 1100,
         "wires": []
-    },
-    {
-        "id": "04a987df988db9c4",
-        "type": "function",
-        "z": "d13820078197e616",
-        "name": "map vins & get last date available",
-        "func": "msg.vins = msg.sub.rows.map(x => x.value.vin);\nmsg.payload = msg.vins;\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 660,
-        "y": 840,
-        "wires": [
-            [
-                "a02f33bd82720871"
-            ]
-        ]
     },
     {
         "id": "1e1e4398175e1d32",
@@ -17256,7 +17236,7 @@
         "upload": false,
         "swaggerDoc": "",
         "x": 170,
-        "y": 1120,
+        "y": 740,
         "wires": [
             [
                 "4f453f7443b1bdba"
@@ -17276,7 +17256,7 @@
         "finalize": "",
         "libs": [],
         "x": 510,
-        "y": 1120,
+        "y": 740,
         "wires": [
             [
                 "e81fa0ee0a22e6ef"
@@ -17289,7 +17269,7 @@
         "z": "d13820078197e616",
         "name": "",
         "x": 500,
-        "y": 1160,
+        "y": 780,
         "wires": [
             [
                 "984e94050d362a8d"
@@ -17304,7 +17284,7 @@
         "statusCode": "200",
         "headers": {},
         "x": 680,
-        "y": 1200,
+        "y": 820,
         "wires": []
     },
     {
@@ -17320,7 +17300,7 @@
         "finalize": "",
         "libs": [],
         "x": 470,
-        "y": 1200,
+        "y": 820,
         "wires": [
             [
                 "2f1b9c689692a3d4",
@@ -17342,7 +17322,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 690,
-        "y": 1240,
+        "y": 860,
         "wires": []
     },
     {
@@ -17356,8 +17336,8 @@
         "arraySpltType": "len",
         "stream": false,
         "addname": "",
-        "x": 1050,
-        "y": 800,
+        "x": 1630,
+        "y": 960,
         "wires": [
             [
                 "18a7269244842934"
@@ -17376,8 +17356,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1070,
-        "y": 840,
+        "x": 1650,
+        "y": 1000,
         "wires": [
             [
                 "b5e3e1cd2f2596b2"
@@ -17391,8 +17371,8 @@
         "name": "",
         "statusCode": "200",
         "headers": {},
-        "x": 1360,
-        "y": 900,
+        "x": 1940,
+        "y": 1160,
         "wires": []
     },
     {
@@ -17411,8 +17391,8 @@
         "timeout": "",
         "count": "",
         "reduceRight": false,
-        "x": 1150,
-        "y": 960,
+        "x": 1730,
+        "y": 1120,
         "wires": [
             [
                 "3d20511160d88c44"
@@ -17431,8 +17411,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1350,
-        "y": 860,
+        "x": 1930,
+        "y": 1120,
         "wires": [
             [
                 "336514b24c7ef6c9"
@@ -17444,18 +17424,18 @@
         "type": "function",
         "z": "d13820078197e616",
         "name": "search by vin",
-        "func": "let data = [].concat(...msg.payload);\nlet { numDays } = msg.ori;\nlet maxDate = getMaxTimestamp(data);\nlet start = subtractDaysFromDate(maxDate, numDays);\nlet end = maxDate;\nmsg.payload = msg.vins.map(x => {\n  return {\n    vin: x,\n    start,\n    end\n  }\n});\nreturn msg;\n\nfunction getMaxTimestamp(data) {\n    let maxTimestamp = 0;\n\n    for (let item of data) {\n        const timestamp = item[2][0];\n        if (timestamp > maxTimestamp) {\n            maxTimestamp = timestamp;\n        }\n    }\n\n    return maxTimestamp;\n}\n\nfunction subtractDaysFromDate(endDate, days) {\n    const date = new Date(endDate);\n    date.setDate(date.getDate() - days);\n    return date.getTime();\n}",
+        "func": "let data = [].concat(...msg.payload);\nlet { numDays } = msg.ori;\nmsg.valid = false;\nlet maxDate = getMaxTimestamp(data);\nif (maxDate > 0) {\n  let start = subtractDaysFromDate(maxDate, numDays);\n  let end = maxDate;\n  msg.payload = msg.vins.map(x => {\n    return {\n      vin: x,\n      start,\n      end\n    }\n  });\n  msg.valid = true;\n}\nreturn msg;\n\nfunction getMaxTimestamp(data) {\n  let maxTimestamp = 0;\n\n  for (let item of data) {\n    const timestamp = item[2][0];\n    if (timestamp > maxTimestamp) {\n      maxTimestamp = timestamp;\n    }\n  }\n\n  return maxTimestamp;\n}\n\nfunction subtractDaysFromDate(endDate, days) {\n  const date = new Date(endDate);\n  date.setDate(date.getDate() - days);\n  return date.getTime();\n}",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1070,
-        "y": 760,
+        "x": 1370,
+        "y": 1020,
         "wires": [
             [
-                "1d2684ccbdd70363"
+                "39296cb9f48e2fea"
             ]
         ]
     },
@@ -17464,8 +17444,8 @@
         "type": "subflow:3065e229b488d382",
         "z": "d13820078197e616",
         "name": "",
-        "x": 810,
-        "y": 880,
+        "x": 1130,
+        "y": 1020,
         "wires": [
             [
                 "7e90e44bfc4bc439"
@@ -17484,8 +17464,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 600,
-        "y": 920,
+        "x": 900,
+        "y": 1060,
         "wires": [
             [
                 "ced3f20985e40611"
@@ -17503,8 +17483,8 @@
         "arraySpltType": "len",
         "stream": false,
         "addname": "",
-        "x": 570,
-        "y": 880,
+        "x": 870,
+        "y": 1020,
         "wires": [
             [
                 "022212bb617ef245"
@@ -17527,8 +17507,8 @@
         "timeout": "",
         "count": "",
         "reduceRight": false,
-        "x": 850,
-        "y": 960,
+        "x": 1170,
+        "y": 1100,
         "wires": [
             [
                 "a6ac08670483d826"
@@ -17547,8 +17527,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 830,
-        "y": 920,
+        "x": 1150,
+        "y": 1060,
         "wires": [
             [
                 "8333ebee9b52b6e6"
@@ -17560,8 +17540,8 @@
         "type": "subflow:27735fb08ab779b0",
         "z": "d13820078197e616",
         "name": "",
-        "x": 1100,
-        "y": 880,
+        "x": 1680,
+        "y": 1040,
         "wires": [
             [
                 "03c672f6c072d1b8"
@@ -17573,18 +17553,174 @@
         "type": "function",
         "z": "d13820078197e616",
         "name": "vin & series",
-        "func": "let { vin } = msg.ori2;\nmsg.payload = {\n    vin: vin,\n    series: msg.sub.map(x => {\n        return {\n            key: x[0].split(':')[1],\n            data: x[2]\n        }\n    })\n}\nreturn msg;",
+        "func": "let { vin } = msg.ori2;\nif (msg.sub && Array.isArray(msg.sub)) {\n    msg.payload = {\n        vin: vin,\n        series: msg.sub.map(x => {\n            return {\n                key: x[0].split(':')[1],\n                data: x[2]\n            }\n        })\n    }\n}\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1070,
-        "y": 920,
+        "x": 1650,
+        "y": 1080,
         "wires": [
             [
                 "381f0317015b5283"
+            ]
+        ]
+    },
+    {
+        "id": "3e135750a524e585",
+        "type": "switch",
+        "z": "d13820078197e616",
+        "name": "",
+        "property": "sub.rows.length",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "gt",
+                "v": "0",
+                "vt": "num"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 690,
+        "y": 1040,
+        "wires": [
+            [
+                "04a987df988db9c4"
+            ],
+            [
+                "199acc2baa60ae12"
+            ]
+        ]
+    },
+    {
+        "id": "04a987df988db9c4",
+        "type": "function",
+        "z": "d13820078197e616",
+        "name": "map vins & get last date available",
+        "func": "msg.vins = msg.sub.rows.map(x => x.value.vin);\nmsg.payload = msg.vins;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 960,
+        "y": 980,
+        "wires": [
+            [
+                "a02f33bd82720871"
+            ]
+        ]
+    },
+    {
+        "id": "aa09f076d82b318d",
+        "type": "http response",
+        "z": "d13820078197e616",
+        "name": "",
+        "statusCode": "400",
+        "headers": {},
+        "x": 880,
+        "y": 1160,
+        "wires": []
+    },
+    {
+        "id": "199acc2baa60ae12",
+        "type": "change",
+        "z": "d13820078197e616",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "no asset",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 900,
+        "y": 1120,
+        "wires": [
+            [
+                "aa09f076d82b318d"
+            ]
+        ]
+    },
+    {
+        "id": "39296cb9f48e2fea",
+        "type": "switch",
+        "z": "d13820078197e616",
+        "name": "date found in range ?",
+        "property": "valid",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 1400,
+        "y": 1060,
+        "wires": [
+            [
+                "1d2684ccbdd70363"
+            ],
+            [
+                "ca553959c0a5b2fe"
+            ]
+        ]
+    },
+    {
+        "id": "2499433d69a2c48e",
+        "type": "http response",
+        "z": "d13820078197e616",
+        "name": "",
+        "statusCode": "400",
+        "headers": {},
+        "x": 1640,
+        "y": 1200,
+        "wires": []
+    },
+    {
+        "id": "ca553959c0a5b2fe",
+        "type": "change",
+        "z": "d13820078197e616",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "no data date in range",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1660,
+        "y": 1160,
+        "wires": [
+            [
+                "2499433d69a2c48e"
             ]
         ]
     },
