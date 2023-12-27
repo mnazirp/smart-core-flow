@@ -180,7 +180,7 @@
         "type": "tab",
         "label": "Broker: Subscriber Tracking",
         "disabled": false,
-        "info": "",
+        "info": "// nrlint function-eslint:off\n",
         "env": []
     },
     {
@@ -975,7 +975,7 @@
         "id": "ef0e7b589320b81a",
         "type": "subflow",
         "name": "sub: couchdb-insert",
-        "info": "# Input\n\n### msg.sub\n\n    {\n        database: 'smart-bucket',\n        doc: {}\n    }",
+        "info": "# Input\n\n### msg.sub\n\n    {\n        database: 'smart-bucket',\n        doc: {}\n    }\n\n// nrlint function-eslint:off\n",
         "category": "",
         "in": [
             {
@@ -18563,7 +18563,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 520,
+        "x": 500,
         "y": 200,
         "wires": [
             [
@@ -19178,7 +19178,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 490,
+        "x": 470,
         "y": 160,
         "wires": [
             [
