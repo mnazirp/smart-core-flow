@@ -1082,7 +1082,7 @@
         "id": "a4fb02ca445b7482",
         "type": "subflow",
         "name": "sub: redis-ts:RANGE",
-        "info": "# INPUT\r\n\r\n### msg.sub\r\n\r\n     {\r\n        key: 'vin:longitude',\r\n        start: '-',\r\n        end: '+',\r\n    }\r\n\r\n     {\r\n        key: 'vin:longitude',\r\n        start: 1701685322000,\r\n        end: 1701688183000,\r\n    }\r\n\r\nstart & end using timestamp",
+        "info": "# INPUT\r\n\r\n### msg.sub\r\n\r\n    {\r\n        key: 'vin:longitude',\r\n        start: '-',\r\n        end: '+',\r\n    }\r\n\r\n    {\r\n        key: 'vin:longitude',\r\n        start: 1701685322000,\r\n        end: 1701688183000,\r\n    }\r\n\r\nstart & end using timestamp",
         "category": "",
         "in": [
             {
@@ -1106,6 +1106,80 @@
                     },
                     {
                         "id": "88e03ac2641d4d13",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [],
+        "meta": {},
+        "color": "#ff69d6"
+    },
+    {
+        "id": "3065e229b488d382",
+        "type": "subflow",
+        "name": "sub: redis-ts:MGET",
+        "info": "# INPUT\r\n\r\n### msg.sub\r\n\r\n    {\r\n        label: ['vin=MJEC1JG43M5196173']\r\n    }\r\n",
+        "category": "",
+        "in": [
+            {
+                "x": 60,
+                "y": 40,
+                "wires": [
+                    {
+                        "id": "f5ab04e3ce838ae7"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 580,
+                "y": 120,
+                "wires": [
+                    {
+                        "id": "550c7648d330d7fa",
+                        "port": 0
+                    },
+                    {
+                        "id": "15816a5a89aee3c3",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [],
+        "meta": {},
+        "color": "#ff69d6"
+    },
+    {
+        "id": "27735fb08ab779b0",
+        "type": "subflow",
+        "name": "sub: redis-ts:MRANGE",
+        "info": "# INPUT\r\n\r\n### msg.sub\r\n\r\n    {\r\n        label: [\r\n            'vin=MJEC1JG43M5196142',\r\n            'topic=heading'\r\n        ],\r\n        start: 1702425450000,\r\n        end: 1703228425000\r\n    }\r\n\r\nstart & end using timestamp",
+        "category": "",
+        "in": [
+            {
+                "x": 60,
+                "y": 80,
+                "wires": [
+                    {
+                        "id": "34ef9fb5ad1ff2c9"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 520,
+                "y": 160,
+                "wires": [
+                    {
+                        "id": "21bfcd99dbe57228",
+                        "port": 0
+                    },
+                    {
+                        "id": "2e14811f12f8a83c",
                         "port": 0
                     }
                 ]
@@ -3534,6 +3608,192 @@
         "id": "88e03ac2641d4d13",
         "type": "function",
         "z": "a4fb02ca445b7482",
+        "name": "msg.error",
+        "func": "msg.sub = msg.error;\nmsg.payload = msg.backup;\ndelete msg.backup;\ndelete msg.error;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 340,
+        "y": 200,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "f5ab04e3ce838ae7",
+        "type": "function",
+        "z": "3065e229b488d382",
+        "name": "function 94",
+        "func": "msg.backup = msg.payload;\nlet { label } = msg.sub;\nlet payload = ['WITHLABELS'];\npayload.push('FILTER');\nif (Array.isArray(label)) {\n    label.forEach(x => {\n        payload.push(x)\n    })\n}\nmsg.payload = payload;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 250,
+        "y": 40,
+        "wires": [
+            [
+                "3d7dada6328be221"
+            ]
+        ]
+    },
+    {
+        "id": "3d7dada6328be221",
+        "type": "redis-command",
+        "z": "3065e229b488d382",
+        "server": "8ca322e6bc2d554c",
+        "command": "TS.MGET",
+        "name": "",
+        "topic": "",
+        "params": "[]",
+        "paramsType": "json",
+        "payloadType": "json",
+        "block": false,
+        "x": 260,
+        "y": 80,
+        "wires": [
+            [
+                "550c7648d330d7fa"
+            ]
+        ]
+    },
+    {
+        "id": "550c7648d330d7fa",
+        "type": "function",
+        "z": "3065e229b488d382",
+        "name": "result msg.sub",
+        "func": "msg.sub = msg.payload;\nmsg.payload = msg.backup;\ndelete msg.backup;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 260,
+        "y": 120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "4875fd9c8c0f58b2",
+        "type": "catch",
+        "z": "3065e229b488d382",
+        "name": "",
+        "scope": [
+            "3d7dada6328be221"
+        ],
+        "uncaught": false,
+        "x": 230,
+        "y": 160,
+        "wires": [
+            [
+                "15816a5a89aee3c3"
+            ]
+        ]
+    },
+    {
+        "id": "15816a5a89aee3c3",
+        "type": "function",
+        "z": "3065e229b488d382",
+        "name": "msg.error",
+        "func": "msg.sub = msg.error;\nmsg.payload = msg.backup;\ndelete msg.backup;\ndelete msg.error;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 380,
+        "y": 160,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "34ef9fb5ad1ff2c9",
+        "type": "function",
+        "z": "27735fb08ab779b0",
+        "name": "function 100",
+        "func": "msg.backup = msg.payload;\nlet { label, start, end } = msg.sub;\nlet payload = [start];\npayload.push(end);\npayload.push('FILTER');\nif (Array.isArray(label)) {\n    label.forEach(x => {\n        payload.push(x)\n    })\n}\n\nmsg.payload = payload;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 210,
+        "y": 80,
+        "wires": [
+            [
+                "631805e7a9a7e892"
+            ]
+        ]
+    },
+    {
+        "id": "631805e7a9a7e892",
+        "type": "redis-command",
+        "z": "27735fb08ab779b0",
+        "server": "8ca322e6bc2d554c",
+        "command": "TS.MRANGE",
+        "name": "",
+        "topic": "",
+        "params": "[]",
+        "paramsType": "json",
+        "payloadType": "json",
+        "block": false,
+        "x": 230,
+        "y": 120,
+        "wires": [
+            [
+                "21bfcd99dbe57228"
+            ]
+        ]
+    },
+    {
+        "id": "21bfcd99dbe57228",
+        "type": "function",
+        "z": "27735fb08ab779b0",
+        "name": "result msg.sub",
+        "func": "msg.sub = msg.payload;\nmsg.payload = msg.backup;\ndelete msg.backup;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 220,
+        "y": 160,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "d07306a332fba1f6",
+        "type": "catch",
+        "z": "27735fb08ab779b0",
+        "name": "",
+        "scope": [
+            "631805e7a9a7e892"
+        ],
+        "uncaught": false,
+        "x": 190,
+        "y": 200,
+        "wires": [
+            [
+                "2e14811f12f8a83c"
+            ]
+        ]
+    },
+    {
+        "id": "2e14811f12f8a83c",
+        "type": "function",
+        "z": "27735fb08ab779b0",
         "name": "msg.error",
         "func": "msg.sub = msg.error;\nmsg.payload = msg.backup;\ndelete msg.backup;\ndelete msg.error;\nreturn msg;",
         "outputs": 1,
@@ -16885,7 +17145,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 610,
+        "x": 630,
         "y": 760,
         "wires": [
             [
@@ -16898,7 +17158,7 @@
         "type": "subflow:d7ccf53b2b9fe097",
         "z": "d13820078197e616",
         "name": "",
-        "x": 600,
+        "x": 620,
         "y": 800,
         "wires": [
             [
@@ -16962,8 +17222,8 @@
         "name": "",
         "statusCode": "400",
         "headers": {},
-        "x": 560,
-        "y": 920,
+        "x": 360,
+        "y": 840,
         "wires": []
     },
     {
@@ -16971,51 +17231,18 @@
         "type": "function",
         "z": "d13820078197e616",
         "name": "map vins & get last date available",
-        "func": "msg.vins = msg.sub.rows.map(x => x.value.vin);\nmsg.sub = {\n    database: 'smart-tracking',\n    design: 'filter',\n    view: 'list-date',\n    group: true,\n    descending: true,\n    limit: 1\n}\nreturn msg;",
+        "func": "msg.vins = msg.sub.rows.map(x => x.value.vin);\nmsg.payload = msg.vins;\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 640,
+        "x": 660,
         "y": 840,
         "wires": [
             [
-                "558a0e3c1ba5721d"
-            ]
-        ]
-    },
-    {
-        "id": "558a0e3c1ba5721d",
-        "type": "subflow:d7ccf53b2b9fe097",
-        "z": "d13820078197e616",
-        "name": "",
-        "x": 680,
-        "y": 880,
-        "wires": [
-            [
-                "35db4056a10dc791"
-            ]
-        ]
-    },
-    {
-        "id": "35db4056a10dc791",
-        "type": "function",
-        "z": "d13820078197e616",
-        "name": "get list if dates",
-        "func": "let { numDays } = msg.ori;\nlet date = msg.sub.rows[0].key[0];\nlet dateList = getLastNDays(date, numDays);\nlet start = new Date(dateList[0]).getTime();\nlet end = new Date(dateList[dateList.length - 1]).getTime();\nmsg.payload = msg.vins.map(x => {\n  return {\n    vin: x,\n    start,\n    end\n  }\n});\nreturn msg;\n\nfunction getLastNDays(startDate, num) {\n  const dateArray = [];\n  let currentDate = new Date(startDate);\n\n  for (let i = 0; i < num; i++) {\n    // Use toISOString() to format the date as \"YYYY-MM-DD\"\n    const dateString = currentDate.toISOString().split('T')[0];\n    dateArray.push(dateString);\n\n    // Move to the previous day\n    currentDate.setDate(currentDate.getDate() - 1);\n\n    // If the month has changed, adjust to the last day of the previous month\n    if (currentDate.getDate() === 1) {\n      currentDate.setMonth(currentDate.getMonth() - 1);\n      currentDate.setDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate());\n    }\n  }\n\n  return dateArray.reverse(); // Reverse the array to have the dates in ascending order\n}",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 940,
-        "y": 760,
-        "wires": [
-            [
-                "1d2684ccbdd70363"
+                "a02f33bd82720871"
             ]
         ]
     },
@@ -17029,7 +17256,7 @@
         "upload": false,
         "swaggerDoc": "",
         "x": 170,
-        "y": 1060,
+        "y": 1120,
         "wires": [
             [
                 "4f453f7443b1bdba"
@@ -17049,7 +17276,7 @@
         "finalize": "",
         "libs": [],
         "x": 510,
-        "y": 1060,
+        "y": 1120,
         "wires": [
             [
                 "e81fa0ee0a22e6ef"
@@ -17062,7 +17289,7 @@
         "z": "d13820078197e616",
         "name": "",
         "x": 500,
-        "y": 1100,
+        "y": 1160,
         "wires": [
             [
                 "984e94050d362a8d"
@@ -17077,7 +17304,7 @@
         "statusCode": "200",
         "headers": {},
         "x": 680,
-        "y": 1140,
+        "y": 1200,
         "wires": []
     },
     {
@@ -17093,7 +17320,7 @@
         "finalize": "",
         "libs": [],
         "x": 470,
-        "y": 1140,
+        "y": 1200,
         "wires": [
             [
                 "2f1b9c689692a3d4",
@@ -17115,7 +17342,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 690,
-        "y": 1180,
+        "y": 1240,
         "wires": []
     },
     {
@@ -17129,7 +17356,7 @@
         "arraySpltType": "len",
         "stream": false,
         "addname": "",
-        "x": 910,
+        "x": 1050,
         "y": 800,
         "wires": [
             [
@@ -17142,18 +17369,18 @@
         "type": "function",
         "z": "d13820078197e616",
         "name": "function 88",
-        "func": "msg.ori = msg.payload;\nlet { vin } = msg.payload;\nmsg.payload = [\n    `${vin}*`\n];\nreturn msg;",
+        "func": "msg.ori2 = msg.payload;\nlet { vin, start, end } = msg.payload;\nmsg.sub = {\n    label: [\n        `vin=${vin}`\n    ],\n    start,\n    end\n};\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 930,
+        "x": 1070,
         "y": 840,
         "wires": [
             [
-                "a0b46c1d07383780"
+                "b5e3e1cd2f2596b2"
             ]
         ]
     },
@@ -17164,8 +17391,8 @@
         "name": "",
         "statusCode": "200",
         "headers": {},
-        "x": 1600,
-        "y": 940,
+        "x": 1360,
+        "y": 900,
         "wires": []
     },
     {
@@ -17184,8 +17411,8 @@
         "timeout": "",
         "count": "",
         "reduceRight": false,
-        "x": 1370,
-        "y": 900,
+        "x": 1150,
+        "y": 960,
         "wires": [
             [
                 "3d20511160d88c44"
@@ -17193,27 +17420,80 @@
         ]
     },
     {
-        "id": "a0b46c1d07383780",
-        "type": "redis-command",
+        "id": "3d20511160d88c44",
+        "type": "function",
         "z": "d13820078197e616",
-        "server": "8ca322e6bc2d554c",
-        "command": "KEYS",
-        "name": "",
-        "topic": "",
-        "params": "[]",
-        "paramsType": "json",
-        "payloadType": "json",
-        "block": false,
-        "x": 1150,
-        "y": 800,
+        "name": "concat array",
+        "func": "msg.payload = [].concat(...msg.payload);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1350,
+        "y": 860,
         "wires": [
             [
-                "5fbc8c76877bdb76"
+                "336514b24c7ef6c9"
             ]
         ]
     },
     {
-        "id": "c06347001b81f2db",
+        "id": "a6ac08670483d826",
+        "type": "function",
+        "z": "d13820078197e616",
+        "name": "search by vin",
+        "func": "let data = [].concat(...msg.payload);\nlet { numDays } = msg.ori;\nlet maxDate = getMaxTimestamp(data);\nlet start = subtractDaysFromDate(maxDate, numDays);\nlet end = maxDate;\nmsg.payload = msg.vins.map(x => {\n  return {\n    vin: x,\n    start,\n    end\n  }\n});\nreturn msg;\n\nfunction getMaxTimestamp(data) {\n    let maxTimestamp = 0;\n\n    for (let item of data) {\n        const timestamp = item[2][0];\n        if (timestamp > maxTimestamp) {\n            maxTimestamp = timestamp;\n        }\n    }\n\n    return maxTimestamp;\n}\n\nfunction subtractDaysFromDate(endDate, days) {\n    const date = new Date(endDate);\n    date.setDate(date.getDate() - days);\n    return date.getTime();\n}",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1070,
+        "y": 760,
+        "wires": [
+            [
+                "1d2684ccbdd70363"
+            ]
+        ]
+    },
+    {
+        "id": "ced3f20985e40611",
+        "type": "subflow:3065e229b488d382",
+        "z": "d13820078197e616",
+        "name": "",
+        "x": 810,
+        "y": 880,
+        "wires": [
+            [
+                "7e90e44bfc4bc439"
+            ]
+        ]
+    },
+    {
+        "id": "022212bb617ef245",
+        "type": "function",
+        "z": "d13820078197e616",
+        "name": "get by label vin",
+        "func": "msg.sub = {\n    label: [`vin=${msg.payload}`]\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 600,
+        "y": 920,
+        "wires": [
+            [
+                "ced3f20985e40611"
+            ]
+        ]
+    },
+    {
+        "id": "a02f33bd82720871",
         "type": "split",
         "z": "d13820078197e616",
         "name": "",
@@ -17223,69 +17503,16 @@
         "arraySpltType": "len",
         "stream": false,
         "addname": "",
-        "x": 1370,
-        "y": 760,
+        "x": 570,
+        "y": 880,
         "wires": [
             [
-                "29d25385d6e13b1f"
+                "022212bb617ef245"
             ]
         ]
     },
     {
-        "id": "29d25385d6e13b1f",
-        "type": "function",
-        "z": "d13820078197e616",
-        "name": "function 89",
-        "func": "msg.sub = {\n    key: msg.payload\n}\nmsg.key = msg.payload;\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 1390,
-        "y": 800,
-        "wires": [
-            [
-                "6fd0ea78c89c46db"
-            ]
-        ]
-    },
-    {
-        "id": "6fd0ea78c89c46db",
-        "type": "subflow:a4fb02ca445b7482",
-        "z": "d13820078197e616",
-        "name": "",
-        "x": 1420,
-        "y": 840,
-        "wires": [
-            [
-                "d99a27d79ca1dad2"
-            ]
-        ]
-    },
-    {
-        "id": "d99a27d79ca1dad2",
-        "type": "function",
-        "z": "d13820078197e616",
-        "name": "function 90",
-        "func": "msg.payload = {\n    key: msg.key.split(':')[1],\n    data: msg.sub\n};\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 1670,
-        "y": 760,
-        "wires": [
-            [
-                "378aeb42b73e2b87"
-            ]
-        ]
-    },
-    {
-        "id": "378aeb42b73e2b87",
+        "id": "8333ebee9b52b6e6",
         "type": "join",
         "z": "d13820078197e616",
         "name": "",
@@ -17300,102 +17527,66 @@
         "timeout": "",
         "count": "",
         "reduceRight": false,
-        "x": 1650,
-        "y": 800,
+        "x": 850,
+        "y": 960,
         "wires": [
             [
-                "3f17c96b8975a555"
+                "a6ac08670483d826"
             ]
         ]
     },
     {
-        "id": "5fbc8c76877bdb76",
-        "type": "switch",
+        "id": "7e90e44bfc4bc439",
+        "type": "function",
+        "z": "d13820078197e616",
+        "name": "function 99",
+        "func": "msg.payload = msg.sub;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 830,
+        "y": 920,
+        "wires": [
+            [
+                "8333ebee9b52b6e6"
+            ]
+        ]
+    },
+    {
+        "id": "b5e3e1cd2f2596b2",
+        "type": "subflow:27735fb08ab779b0",
         "z": "d13820078197e616",
         "name": "",
-        "property": "payload.length",
-        "propertyType": "msg",
-        "rules": [
-            {
-                "t": "gt",
-                "v": "0",
-                "vt": "num"
-            },
-            {
-                "t": "else"
-            }
-        ],
-        "checkall": "true",
-        "repair": false,
-        "outputs": 2,
-        "x": 1170,
-        "y": 840,
+        "x": 1100,
+        "y": 880,
         "wires": [
             [
-                "c06347001b81f2db"
-            ],
-            [
-                "381f0317015b5283"
+                "03c672f6c072d1b8"
             ]
         ]
     },
     {
-        "id": "3f17c96b8975a555",
+        "id": "03c672f6c072d1b8",
         "type": "function",
         "z": "d13820078197e616",
-        "name": "function 92",
-        "func": "msg.payload = {\n    vin: msg.key.split(':')[0],\n    series: msg.payload\n}\nreturn msg;",
+        "name": "vin & series",
+        "func": "let { vin } = msg.ori2;\nmsg.payload = {\n    vin: vin,\n    series: msg.sub.map(x => {\n        return {\n            key: x[0].split(':')[1],\n            data: x[2]\n        }\n    })\n}\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1670,
-        "y": 840,
+        "x": 1070,
+        "y": 920,
         "wires": [
             [
                 "381f0317015b5283"
             ]
         ]
-    },
-    {
-        "id": "3d20511160d88c44",
-        "type": "function",
-        "z": "d13820078197e616",
-        "name": "function 91",
-        "func": "msg.payload = [].concat(...msg.payload);\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 1390,
-        "y": 940,
-        "wires": [
-            [
-                "336514b24c7ef6c9",
-                "7670a42bbdb0529f"
-            ]
-        ]
-    },
-    {
-        "id": "7670a42bbdb0529f",
-        "type": "debug",
-        "z": "d13820078197e616",
-        "name": "debug 184",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 1610,
-        "y": 900,
-        "wires": []
     },
     {
         "id": "bc39f3d827ecdc09",
