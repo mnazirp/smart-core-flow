@@ -15547,7 +15547,7 @@
         "type": "function",
         "z": "d13820078197e616",
         "name": "search by vin",
-        "func": "let data = [].concat(...msg.payload);\nlet { numDays } = msg.ori;\nmsg.valid = false;\nlet maxDate = getMaxTimestamp(data);\nif (maxDate > 0) {\n  let start = subtractDaysFromDate(maxDate, numDays);\n  let end = maxDate;\n  msg.payload = msg.vins.map(x => {\n    return {\n      vin: x,\n      start,\n      end\n    }\n  });\n  msg.valid = true;\n}\nreturn msg;\n\nfunction getMaxTimestamp(data) {\n  let maxTimestamp = 0;\n\n  for (let item of data) {\n    const timestamp = item[2][0];\n    if (timestamp > maxTimestamp) {\n      maxTimestamp = timestamp;\n    }\n  }\n\n  return maxTimestamp;\n}\n\nfunction subtractDaysFromDate(endDate, days) {\n  const date = new Date(endDate);\n  date.setDate(date.getDate() - days);\n  return date.getTime();\n}",
+        "func": "let data = [].concat(...msg.payload);\nlet { numDays } = msg.ori;\nmsg.valid = false;\nnode.warn(data);\nif (data.length > 0) {\n  let maxDate = getMaxTimestamp(data);\n  if (maxDate > 0) {\n    let start = subtractDaysFromDate(maxDate, numDays);\n    let end = maxDate;\n    msg.payload = msg.vins.map(x => {\n      return {\n        vin: x,\n        start,\n        end\n      }\n    });\n    msg.valid = true;\n  }\n}\nreturn msg;\n\nfunction getMaxTimestamp(data) {\n  let maxTimestamp = 0;\n\n  for (let item of data) {\n    if (item.length == 3) {\n      const timestamp = item[2][0];\n      if (timestamp > maxTimestamp) {\n        maxTimestamp = timestamp;\n      }\n    }\n  }\n\n  return maxTimestamp;\n}\n\nfunction subtractDaysFromDate(endDate, days) {\n  const date = new Date(endDate);\n  date.setDate(date.getDate() - days);\n  return date.getTime();\n}",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -18538,7 +18538,7 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "payload": "{\"date\":\"2023-12-13\"}",
+        "payload": "{\"date\":\"2023-12-24\"}",
         "payloadType": "json",
         "x": 180,
         "y": 420,
@@ -18631,6 +18631,129 @@
         "x": 670,
         "y": 460,
         "wires": []
+    },
+    {
+        "id": "9fec4dc851956008",
+        "type": "inject",
+        "z": "d27f5b11c2fa7b08",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"date\":\"2023-12-21\"}",
+        "payloadType": "json",
+        "x": 180,
+        "y": 640,
+        "wires": [
+            [
+                "dac8f042ca0d2b84"
+            ]
+        ]
+    },
+    {
+        "id": "dac8f042ca0d2b84",
+        "type": "function",
+        "z": "d27f5b11c2fa7b08",
+        "name": "smart-bucket hino vehicle",
+        "func": "let { date } = msg.payload;\nmsg.sub = {\n    database: 'smart-bucket',\n    design: 'vehicle',\n    view: 'hino',\n    key: [date],\n    limit: 1\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 450,
+        "y": 640,
+        "wires": [
+            [
+                "aab79fc8cd3070e8"
+            ]
+        ]
+    },
+    {
+        "id": "aab79fc8cd3070e8",
+        "type": "subflow:d7ccf53b2b9fe097",
+        "z": "d27f5b11c2fa7b08",
+        "name": "",
+        "x": 440,
+        "y": 680,
+        "wires": [
+            [
+                "869b3c03808dca46"
+            ]
+        ]
+    },
+    {
+        "id": "631daa0bb08efa1f",
+        "type": "debug",
+        "z": "d27f5b11c2fa7b08",
+        "name": "debug 186",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 670,
+        "y": 760,
+        "wires": []
+    },
+    {
+        "id": "869b3c03808dca46",
+        "type": "function",
+        "z": "d27f5b11c2fa7b08",
+        "name": "function 101",
+        "func": "let doc = msg.sub.rows[0].value;\nmsg.sub = {\n    database: 'smart-vehicle',\n    docs: doc.payload\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 410,
+        "y": 720,
+        "wires": [
+            [
+                "fe7a2f75e83e5c53"
+            ]
+        ]
+    },
+    {
+        "id": "fe7a2f75e83e5c53",
+        "type": "subflow:f0ae825b26a06b48",
+        "z": "d27f5b11c2fa7b08",
+        "name": "",
+        "x": 440,
+        "y": 760,
+        "wires": [
+            [
+                "631daa0bb08efa1f"
+            ]
+        ]
+    },
+    {
+        "id": "3eac8bb7b2403ef1",
+        "type": "subflow:2feba16f27db3384",
+        "z": "d27f5b11c2fa7b08",
+        "name": "",
+        "x": 500,
+        "y": 840,
+        "wires": [
+            []
+        ]
     },
     {
         "id": "3180930ea2b7037b",
