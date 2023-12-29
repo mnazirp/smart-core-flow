@@ -8334,47 +8334,9 @@
         "y": 1060,
         "wires": [
             [
-                "d619547e4be68607",
+                "77d7d852486e16e6",
                 "ce54e0600d91fba8",
-                "3da5a93a835288dd"
-            ]
-        ]
-    },
-    {
-        "id": "d619547e4be68607",
-        "type": "template",
-        "z": "f26db8e574ea05fe",
-        "name": "_design/hino",
-        "field": "payload",
-        "fieldType": "msg",
-        "format": "handlebars",
-        "syntax": "mustache",
-        "template": "{\n  \"_id\": \"_design/hino\",\n  \"views\": {\n    \"hino-vehicle\": {\n      \"map\": \"function (doc) {\\n  if(doc.dataType == 'hino-vehicle')emit(doc._id, doc);\\n}\"\n    },\n    \"hino-vehiclepositions\": {\n      \"map\": \"function (doc) {\\n  if(doc.dataType == 'hino-vehiclepositions')emit(doc._id, doc);\\n}\"\n    },\n    \"hinoTracking-20231107\": {\n      \"map\": \"function (doc) {\\n  if(doc.dataType == 'hino-vehiclepositions' && doc.createdAt.indexOf('2023-11-07T') >=0 ){\\n    emit(doc._id, doc);\\n  }\\n}\"\n    },\n    \"hinoTracking-20231108\": {\n      \"map\": \"function (doc) {\\n  if(doc.dataType == 'hino-vehiclepositions' && doc.createdAt.indexOf('2023-11-08T') >=0 ){\\n    emit(doc._id, doc);\\n  }\\n}\"\n    },\n    \"hinoTracking-20231117\": {\n      \"map\": \"function (doc) {\\n  if(doc.dataType == 'hino-vehiclepositions' && doc.createdAt.indexOf('2023-11-17T') >=0  && doc.vin=='MJEFM2PL2PJM10382'){\\n    emit(doc._id, doc);\\n  }\\n}\"\n    }\n  },\n  \"language\": \"javascript\"\n}",
-        "output": "str",
-        "x": 450,
-        "y": 1060,
-        "wires": [
-            [
-                "f04882e1b1e5fceb"
-            ]
-        ]
-    },
-    {
-        "id": "ce54e0600d91fba8",
-        "type": "template",
-        "z": "f26db8e574ea05fe",
-        "name": "_design/filter",
-        "field": "payload",
-        "fieldType": "msg",
-        "format": "handlebars",
-        "syntax": "mustache",
-        "template": "{\n  \"_id\": \"_design/filter\",\n  \"views\": {\n    \"vehiclepositions-by-date\": {\n      \"map\": \"function (doc) {\\n  if(doc.dataType == 'hino-vehiclepositions'){\\n    let d = new Date(doc.createdAt);\\n    emit([`${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`], doc);\\n  }\\n}\"\n    },\n    \"vehicle-by-date\": {\n      \"map\": \"function (doc) {\\n  if(doc.dataType == 'hino-vehicle'){\\n    let d = new Date(doc.createdAt);\\n    emit([`${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`], doc);\\n  }\\n}\"\n    },\n    \"hino-vehiclepositions-longlat\": {\n      \"map\": \"function (doc) {\\n  if(doc.dataType == 'hino-vehiclepositions'){\\n    let d = new Date(doc.createdAt);\\n    emit(`${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`, {\\n      vin: doc.vin, \\n      longitude: doc.longitude, \\n      latitude : doc.latitude,\\n      odometer: doc.odometer,\\n      createddatetime: doc.createddatetime\\n    });\\n  }\\n}\"\n    },\n    \"hino-position-by-vin-date\": {\n      \"map\": \"function (doc) {\\n  if(doc.dataType == 'hino-vehiclepositions'){\\n    let d = new Date(doc.positiondatetime);\\n    emit([doc.vin, `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`], {\\n      vin: doc.vin, \\n      longitude: doc.longitude, \\n      latitude : doc.latitude,\\n      odometer: doc.odometer,\\n      positiondatetime: doc.positiondatetime\\n    });\\n  }\\n}\"\n    },\n    \"hino-vehicle-by-vin-date\": {\n      \"map\": \"function (doc) {\\n  if(doc.dataType == 'hino-vehicle'){\\n    let d = new Date(doc.createdAt);\\n    emit([doc.vin, `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`], {\\n      vin: doc.vin, \\n      plate: doc.plate, \\n      name : doc.name,\\n      imei: doc.imei,\\n      model: doc.model\\n    });\\n  }\\n}\"\n    },\n    \"list-date\": {\n      \"map\": \"function (doc) {\\n  if(doc.dataType == 'hino-vehiclepositions'){\\n    emit([doc.positiondatetime.split('T')[0]], 1);\\n  }\\n}\",\n      \"reduce\": \"function (keys, values, rereduce) {\\n  if (rereduce) {\\n    return sum(values);\\n  } else {\\n    return values.length;\\n  }\\n}\"\n    }\n  },\n  \"language\": \"javascript\"\n}",
-        "output": "str",
-        "x": 450,
-        "y": 1020,
-        "wires": [
-            [
-                "f04882e1b1e5fceb"
+                "d619547e4be68607"
             ]
         ]
     },
@@ -8412,25 +8374,6 @@
         "x": 970,
         "y": 1060,
         "wires": []
-    },
-    {
-        "id": "3da5a93a835288dd",
-        "type": "template",
-        "z": "f26db8e574ea05fe",
-        "name": "_design/sort",
-        "field": "payload",
-        "fieldType": "msg",
-        "format": "handlebars",
-        "syntax": "mustache",
-        "template": "{\n  \"_id\": \"_design/sort\",\n  \"views\": {\n    \"by-vin-positiondatetime\": {\n      \"map\": \"function (doc) {\\n  if(doc.vin && doc.dataType == 'hino-vehiclepositions' && doc.positiondatetime){\\n    let datetime = new Date(doc.positiondatetime)\\n    emit([doc.vin, datetime], {\\n      vin: doc.vin, \\n      longitude: doc.longitude, \\n      latitude : doc.latitude,\\n      vehiclestatus: doc.vehiclestatus,\\n      speed: doc.speed,\\n      odometer: doc.odometer,\\n      heading: doc.heading,\\n      province_name: doc.province_name,\\n      positiondatetime: doc.positiondatetime,\\n      printed_timezone: doc.printed_timezone\\n    });\\n  }\\n}\"\n    }\n  },\n  \"language\": \"javascript\"\n}",
-        "output": "str",
-        "x": 450,
-        "y": 1100,
-        "wires": [
-            [
-                "f04882e1b1e5fceb"
-            ]
-        ]
     },
     {
         "id": "5cda733cb560cf46",
@@ -9555,12 +9498,12 @@
         "id": "e1e2ee3d1aa8f5fd",
         "type": "template",
         "z": "f26db8e574ea05fe",
-        "name": "_design/hino",
+        "name": "_design/truck",
         "field": "payload",
         "fieldType": "msg",
         "format": "handlebars",
         "syntax": "mustache",
-        "template": "{\n  \"_id\": \"_design/truck\",\n  \"views\": {\n    \"by-unit\": {\n      \"map\": \"function (doc) {\\n  if(doc.type == 'truck' && doc.szOrgName)emit([doc.szOrgName], doc);\\n}\"\n    },\n    \"by-unit-vin\": {\n      \"map\": \"function (doc) {\\n  if(doc.type == 'truck' && doc.szOrgName)emit([doc.szOrgName, doc.szPhysicalNo2], doc);\\n}\"\n    },\n    \"by-vin\": {\n      \"map\": \"function (doc) {\\n  if(doc.type == 'truck')emit([doc.szPhysicalNo2], doc);\\n}\"\n    },\n    \"by-unitID\": {\n      \"map\": \"function (doc) {\\n  if(doc.type == 'truck' && doc.iOrgToServe)emit([doc.iOrgToServe], {\\n    vin: doc.szPhysicalNo2\\n  });\\n}\"\n    }\n  },\n  \"language\": \"javascript\"\n}",
+        "template": "{\n  \"_id\": \"_design/truck\",\n  \"views\": {\n    \"by-unit\": {\n      \"map\": \"function (doc) {\\n  if(doc.type == 'truck' && doc.szOrgName)emit([doc.szOrgName], doc);\\n}\"\n    },\n    \"by-unit-vin\": {\n      \"map\": \"function (doc) {\\n  if(doc.type == 'truck' && doc.szOrgName)emit([doc.szOrgName, doc.szPhysicalNo2], doc);\\n}\"\n    },\n    \"by-vin\": {\n      \"map\": \"function (doc) {\\n  if(doc.type == 'truck')emit([doc.szPhysicalNo2], doc);\\n}\"\n    },\n    \"by-unitID\": {\n      \"map\": \"function (doc) {\\n  if(doc.type == 'truck' && doc.iOrgToServe)emit([doc.iOrgToServe], {\\n    vin: doc.szPhysicalNo2,\\n    unitTransport: doc.iOrgToServe,\\n    images: doc.arImageID,\\n    comodity: doc.iCommodityToCarry\\n  });\\n}\"\n    }\n  },\n  \"language\": \"javascript\"\n}",
         "output": "str",
         "x": 450,
         "y": 3220,
@@ -9621,6 +9564,63 @@
         "wires": [
             [
                 "301892036ecb1271"
+            ]
+        ]
+    },
+    {
+        "id": "77d7d852486e16e6",
+        "type": "template",
+        "z": "f26db8e574ea05fe",
+        "name": "_design/vehicle",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "{\n  \"_id\": \"_design/vehicle\",\n  \"views\": {\n    \"hino\": {\n      \"map\": \"function (doc) {\\n  if(doc.topic == 'vehicle' && doc.source.party == 'hino'){\\n    let date = doc.createdAt.split('T')[0];\\n    emit([date], doc)\\n  }\\n}\"\n    }\n  },\n  \"language\": \"javascript\"\n}",
+        "output": "str",
+        "x": 460,
+        "y": 1100,
+        "wires": [
+            [
+                "f04882e1b1e5fceb"
+            ]
+        ]
+    },
+    {
+        "id": "ce54e0600d91fba8",
+        "type": "template",
+        "z": "f26db8e574ea05fe",
+        "name": "_design/date",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "{\n  \"_id\": \"_design/date\",\n  \"views\": {\n    \"createdAt\": {\n      \"map\": \"function (doc) {\\n  if(doc.createdAt) emit(doc.createdAt, 1);\\n}\"\n    }\n  },\n  \"language\": \"javascript\"\n}",
+        "output": "str",
+        "x": 450,
+        "y": 1020,
+        "wires": [
+            [
+                "f04882e1b1e5fceb"
+            ]
+        ]
+    },
+    {
+        "id": "d619547e4be68607",
+        "type": "template",
+        "z": "f26db8e574ea05fe",
+        "name": "_design/position",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "{\n  \"_id\": \"_design/position\",\n  \"views\": {\n    \"hino\": {\n      \"map\": \"function (doc) {\\n  if(doc.topic == 'vehicle-position' && doc.source.party == 'hino'){\\n    let date = doc.createdAt.split('T')[0];\\n    emit([date], doc)\\n  }\\n}\"\n    }\n  },\n  \"language\": \"javascript\"\n}",
+        "output": "str",
+        "x": 460,
+        "y": 1060,
+        "wires": [
+            [
+                "f04882e1b1e5fceb"
             ]
         ]
     },
@@ -18597,6 +18597,138 @@
         "wires": [
             [
                 "631daa0bb08efa1f"
+            ]
+        ]
+    },
+    {
+        "id": "b97127455f88ae14",
+        "type": "inject",
+        "z": "d27f5b11c2fa7b08",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 140,
+        "y": 820,
+        "wires": [
+            [
+                "82d74ab1737231ca"
+            ]
+        ]
+    },
+    {
+        "id": "82d74ab1737231ca",
+        "type": "function",
+        "z": "d27f5b11c2fa7b08",
+        "name": "smart-asset by-vin",
+        "func": "msg.sub = {\n    database: 'smart-asset',\n    design: 'truck',\n    view: 'by-vin'\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 390,
+        "y": 820,
+        "wires": [
+            [
+                "0b882cdbbbb45cfb"
+            ]
+        ]
+    },
+    {
+        "id": "0b882cdbbbb45cfb",
+        "type": "subflow:d7ccf53b2b9fe097",
+        "z": "d27f5b11c2fa7b08",
+        "name": "",
+        "x": 400,
+        "y": 860,
+        "wires": [
+            [
+                "ca2561d706170bc0"
+            ]
+        ]
+    },
+    {
+        "id": "ca2561d706170bc0",
+        "type": "function",
+        "z": "d27f5b11c2fa7b08",
+        "name": "vehicle by-vin",
+        "func": "let asset = msg.sub.rows.map(x => x.key);\nmsg.asset = [].concat(...asset)\nmsg.sub = {\n    database: 'smart-vehicle',\n    design: 'list',\n    view: 'by-vin'\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 420,
+        "y": 900,
+        "wires": [
+            [
+                "d7cc97255aea3ddd"
+            ]
+        ]
+    },
+    {
+        "id": "daa936e4c3ae9be4",
+        "type": "debug",
+        "z": "d27f5b11c2fa7b08",
+        "name": "debug 187",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1030,
+        "y": 860,
+        "wires": []
+    },
+    {
+        "id": "d7cc97255aea3ddd",
+        "type": "subflow:d7ccf53b2b9fe097",
+        "z": "d27f5b11c2fa7b08",
+        "name": "",
+        "x": 700,
+        "y": 820,
+        "wires": [
+            [
+                "2c5abcb26121cfed"
+            ]
+        ]
+    },
+    {
+        "id": "2c5abcb26121cfed",
+        "type": "function",
+        "z": "d27f5b11c2fa7b08",
+        "name": "return vehicle yang belum di registrasi",
+        "func": "let vehicles = msg.sub.rows.map(x => x.value);\nlet asset = msg.asset;\nmsg.payload = vehicles.filter(x => !asset.some(ass => ass == x.vin));\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 750,
+        "y": 860,
+        "wires": [
+            [
+                "daa936e4c3ae9be4"
             ]
         ]
     },
