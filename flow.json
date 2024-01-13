@@ -16323,8 +16323,8 @@
         "name": "",
         "statusCode": "200",
         "headers": {},
-        "x": 1260,
-        "y": 660,
+        "x": 1500,
+        "y": 620,
         "wires": []
     },
     {
@@ -16332,7 +16332,7 @@
         "type": "function",
         "z": "d13820078197e616",
         "name": "smart-vehicle",
-        "func": "let { startkey, endkey } = msg.ori;\nlet assets = msg.sub.rows.map(x => {\n    let {_id, _rev, ...other} = x.value;\n    return other;\n});\nlet keys = assets.map(x => `[\"${x.vin}\"]`);\nmsg.assets = assets;\nmsg.sub = {\n    database: 'smart-vehicle',\n    design: 'list',\n    view: 'by-vin',\n    keys\n}\n\nreturn msg;",
+        "func": "let { startkey, endkey } = msg.ori;\nlet assets = msg.sub.rows.map(x => {\n    let {_id, _rev, ...other} = x.value;\n    return other;\n});\nlet keys = assets.map(x => `[\"${x.vin}\"]`);\nnode.warn(keys);\nmsg.assets = assets;\nmsg.sub = {\n    database: 'smart-vehicle',\n    design: 'list',\n    view: 'by-vin',\n    keys\n}\n\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -16356,7 +16356,7 @@
         "y": 600,
         "wires": [
             [
-                "0b7381b13c15520c"
+                "6993bfb8d9e8e77a"
             ]
         ]
     },
@@ -16372,8 +16372,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1070,
-        "y": 640,
+        "x": 1270,
+        "y": 600,
         "wires": [
             [
                 "7e5f1c0eeb77a254"
@@ -16709,8 +16709,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 1050,
-        "y": 680,
+        "x": 1290,
+        "y": 640,
         "wires": [
             [
                 "212d39b498c44943"
@@ -16727,8 +16727,8 @@
         "name": "",
         "statusCode": "204",
         "headers": {},
-        "x": 1260,
-        "y": 700,
+        "x": 1500,
+        "y": 660,
         "wires": []
     },
     {
@@ -17555,6 +17555,48 @@
         ]
     },
     {
+        "id": "6993bfb8d9e8e77a",
+        "type": "switch",
+        "z": "d13820078197e616",
+        "name": "",
+        "property": "sub.rows.length",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "gt",
+                "v": "0",
+                "vt": "num"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 1090,
+        "y": 640,
+        "wires": [
+            [
+                "0b7381b13c15520c"
+            ],
+            [
+                "fa966f946be72c3d"
+            ]
+        ]
+    },
+    {
+        "id": "fa966f946be72c3d",
+        "type": "http response",
+        "z": "d13820078197e616",
+        "name": "",
+        "statusCode": "204",
+        "headers": {},
+        "x": 1260,
+        "y": 700,
+        "wires": []
+    },
+    {
         "id": "bc39f3d827ecdc09",
         "type": "function",
         "z": "a40781dc17a39203",
@@ -18072,6 +18114,175 @@
         ]
     },
     {
+        "id": "5c706061eb0789b2",
+        "type": "redis-command",
+        "z": "4482c877021370dc",
+        "server": "8ca322e6bc2d554c",
+        "command": "KEYS",
+        "name": "",
+        "topic": "",
+        "params": "[]",
+        "paramsType": "json",
+        "payloadType": "json",
+        "block": false,
+        "x": 550,
+        "y": 280,
+        "wires": [
+            [
+                "b0ad616d70bff933"
+            ]
+        ]
+    },
+    {
+        "id": "2b1354f7155d487c",
+        "type": "debug",
+        "z": "4482c877021370dc",
+        "name": "debug 189",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 950,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "b0ad616d70bff933",
+        "type": "split",
+        "z": "4482c877021370dc",
+        "name": "",
+        "splt": "\\n",
+        "spltType": "str",
+        "arraySplt": 1,
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "x": 770,
+        "y": 200,
+        "wires": [
+            [
+                "6225c85cbfef4342"
+            ]
+        ]
+    },
+    {
+        "id": "6225c85cbfef4342",
+        "type": "redis-command",
+        "z": "4482c877021370dc",
+        "server": "8ca322e6bc2d554c",
+        "command": "DEL",
+        "name": "",
+        "topic": "",
+        "params": "[]",
+        "paramsType": "json",
+        "payloadType": "json",
+        "block": false,
+        "x": 760,
+        "y": 240,
+        "wires": [
+            [
+                "e1149da61cb41497"
+            ]
+        ]
+    },
+    {
+        "id": "e1149da61cb41497",
+        "type": "join",
+        "z": "4482c877021370dc",
+        "name": "",
+        "mode": "auto",
+        "build": "object",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "accumulate": "false",
+        "timeout": "",
+        "count": "",
+        "reduceRight": false,
+        "x": 770,
+        "y": 280,
+        "wires": [
+            [
+                "2b1354f7155d487c"
+            ]
+        ]
+    },
+    {
+        "id": "dfe6e56024dd1413",
+        "type": "promptinput",
+        "z": "4482c877021370dc",
+        "name": "CONFIRM delete redis by wildcard keys ?",
+        "datatype": "str",
+        "prompt": "flush all series data ?",
+        "property": "sub",
+        "propertyType": "msg",
+        "x": 220,
+        "y": 200,
+        "wires": [
+            [
+                "152ebadc0ff5c925"
+            ]
+        ]
+    },
+    {
+        "id": "152ebadc0ff5c925",
+        "type": "switch",
+        "z": "4482c877021370dc",
+        "name": "",
+        "property": "sub",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "y",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 510,
+        "y": 200,
+        "wires": [
+            [
+                "a2a9a2b8d581a7c8"
+            ]
+        ]
+    },
+    {
+        "id": "a2a9a2b8d581a7c8",
+        "type": "change",
+        "z": "4482c877021370dc",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "*",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 540,
+        "y": 240,
+        "wires": [
+            [
+                "5c706061eb0789b2"
+            ]
+        ]
+    },
+    {
         "id": "c84eeed0ccaf76ac",
         "type": "inject",
         "z": "d27f5b11c2fa7b08",
@@ -18394,7 +18605,7 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "payload": "{\"date\":\"2023-12-24\"}",
+        "payload": "{\"date\":\"2023-12-12\"}",
         "payloadType": "json",
         "x": 180,
         "y": 420,
