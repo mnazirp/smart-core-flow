@@ -1215,7 +1215,9 @@
             "d6165c1f299c9aee"
         ],
         "x": 54,
-        "y": 59
+        "y": 59,
+        "w": 1172,
+        "h": 382
     },
     {
         "id": "784d89e62dfb5070",
@@ -18034,7 +18036,7 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 740,
+        "x": 520,
         "y": 100,
         "wires": []
     },
@@ -18048,7 +18050,7 @@
         "func": "local keys = redis.call('KEYS', ARGV[1]);\n\nfor i, key in ipairs(keys) do\n    redis.call('DEL', key)\nend\n\nreturn keys;",
         "stored": false,
         "block": false,
-        "x": 560,
+        "x": 340,
         "y": 100,
         "wires": [
             [
@@ -18068,7 +18070,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 540,
+        "x": 320,
         "y": 60,
         "wires": [
             [
@@ -18088,7 +18090,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 740,
+        "x": 520,
         "y": 60,
         "wires": [
             [
@@ -18100,12 +18102,12 @@
         "id": "5fd824e0823b5497",
         "type": "promptinput",
         "z": "4482c877021370dc",
-        "name": "CONFIRM delete redis by wildcard keys ?",
+        "name": "Confirm",
         "datatype": "str",
         "prompt": "are you sure to delete redis data ?",
         "property": "sub",
         "propertyType": "msg",
-        "x": 220,
+        "x": 110,
         "y": 60,
         "wires": [
             [
@@ -18125,7 +18127,7 @@
         "paramsType": "json",
         "payloadType": "json",
         "block": false,
-        "x": 550,
+        "x": 330,
         "y": 280,
         "wires": [
             [
@@ -18146,7 +18148,7 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 950,
+        "x": 730,
         "y": 280,
         "wires": []
     },
@@ -18161,7 +18163,7 @@
         "arraySpltType": "len",
         "stream": false,
         "addname": "",
-        "x": 770,
+        "x": 550,
         "y": 200,
         "wires": [
             [
@@ -18181,7 +18183,7 @@
         "paramsType": "json",
         "payloadType": "json",
         "block": false,
-        "x": 760,
+        "x": 540,
         "y": 240,
         "wires": [
             [
@@ -18205,7 +18207,7 @@
         "timeout": "",
         "count": "",
         "reduceRight": false,
-        "x": 770,
+        "x": 550,
         "y": 280,
         "wires": [
             [
@@ -18217,12 +18219,12 @@
         "id": "dfe6e56024dd1413",
         "type": "promptinput",
         "z": "4482c877021370dc",
-        "name": "CONFIRM delete redis by wildcard keys ?",
+        "name": "Confirm",
         "datatype": "str",
         "prompt": "flush all series data ?",
         "property": "sub",
         "propertyType": "msg",
-        "x": 220,
+        "x": 110,
         "y": 200,
         "wires": [
             [
@@ -18247,7 +18249,7 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 510,
+        "x": 290,
         "y": 200,
         "wires": [
             [
@@ -18274,7 +18276,7 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 540,
+        "x": 320,
         "y": 240,
         "wires": [
             [
@@ -18382,31 +18384,6 @@
         ]
     },
     {
-        "id": "b4b9f0c8a4eb410f",
-        "type": "inject",
-        "z": "d27f5b11c2fa7b08",
-        "name": "",
-        "props": [
-            {
-                "p": "payload"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "2023-12-22",
-        "payloadType": "str",
-        "x": 150,
-        "y": 240,
-        "wires": [
-            [
-                "31a9069ea1d3f060"
-            ]
-        ]
-    },
-    {
         "id": "2e363ba10edd726f",
         "type": "subflow:d7ccf53b2b9fe097",
         "z": "d27f5b11c2fa7b08",
@@ -18503,25 +18480,11 @@
         ]
     },
     {
-        "id": "24fd880139ce6a0f",
-        "type": "subflow:d7ccf53b2b9fe097",
-        "z": "d27f5b11c2fa7b08",
-        "name": "",
-        "x": 400,
-        "y": 280,
-        "wires": [
-            [
-                "b69d3ec47ac1ba33",
-                "806e9c90a68a21bd"
-            ]
-        ]
-    },
-    {
-        "id": "31a9069ea1d3f060",
+        "id": "7437c9629891b0da",
         "type": "function",
         "z": "d27f5b11c2fa7b08",
-        "name": "query view",
-        "func": "msg.sub = {\n    database: 'smart-tracking',\n    design: 'filter',\n    view: 'vehiclepositions-by-date',\n    key: [msg.payload]\n}\nreturn msg;",
+        "name": "smart-bucket hino position",
+        "func": "let date  = msg.sub;\nmsg.sub = {\n    database: 'smart-bucket',\n    design: 'position',\n    view: 'hino',\n    key: [date]\n}\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -18529,106 +18492,7 @@
         "finalize": "",
         "libs": [],
         "x": 370,
-        "y": 240,
-        "wires": [
-            [
-                "24fd880139ce6a0f"
-            ]
-        ]
-    },
-    {
-        "id": "b69d3ec47ac1ba33",
-        "type": "function",
-        "z": "d27f5b11c2fa7b08",
-        "name": "spawn positions",
-        "func": "let payload = [];\nlet counter = 0;\nlet data = msg.sub.rows\nif (Array.isArray(data)) {\n    payload = data.map(x => x.value)\n    split();\n}\nreturn null;\n\nfunction split() {\n    if (counter < payload.length) {\n        node.send({\n            payload: payload[counter]\n        });\n        counter++;\n        setTimeout(split, 1);\n    }\n}",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 380,
-        "y": 320,
-        "wires": [
-            [
-                "54ead624d118cc0e"
-            ]
-        ]
-    },
-    {
-        "id": "54ead624d118cc0e",
-        "type": "amqp out",
-        "z": "d27f5b11c2fa7b08",
-        "name": "",
-        "routingkey": "",
-        "iotype": "4",
-        "ioname": "job.tracking.vehicle.position",
-        "server": "e907ba5364e5896f",
-        "x": 660,
-        "y": 320,
-        "wires": []
-    },
-    {
-        "id": "806e9c90a68a21bd",
-        "type": "debug",
-        "z": "d27f5b11c2fa7b08",
-        "name": "debug 164",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 650,
-        "y": 280,
-        "wires": []
-    },
-    {
-        "id": "4f84313c851b205f",
-        "type": "inject",
-        "z": "d27f5b11c2fa7b08",
-        "name": "",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "{\"date\":\"2023-12-12\"}",
-        "payloadType": "json",
-        "x": 180,
-        "y": 420,
-        "wires": [
-            [
-                "7437c9629891b0da"
-            ]
-        ]
-    },
-    {
-        "id": "7437c9629891b0da",
-        "type": "function",
-        "z": "d27f5b11c2fa7b08",
-        "name": "smart-bucket hino position",
-        "func": "let { date } = msg.payload;\nmsg.sub = {\n    database: 'smart-bucket',\n    design: 'position',\n    view: 'hino',\n    key: [date]\n}\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 450,
-        "y": 420,
+        "y": 260,
         "wires": [
             [
                 "5a1fd67057903659"
@@ -18640,12 +18504,11 @@
         "type": "subflow:d7ccf53b2b9fe097",
         "z": "d27f5b11c2fa7b08",
         "name": "",
-        "x": 440,
-        "y": 460,
+        "x": 360,
+        "y": 300,
         "wires": [
             [
-                "fa2f23cd37b2be86",
-                "b5c42926818adc6d"
+                "fa2f23cd37b2be86"
             ]
         ]
     },
@@ -18662,7 +18525,7 @@
         "finalize": "",
         "libs": [],
         "x": 410,
-        "y": 500,
+        "y": 340,
         "wires": [
             [
                 "8d62b7fb8aa63760"
@@ -18678,138 +18541,9 @@
         "iotype": "4",
         "ioname": "job.tracking.vehicle.position",
         "server": "e907ba5364e5896f",
-        "x": 700,
-        "y": 500,
+        "x": 680,
+        "y": 340,
         "wires": []
-    },
-    {
-        "id": "b5c42926818adc6d",
-        "type": "debug",
-        "z": "d27f5b11c2fa7b08",
-        "name": "debug 185",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 690,
-        "y": 460,
-        "wires": []
-    },
-    {
-        "id": "9fec4dc851956008",
-        "type": "inject",
-        "z": "d27f5b11c2fa7b08",
-        "name": "",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "{\"date\":\"2023-12-21\"}",
-        "payloadType": "json",
-        "x": 180,
-        "y": 600,
-        "wires": [
-            [
-                "dac8f042ca0d2b84"
-            ]
-        ]
-    },
-    {
-        "id": "dac8f042ca0d2b84",
-        "type": "function",
-        "z": "d27f5b11c2fa7b08",
-        "name": "smart-bucket hino vehicle",
-        "func": "let { date } = msg.payload;\nmsg.sub = {\n    database: 'smart-bucket',\n    design: 'vehicle',\n    view: 'hino',\n    key: [date],\n    limit: 1\n}\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 450,
-        "y": 600,
-        "wires": [
-            [
-                "aab79fc8cd3070e8"
-            ]
-        ]
-    },
-    {
-        "id": "aab79fc8cd3070e8",
-        "type": "subflow:d7ccf53b2b9fe097",
-        "z": "d27f5b11c2fa7b08",
-        "name": "",
-        "x": 440,
-        "y": 640,
-        "wires": [
-            [
-                "869b3c03808dca46"
-            ]
-        ]
-    },
-    {
-        "id": "631daa0bb08efa1f",
-        "type": "debug",
-        "z": "d27f5b11c2fa7b08",
-        "name": "debug 186",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 670,
-        "y": 720,
-        "wires": []
-    },
-    {
-        "id": "869b3c03808dca46",
-        "type": "function",
-        "z": "d27f5b11c2fa7b08",
-        "name": "function 101",
-        "func": "let doc = msg.sub.rows[0].value;\nmsg.sub = {\n    database: 'smart-vehicle',\n    docs: doc.payload\n}\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 410,
-        "y": 680,
-        "wires": [
-            [
-                "fe7a2f75e83e5c53"
-            ]
-        ]
-    },
-    {
-        "id": "fe7a2f75e83e5c53",
-        "type": "subflow:f0ae825b26a06b48",
-        "z": "d27f5b11c2fa7b08",
-        "name": "",
-        "x": 440,
-        "y": 720,
-        "wires": [
-            [
-                "631daa0bb08efa1f"
-            ]
-        ]
     },
     {
         "id": "b97127455f88ae14",
@@ -18833,7 +18567,7 @@
         "payload": "",
         "payloadType": "date",
         "x": 140,
-        "y": 820,
+        "y": 480,
         "wires": [
             [
                 "82d74ab1737231ca"
@@ -18853,7 +18587,7 @@
         "finalize": "",
         "libs": [],
         "x": 390,
-        "y": 820,
+        "y": 480,
         "wires": [
             [
                 "0b882cdbbbb45cfb"
@@ -18866,7 +18600,7 @@
         "z": "d27f5b11c2fa7b08",
         "name": "",
         "x": 400,
-        "y": 860,
+        "y": 520,
         "wires": [
             [
                 "ca2561d706170bc0"
@@ -18886,7 +18620,7 @@
         "finalize": "",
         "libs": [],
         "x": 420,
-        "y": 900,
+        "y": 560,
         "wires": [
             [
                 "d7cc97255aea3ddd"
@@ -18907,7 +18641,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 1030,
-        "y": 860,
+        "y": 520,
         "wires": []
     },
     {
@@ -18916,7 +18650,7 @@
         "z": "d27f5b11c2fa7b08",
         "name": "",
         "x": 700,
-        "y": 820,
+        "y": 480,
         "wires": [
             [
                 "2c5abcb26121cfed"
@@ -18936,10 +18670,27 @@
         "finalize": "",
         "libs": [],
         "x": 750,
-        "y": 860,
+        "y": 520,
         "wires": [
             [
                 "daa936e4c3ae9be4"
+            ]
+        ]
+    },
+    {
+        "id": "a7750a2951f6e97c",
+        "type": "promptinput",
+        "z": "d27f5b11c2fa7b08",
+        "name": "confirm",
+        "datatype": "str",
+        "prompt": "inputkan tanggal YYYY-MM-DD",
+        "property": "sub",
+        "propertyType": "msg",
+        "x": 130,
+        "y": 260,
+        "wires": [
+            [
+                "7437c9629891b0da"
             ]
         ]
     },
