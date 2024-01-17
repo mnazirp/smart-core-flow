@@ -1215,9 +1215,7 @@
             "d6165c1f299c9aee"
         ],
         "x": 54,
-        "y": 59,
-        "w": 1172,
-        "h": 382
+        "y": 59
     },
     {
         "id": "784d89e62dfb5070",
@@ -1267,6 +1265,7 @@
         "name": "jwt sign",
         "func": "try {\n    let secret = env.get('JWTSECRET');\n    let options = { expiresIn: '2 days' };\n    let token = jwt.sign(msg.sub, secret, options);\n    let decoded = jwt.verify(token, secret);\n    msg.sub = token;\n} catch (error) {\n    msg.sub = null;\n    msg.error = error.message;\n};\nreturn msg;",
         "outputs": 1,
+        "timeout": "",
         "noerr": 0,
         "initialize": "",
         "finalize": "",
@@ -4804,6 +4803,7 @@
         "name": "prepare jwt payload",
         "func": "msg.sub = {\n    nik: '09001040',\n    fullName: 'Ahmad Nuroffiq',\n    email: 'staff.rc.pmse@sinarmas-agri.com',\n    occupation: 'RCS',\n    roles: ['SFR']\n}\n\nreturn msg;",
         "outputs": 1,
+        "timeout": "",
         "noerr": 0,
         "initialize": "",
         "finalize": "",
@@ -4830,35 +4830,6 @@
         ]
     },
     {
-        "id": "a77291f3c5c33cc0",
-        "type": "inject",
-        "z": "bf22cd3c7ed55a35",
-        "name": "",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 100,
-        "y": 200,
-        "wires": [
-            [
-                "1755b545d754801e"
-            ]
-        ]
-    },
-    {
         "id": "993afa7afcd3c77b",
         "type": "debug",
         "z": "bf22cd3c7ed55a35",
@@ -4880,8 +4851,9 @@
         "type": "function",
         "z": "bf22cd3c7ed55a35",
         "name": "prepare jwt payload",
-        "func": "// msg.sub = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuaWsiOiIwOTAwMTA0MCIsImZ1bGxOYW1lIjoiQWhtYWQgTnVyb2ZmaXEiLCJlbWFpbCI6InN0YWZmLnJjLnBtc2VAc2luYXJtYXMtYWdyaS5jb20iLCJvY2N1cGF0aW9uIjoiUkNTIiwicm9sZXMiOlsiU0ZSIl0sImlhdCI6MTY3NjYyMDE0MSwiZXhwIjoxNjc2NzkyOTQxfQ.LycdE5eTfYbAecB5cJ2JW8EQShn5NPpvDGxvP1qPq_c`;\nmsg.sub = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuaWsiOiIwOTAwMTA0MCIsImZ1bGxOYW1lIjoiQWhtYWQgTnVyb2ZmaXEiLCJlbWFpbCI6InN0YWZmLnJjLnBtc2VAc2luYXJtYXMtYWdyaS5jb20iLCJvY2N1cGF0aW9uIjoiUkNTIiwicm9sZXMiOlsiU0ZSIl0sImlhdCI6MTY3Njg2MTYyMywiZXhwIjoxNjc3MDM0NDIzfQ.2qCafDVE3C6NiO5V1Gt_PeKN5LSfc_1j1c-SLlkuWgw`;\nreturn msg;",
+        "func": "// msg.sub = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuaWsiOiIwOTAwMTA0MCIsImZ1bGxOYW1lIjoiQWhtYWQgTnVyb2ZmaXEiLCJlbWFpbCI6InN0YWZmLnJjLnBtc2VAc2luYXJtYXMtYWdyaS5jb20iLCJvY2N1cGF0aW9uIjoiUkNTIiwicm9sZXMiOlsiU0ZSIl0sImlhdCI6MTY3NjYyMDE0MSwiZXhwIjoxNjc2NzkyOTQxfQ.LycdE5eTfYbAecB5cJ2JW8EQShn5NPpvDGxvP1qPq_c`;\nmsg.sub = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuaWsiOiIwOTAwMTA0MCIsImZ1bGxOYW1lIjoiQWhtYWQgTnVyb2ZmaXEiLCJlbWFpbCI6InN0YWZmLnJjLnBtc2VAc2luYXJtYXMtYWdyaS5jb20iLCJvY2N1cGF0aW9uIjoiUkNTIiwicm9sZXMiOlsiU0ZSIl0sImlhdCI6MTcwNTQ3MTc5MSwiZXhwIjoxNzA1NjQ0NTkxfQ.MUPj4JJ5cCOQedD39Wb1VvjqCZWRipB0UaxMZtzR0DU`;\nreturn msg;",
         "outputs": 1,
+        "timeout": "",
         "noerr": 0,
         "initialize": "",
         "finalize": "",
@@ -5494,6 +5466,23 @@
         "x": 500,
         "y": 880,
         "wires": []
+    },
+    {
+        "id": "4a124c3daef6d945",
+        "type": "promptinput",
+        "z": "bf22cd3c7ed55a35",
+        "name": "",
+        "datatype": "str",
+        "prompt": "masukkan token",
+        "property": "payload",
+        "propertyType": "msg",
+        "x": 110,
+        "y": 200,
+        "wires": [
+            [
+                "1755b545d754801e"
+            ]
+        ]
     },
     {
         "id": "f23842780cb1d49b",
@@ -15314,7 +15303,7 @@
         "type": "function",
         "z": "d13820078197e616",
         "name": "validated",
-        "func": "let valid = false;\nlet { unittransport, numDays } = msg.payload;\nif (unittransport \n    && numDays \n    && Array.isArray(unittransport)\n    && unittransport.length > 0\n    && typeof numDays == 'number') {\n    msg.ori = msg.payload;\n    valid = true;\n}\nmsg.valid = valid;\nif (!valid) {\n    msg.payload = \"parameter is not valid\"\n}\nreturn msg;",
+        "func": "let valid = false;\nlet { unittransport, numDays, allUnit } = msg.payload;\nif (\n    numDays\n    && typeof numDays == 'number'\n) {\n    if (unittransport\n        && allUnit == undefined\n        && Array.isArray(unittransport)\n        && unittransport.length > 0) {\n        msg.ori = msg.payload;\n        valid = true;\n    }\n\n    if (\n        allUnit != undefined\n        && unittransport == undefined\n        && typeof allUnit == 'boolean'\n    ) {\n        msg.ori = msg.payload;\n        valid = true;\n    }\n}\nmsg.valid = valid;\nif (!valid) {\n    msg.payload = \"parameter is not valid\"\n}\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -18662,7 +18651,7 @@
         "type": "function",
         "z": "d27f5b11c2fa7b08",
         "name": "return vehicle yang belum di registrasi",
-        "func": "let vehicles = msg.sub.rows.map(x => x.value);\nlet asset = msg.asset;\nmsg.payload = vehicles.filter(x => !asset.some(ass => ass == x.vin));\nreturn msg;",
+        "func": "let vehicles = msg.sub.rows.map(x => x.value);\nmsg.vehicles = vehicles;\nlet asset = msg.asset;\nlet yangBelum = vehicles.filter(x => !asset.some(ass => ass == x.vin));\nlet sudahRegister = vehicles.filter(x => asset.some(ass => ass == x.vin));\nmsg.sudah = sudahRegister;\nmsg.belum = yangBelum;\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -18691,6 +18680,160 @@
         "wires": [
             [
                 "7437c9629891b0da"
+            ]
+        ]
+    },
+    {
+        "id": "a5536deef0ab9c12",
+        "type": "inject",
+        "z": "d27f5b11c2fa7b08",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 180,
+        "y": 740,
+        "wires": [
+            [
+                "7797bf4b9c740e7b"
+            ]
+        ]
+    },
+    {
+        "id": "7797bf4b9c740e7b",
+        "type": "function",
+        "z": "d27f5b11c2fa7b08",
+        "name": "function 101",
+        "func": "msg.payload = \"*\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 390,
+        "y": 740,
+        "wires": [
+            [
+                "827e2c3d7e1cef02"
+            ]
+        ]
+    },
+    {
+        "id": "827e2c3d7e1cef02",
+        "type": "redis-command",
+        "z": "d27f5b11c2fa7b08",
+        "server": "8ca322e6bc2d554c",
+        "command": "KEYS",
+        "name": "",
+        "topic": "",
+        "params": "[]",
+        "paramsType": "json",
+        "payloadType": "json",
+        "block": false,
+        "x": 390,
+        "y": 780,
+        "wires": [
+            [
+                "dcb38f30dd793e0c"
+            ]
+        ]
+    },
+    {
+        "id": "dcb38f30dd793e0c",
+        "type": "debug",
+        "z": "d27f5b11c2fa7b08",
+        "name": "debug 190",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 590,
+        "y": 780,
+        "wires": []
+    },
+    {
+        "id": "e4695c24c95d018d",
+        "type": "http in",
+        "z": "d27f5b11c2fa7b08",
+        "name": "",
+        "url": "/api/tracking/all",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 190,
+        "y": 920,
+        "wires": [
+            [
+                "6cf2d96ff3020a54"
+            ]
+        ]
+    },
+    {
+        "id": "dc4aeb5c3bf8905a",
+        "type": "http response",
+        "z": "d27f5b11c2fa7b08",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 640,
+        "y": 960,
+        "wires": []
+    },
+    {
+        "id": "6cf2d96ff3020a54",
+        "type": "function",
+        "z": "d27f5b11c2fa7b08",
+        "name": "function 102",
+        "func": "msg.payload = \"*\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 920,
+        "wires": [
+            [
+                "9d214619414aa507"
+            ]
+        ]
+    },
+    {
+        "id": "9d214619414aa507",
+        "type": "redis-command",
+        "z": "d27f5b11c2fa7b08",
+        "server": "8ca322e6bc2d554c",
+        "command": "KEYS",
+        "name": "",
+        "topic": "",
+        "params": "[]",
+        "paramsType": "json",
+        "payloadType": "json",
+        "block": false,
+        "x": 430,
+        "y": 960,
+        "wires": [
+            [
+                "dc4aeb5c3bf8905a"
             ]
         ]
     },
