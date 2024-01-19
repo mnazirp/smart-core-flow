@@ -6078,7 +6078,7 @@
         "type": "function",
         "z": "bf22cd3c7ed55a35",
         "name": "function 111",
-        "func": "const redis = global.get('redis');\n\nlet key = '*';\nlet keys = [\n  'MJEC1JG43N5198104:*',\n  'MJEC1JG43N5198102x:*'\n];\nlet rs = redis.checkKey(key);\nrs.then(x => {\n  node.send({\n    payload: x\n  });\n})\n// let rs = redis.checkKeys(keys);\n// rs.then(x => {\n//   node.send({\n//     payload: x\n//   });\n// })\n\nreturn null;",
+        "func": "const redis = global.get('redis');\n\nlet key = '*';\n// let keys = [\n//   'MJEC1JG43N5198104:*',\n//   'MJEC1JG43N5198102x:*'\n// ];\nlet rs = redis.checkKey(key);\nrs.then(x => {\n  node.send({\n    payload: x\n  });\n})\n// let rs = redis.checkKeys(keys);\n// rs.then(x => {\n//   node.send({\n//     payload: x\n//   });\n// })\n\nreturn null;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -16550,7 +16550,7 @@
         "type": "function",
         "z": "d13820078197e616",
         "name": "smart-vehicle",
-        "func": "let { startkey, endkey } = msg.ori;\nlet assets = msg.sub.rows.map(x => {\n    let {_id, _rev, ...other} = x.value;\n    return other;\n});\nlet keys = assets.map(x => `[\"${x.vin}\"]`);\nnode.warn(keys);\nmsg.assets = assets;\nmsg.sub = {\n    database: 'smart-vehicle',\n    design: 'list',\n    view: 'by-vin',\n    keys\n}\n\nreturn msg;",
+        "func": "let { startkey, endkey } = msg.ori;\nlet assets = msg.sub.rows.map(x => {\n    let {_id, _rev, ...other} = x.value;\n    return other;\n});\nlet keys = assets.map(x => `[\"${x.vin}\"]`);\nmsg.assets = assets;\nmsg.sub = {\n    database: 'smart-vehicle',\n    design: 'list',\n    view: 'by-vin',\n    keys\n}\n\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -17901,7 +17901,7 @@
         "type": "function",
         "z": "d13820078197e616",
         "name": "msg.vinAsset",
-        "func": "msg.vinAsset = msg.sub.rows.map(x => x.value.vin);\nreturn msg;",
+        "func": "msg.vinAsset = msg.sub.rows.filter(x => x.value != \"\").map(x => x.value.vin);\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -17923,7 +17923,7 @@
         "name": "",
         "statusCode": "200",
         "headers": {},
-        "x": 1320,
+        "x": 1680,
         "y": 420,
         "wires": []
     },
@@ -17932,7 +17932,7 @@
         "type": "function",
         "z": "d13820078197e616",
         "name": "get vehicle position by vinAsset",
-        "func": "const redisTS = global.get('redisTS');\nlet { numDays } = msg.ori;\n\nlet vins = msg.vinAsset;\nlet topics = vins.map(x => {\n    return `vin=${x}`\n});\nlet latest = redisTS.mgetByTopics(topics);\nlatest.then(late => {\n    // let assetNoTracking = late.filter(x => x.data.length == 0).map(x => x.topic.split('=')[1]);\n    // let assetInTracking = late.filter(x => x.data.length > 0).map(x => x.topic.split('=')[1]);\n    let filters = late.filter(x => x.data.length > 0).map(x => {\n        let lastDate = x.data.find(x => x.length > 0)[2][0];\n        return {\n            key: x.topic,\n            start: (lastDate) ? lastDate - (numDays * 24 * 60 * 60 * 1000) : null,\n            end: (lastDate) ? lastDate : null\n        }\n    });\n    let nDaysData = redisTS.mrangeFilter(filters);\n    nDaysData.then(result => {\n        let { data } = result;\n        msg.payload = data.map(x => {\n            return {\n                vin: x.topic.split('=')[1],\n                series: x.data.map(x => {\n                    return {\n                        key: x[0].split(':')[1],\n                        data: x[2]\n                    }\n                })\n            }\n        });\n        node.send(msg);\n    }).catch(err => {\n        let { success, func, message } = err;\n        msg.payload = { success, func, message: message.toString() };\n        node.send(msg);\n    })\n}).catch(err => {\n    let { success, func, message } = err;\n    msg.payload = { success, func, message: message.toString() };\n    node.send(msg);\n});\nreturn null;",
+        "func": "const redisTS = global.get('redisTS');\nlet { numDays } = msg.ori;\n\nlet vins = msg.vinAsset;\nlet topics = vins.filter(x => x != '').map(x => {\n    return `vin=${x}`\n});\nlet latest = redisTS.mgetByTopics(topics);\nlatest.then(late => {\n    // let assetNoTracking = late.filter(x => x.data.length == 0).map(x => x.topic.split('=')[1]);\n    // let assetInTracking = late.filter(x => x.data.length > 0).map(x => x.topic.split('=')[1]);\n    let filters = late.filter(x => x.data.length > 0).map(x => {\n        let lastDate = x.data.find(x => x.length > 0)[2][0];\n        return {\n            key: x.topic,\n            start: (lastDate) ? lastDate - (numDays * 24 * 60 * 60 * 1000) : null,\n            end: (lastDate) ? lastDate : null\n        }\n    });\n    let nDaysData = redisTS.mrangeFilter(filters);\n    nDaysData.then(result => {\n        msg.payload = result\n        node.send(msg);\n    }).catch(err => {\n        let { success, func, message } = err;\n        msg.payload = { success, func, message: message.toString() };\n        node.send(msg);\n    })\n}).catch(err => {\n    let { success, func, message } = err;\n    msg.payload = { success, func, message: message.toString() };\n    node.send(msg);\n});\nreturn null;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -17943,8 +17943,7 @@
         "y": 380,
         "wires": [
             [
-                "8eaec37ed5c09694",
-                "8eb1a33b308d05d3"
+                "8f3537e2d392e144"
             ]
         ]
     },
@@ -17960,7 +17959,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1650,
+        "x": 1890,
         "y": 380,
         "wires": [
             [
@@ -17983,7 +17982,7 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 1670,
+        "x": 1910,
         "y": 420,
         "wires": [
             [
@@ -18003,7 +18002,7 @@
         "paramsType": "json",
         "payloadType": "json",
         "block": false,
-        "x": 1660,
+        "x": 1900,
         "y": 460,
         "wires": [
             []
@@ -18107,6 +18106,310 @@
         "headers": {},
         "x": 1060,
         "y": 560,
+        "wires": []
+    },
+    {
+        "id": "8f3537e2d392e144",
+        "type": "switch",
+        "z": "d13820078197e616",
+        "name": "",
+        "property": "payload.success",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 1470,
+        "y": 420,
+        "wires": [
+            [
+                "dc327375d01b3762"
+            ],
+            [
+                "69741c87d9e5a90b"
+            ]
+        ]
+    },
+    {
+        "id": "dc327375d01b3762",
+        "type": "function",
+        "z": "d13820078197e616",
+        "name": "function 112",
+        "func": "let { data } = msg.payload;\nmsg.payload = data.map(x => {\n    return {\n        vin: x.topic.split('=')[1],\n        series: x.data.map(x => {\n            return {\n                key: x[0].split(':')[1],\n                data: x[2]\n            }\n        })\n    }\n});\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1670,
+        "y": 380,
+        "wires": [
+            [
+                "8eaec37ed5c09694",
+                "8eb1a33b308d05d3"
+            ]
+        ]
+    },
+    {
+        "id": "69741c87d9e5a90b",
+        "type": "http response",
+        "z": "d13820078197e616",
+        "name": "",
+        "statusCode": "500",
+        "headers": {},
+        "x": 1660,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "d435ec781b508608",
+        "type": "http in",
+        "z": "d13820078197e616",
+        "name": "",
+        "url": "/api/tracking/asset-vs-tracking",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 200,
+        "y": 2320,
+        "wires": [
+            [
+                "85e17e6d5d5a7128"
+            ]
+        ]
+    },
+    {
+        "id": "85e17e6d5d5a7128",
+        "type": "function",
+        "z": "d13820078197e616",
+        "name": "validated",
+        "func": "let valid = false;\nlet { unittransport, numDays, allUnit } = msg.payload;\nif (\n    numDays\n    && typeof numDays == 'number'\n) {\n    if (unittransport\n        && allUnit == undefined\n        && Array.isArray(unittransport)\n        && unittransport.length > 0) {\n        msg.ori = msg.payload;\n        msg.redisKey = `cache:tracking:${unittransport.join(';')}`\n        valid = true;\n    }\n\n    if (\n        allUnit != undefined\n        && unittransport == undefined\n        && typeof allUnit == 'boolean'\n    ) {\n        msg.ori = msg.payload;\n        msg.redisKey = `cache:tracking:all-unit`\n        valid = true;\n    }\n}\nmsg.valid = valid;\nif (!valid) {\n    msg.payload = \"parameter is not valid\"\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 440,
+        "y": 2320,
+        "wires": [
+            [
+                "bc758d6fb0984cf7"
+            ]
+        ]
+    },
+    {
+        "id": "bc758d6fb0984cf7",
+        "type": "switch",
+        "z": "d13820078197e616",
+        "name": "",
+        "property": "valid",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 450,
+        "y": 2360,
+        "wires": [
+            [
+                "0bf3e6e25789e8ed"
+            ],
+            [
+                "72944f40983dd48a"
+            ]
+        ]
+    },
+    {
+        "id": "d7b7ca782d735c65",
+        "type": "function",
+        "z": "d13820078197e616",
+        "name": "get vin by unit-transport",
+        "func": "let { unittransport } = msg.ori;\nmsg.sub = {\n    database: 'smart-asset',\n    design: 'truck',\n    view: 'by-unitID',\n    keys: unittransport.map(x => `[${x}]`),\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 850,
+        "y": 2380,
+        "wires": [
+            [
+                "97a25293d9670d35"
+            ]
+        ]
+    },
+    {
+        "id": "97a25293d9670d35",
+        "type": "subflow:d7ccf53b2b9fe097",
+        "z": "d13820078197e616",
+        "name": "",
+        "x": 840,
+        "y": 2420,
+        "wires": [
+            [
+                "2cad50f70dbecc57"
+            ]
+        ]
+    },
+    {
+        "id": "0bf3e6e25789e8ed",
+        "type": "switch",
+        "z": "d13820078197e616",
+        "name": "",
+        "property": "ori.allUnit",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 610,
+        "y": 2320,
+        "wires": [
+            [
+                "3905735f60ecbeee"
+            ],
+            [
+                "d7b7ca782d735c65"
+            ]
+        ]
+    },
+    {
+        "id": "3905735f60ecbeee",
+        "type": "function",
+        "z": "d13820078197e616",
+        "name": "smart-asset by-vin",
+        "func": "msg.sub = {\n    database: 'smart-asset',\n    design: 'truck',\n    view: 'by-vin'\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 830,
+        "y": 2260,
+        "wires": [
+            [
+                "1a122284d912662b"
+            ]
+        ]
+    },
+    {
+        "id": "1a122284d912662b",
+        "type": "subflow:d7ccf53b2b9fe097",
+        "z": "d13820078197e616",
+        "name": "",
+        "x": 860,
+        "y": 2300,
+        "wires": [
+            [
+                "7d1be67e600cac6e"
+            ]
+        ]
+    },
+    {
+        "id": "7d1be67e600cac6e",
+        "type": "function",
+        "z": "d13820078197e616",
+        "name": "msg.vinAsset",
+        "func": "let asset = msg.sub.rows.map(x => x.key);\nmsg.vinAsset = [].concat(...asset).filter(x => x != \"\");\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 890,
+        "y": 2340,
+        "wires": [
+            [
+                "95fabdc735812f68"
+            ]
+        ]
+    },
+    {
+        "id": "2cad50f70dbecc57",
+        "type": "function",
+        "z": "d13820078197e616",
+        "name": "msg.vinAsset",
+        "func": "msg.vinAsset = msg.sub.rows.filter(x => x.value != \"\").map(x => x.value.vin);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 890,
+        "y": 2460,
+        "wires": [
+            [
+                "95fabdc735812f68"
+            ]
+        ]
+    },
+    {
+        "id": "72944f40983dd48a",
+        "type": "http response",
+        "z": "d13820078197e616",
+        "name": "",
+        "statusCode": "400",
+        "headers": {},
+        "x": 620,
+        "y": 2420,
+        "wires": []
+    },
+    {
+        "id": "95fabdc735812f68",
+        "type": "function",
+        "z": "d13820078197e616",
+        "name": "function 113",
+        "func": "const redisTS = global.get('redisTS');\nlet rs = redisTS.checkKey('*');\nlet vinAsset = msg.vinAsset;\nrs.then(keys => {\n    let vins = keys.map(x => x.split(':')[0]);\n    let vinTracking = [...new Set(vins)];\n    let vinAssetNotInTracking = vinAsset.filter(x => !vinTracking.includes(x));\n    let vinTrackingNotInAsset = vinTracking.filter(x => !vinAsset.includes(x));\n    msg.payload = { vinAsset, vinTracking, vinAssetNotInTracking, vinTrackingNotInAsset }\n    node.send(msg);\n})\n    .catch(err => {\n        msg.payload = msg;\n        node.send(msg);\n    });\nreturn null;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1150,
+        "y": 2340,
+        "wires": [
+            [
+                "805c319aabca1c7d"
+            ]
+        ]
+    },
+    {
+        "id": "805c319aabca1c7d",
+        "type": "http response",
+        "z": "d13820078197e616",
+        "name": "",
+        "statusCode": "400",
+        "headers": {},
+        "x": 1160,
+        "y": 2380,
         "wires": []
     },
     {
