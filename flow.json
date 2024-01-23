@@ -4352,8 +4352,8 @@
         "method": "post",
         "upload": false,
         "swaggerDoc": "",
-        "x": 140,
-        "y": 160,
+        "x": 160,
+        "y": 120,
         "wires": [
             [
                 "1139aaeb805d591e"
@@ -4371,8 +4371,8 @@
         "search": "_view_",
         "design": "view-user",
         "index": "by-nik",
-        "x": 730,
-        "y": 160,
+        "x": 750,
+        "y": 120,
         "wires": [
             [
                 "b3f14e2a3a967408"
@@ -4390,8 +4390,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 530,
-        "y": 160,
+        "x": 550,
+        "y": 120,
         "wires": [
             [
                 "5dbfca463b8f94ea"
@@ -4418,8 +4418,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 750,
-        "y": 200,
+        "x": 770,
+        "y": 160,
         "wires": [
             [
                 "f76eb5c7ca814e7f"
@@ -4436,8 +4436,8 @@
         "name": "",
         "statusCode": "400",
         "headers": {},
-        "x": 940,
-        "y": 300,
+        "x": 960,
+        "y": 260,
         "wires": []
     },
     {
@@ -4459,8 +4459,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 960,
-        "y": 260,
+        "x": 980,
+        "y": 220,
         "wires": [
             [
                 "c9f15de4fba5c2e0"
@@ -4479,8 +4479,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 950,
-        "y": 120,
+        "x": 970,
+        "y": 80,
         "wires": [
             [
                 "12be102bd5a5549e"
@@ -4492,8 +4492,8 @@
         "type": "subflow:c2f437acbbab02bd",
         "z": "3a3a41a0d95d74c4",
         "name": "",
-        "x": 980,
-        "y": 160,
+        "x": 1000,
+        "y": 120,
         "wires": [
             [
                 "54a019b169729c69"
@@ -4511,8 +4511,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1220,
-        "y": 160,
+        "x": 1240,
+        "y": 120,
         "wires": [
             [
                 "5ef56066432171ba"
@@ -4524,8 +4524,8 @@
         "type": "subflow:77002254b872fa8e",
         "z": "3a3a41a0d95d74c4",
         "name": "",
-        "x": 1450,
-        "y": 160,
+        "x": 1470,
+        "y": 120,
         "wires": [
             [
                 "b2e40b5de9099cf4"
@@ -4550,8 +4550,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 1250,
-        "y": 200,
+        "x": 1270,
+        "y": 160,
         "wires": [
             [
                 "ab91fa5df5761e58"
@@ -4568,8 +4568,8 @@
         "name": "",
         "statusCode": "400",
         "headers": {},
-        "x": 1440,
-        "y": 300,
+        "x": 1460,
+        "y": 260,
         "wires": []
     },
     {
@@ -4591,8 +4591,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1460,
-        "y": 260,
+        "x": 1480,
+        "y": 220,
         "wires": [
             [
                 "11fc9ef3ad64cf3c"
@@ -4617,8 +4617,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 550,
-        "y": 200,
+        "x": 570,
+        "y": 160,
         "wires": [
             [
                 "24dfaa402842999c"
@@ -4635,8 +4635,8 @@
         "name": "",
         "statusCode": "400",
         "headers": {},
-        "x": 720,
-        "y": 300,
+        "x": 740,
+        "y": 260,
         "wires": []
     },
     {
@@ -4658,8 +4658,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 740,
-        "y": 260,
+        "x": 760,
+        "y": 220,
         "wires": [
             [
                 "96353977042ba7f3"
@@ -4677,8 +4677,8 @@
         "search": "_view_",
         "design": "type",
         "index": "by-topic",
-        "x": 1680,
-        "y": 200,
+        "x": 1700,
+        "y": 160,
         "wires": [
             [
                 "17cf590e3d949f01"
@@ -4697,8 +4697,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1910,
-        "y": 200,
+        "x": 1930,
+        "y": 160,
         "wires": [
             [
                 "33feea6c9732727e"
@@ -4716,8 +4716,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1680,
-        "y": 160,
+        "x": 1700,
+        "y": 120,
         "wires": [
             [
                 "946615b5dff60503"
@@ -4729,8 +4729,8 @@
         "type": "subflow:44e549ae5408d3d3",
         "z": "3a3a41a0d95d74c4",
         "name": "",
-        "x": 1930,
-        "y": 240,
+        "x": 1950,
+        "y": 200,
         "wires": [
             [
                 "98a0c35f4d38f37f"
@@ -4748,8 +4748,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 2140,
-        "y": 240,
+        "x": 2160,
+        "y": 200,
         "wires": [
             [
                 "c41d95634343de45"
@@ -4763,8 +4763,8 @@
         "name": "",
         "statusCode": "",
         "headers": {},
-        "x": 2170,
-        "y": 280,
+        "x": 2190,
+        "y": 240,
         "wires": []
     },
     {
@@ -4785,8 +4785,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 1030,
-        "y": 200,
+        "x": 1050,
+        "y": 160,
         "wires": [
             [
                 "0460f41c928aef8f"
@@ -4803,8 +4803,8 @@
         "name": "",
         "statusCode": "500",
         "headers": {},
-        "x": 1200,
-        "y": 300,
+        "x": 1220,
+        "y": 260,
         "wires": []
     },
     {
@@ -4826,8 +4826,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1220,
-        "y": 260,
+        "x": 1240,
+        "y": 220,
         "wires": [
             [
                 "aa91185e5d5a25e1"
@@ -4852,8 +4852,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 1470,
-        "y": 200,
+        "x": 1490,
+        "y": 160,
         "wires": [
             [
                 "20f7357695b26aa8"
@@ -4870,8 +4870,8 @@
         "name": "",
         "statusCode": "500",
         "headers": {},
-        "x": 1680,
-        "y": 300,
+        "x": 1700,
+        "y": 260,
         "wires": []
     },
     {
@@ -4893,8 +4893,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1700,
-        "y": 260,
+        "x": 1720,
+        "y": 220,
         "wires": [
             [
                 "7670ff903689d835"
@@ -4919,8 +4919,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 1950,
-        "y": 280,
+        "x": 1970,
+        "y": 240,
         "wires": [
             [
                 "3b111b6afac1790d"
@@ -4949,8 +4949,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 2140,
-        "y": 340,
+        "x": 2160,
+        "y": 300,
         "wires": [
             [
                 "2596021eeda7b11e"
@@ -4964,8 +4964,8 @@
         "name": "",
         "statusCode": "500",
         "headers": {},
-        "x": 2160,
-        "y": 380,
+        "x": 2180,
+        "y": 340,
         "wires": []
     },
     {
@@ -4977,8 +4977,8 @@
         "method": "post",
         "upload": false,
         "swaggerDoc": "",
-        "x": 170,
-        "y": 460,
+        "x": 190,
+        "y": 380,
         "wires": [
             [
                 "409cfef1a9b30527"
@@ -4992,8 +4992,8 @@
         "name": "",
         "statusCode": "200",
         "headers": {},
-        "x": 1040,
-        "y": 780,
+        "x": 1400,
+        "y": 620,
         "wires": []
     },
     {
@@ -5007,11 +5007,11 @@
         "name": "",
         "field": "payload",
         "fieldType": "msg",
-        "x": 870,
-        "y": 660,
+        "x": 890,
+        "y": 580,
         "wires": [
             [
-                "4085a163060750bc"
+                "318fd6943773c9b1"
             ]
         ]
     },
@@ -5020,15 +5020,15 @@
         "type": "function",
         "z": "3a3a41a0d95d74c4",
         "name": "validate",
-        "func": "let valid = false;\nlet { app, dns } = msg.payload;\nif (app && app.id && app.version && dns) {\n    valid = true;\n    msg.ori = msg.payload;\n    msg.agiliteUtils = {\n        namespace: `${dns}.${app.id}.${app.version}`\n    };\n}\nmsg.valid = valid;\nreturn msg;",
+        "func": "let valid = false;\nlet { app, dns, secret } = msg.payload;\nif (app && app.id && app.version && dns && secret) {\n    valid = true;\n    msg.ori = msg.payload;\n    msg.agiliteUtils = {\n        namespace: `${dns}.${app.id}.${app.version}`\n    };\n}\nmsg.valid = valid;\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 440,
-        "y": 460,
+        "x": 460,
+        "y": 380,
         "wires": [
             [
                 "6eb3e8d36afa404e"
@@ -5047,8 +5047,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 900,
-        "y": 620,
+        "x": 920,
+        "y": 540,
         "wires": [
             [
                 "83b7582d1a701f0f"
@@ -5066,8 +5066,8 @@
         "search": "_id_",
         "design": "",
         "index": "",
-        "x": 660,
-        "y": 500,
+        "x": 680,
+        "y": 420,
         "wires": [
             [
                 "e0227a0625930d4a"
@@ -5086,8 +5086,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 660,
-        "y": 460,
+        "x": 680,
+        "y": 380,
         "wires": [
             [
                 "cac484c9466468d5"
@@ -5112,8 +5112,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 430,
-        "y": 500,
+        "x": 450,
+        "y": 420,
         "wires": [
             [
                 "7bf3619a7ec412a3"
@@ -5130,8 +5130,8 @@
         "name": "",
         "statusCode": "400",
         "headers": {},
-        "x": 640,
-        "y": 660,
+        "x": 660,
+        "y": 580,
         "wires": []
     },
     {
@@ -5153,8 +5153,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 660,
-        "y": 620,
+        "x": 680,
+        "y": 540,
         "wires": [
             [
                 "03688b6c80fe2a51"
@@ -5173,8 +5173,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 650,
-        "y": 540,
+        "x": 670,
+        "y": 460,
         "wires": [
             [
                 "11f7b4d237cda608"
@@ -5199,8 +5199,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 680,
-        "y": 580,
+        "x": 700,
+        "y": 500,
         "wires": [
             [
                 "e46c2b2b838af1ed"
@@ -5217,8 +5217,8 @@
         "name": "",
         "statusCode": "400",
         "headers": {},
-        "x": 1100,
-        "y": 540,
+        "x": 1120,
+        "y": 460,
         "wires": []
     },
     {
@@ -5240,8 +5240,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 900,
-        "y": 540,
+        "x": 920,
+        "y": 460,
         "wires": [
             [
                 "d9ccda264275691d"
@@ -5253,15 +5253,15 @@
         "type": "function",
         "z": "3a3a41a0d95d74c4",
         "name": "update api-keys configs",
-        "func": "let { app, dns, description } = msg.ori;\nlet data = msg.document.data;\ndata.push({\n    app,\n    dns,\n    description,\n    apiKey: msg.payload\n});\nmsg.apiKey = msg.payload;\nmsg.document.data = data;\nmsg.payload = msg.document;\nreturn msg;",
+        "func": "let { app, dns, description } = msg.ori;\nlet data = msg.document.data;\nlet secretKey = msg.sub\ndata.push({\n    app,\n    dns,\n    description,\n    apiKey: msg.apiKey,\n    secretKey\n});\nmsg.apiKey = msg.payload;\nmsg.secretKey = secretKey;\nmsg.document.data = data;\nmsg.payload = msg.document;\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 930,
-        "y": 700,
+        "x": 1290,
+        "y": 540,
         "wires": [
             [
                 "d8d91a2489d4eb7b"
@@ -5278,8 +5278,8 @@
         "service": "_ext_",
         "payonly": true,
         "operation": "insert",
-        "x": 900,
-        "y": 740,
+        "x": 1260,
+        "y": 580,
         "wires": [
             [
                 "19554a016e0a3152"
@@ -5291,15 +5291,15 @@
         "type": "function",
         "z": "3a3a41a0d95d74c4",
         "name": "return",
-        "func": "msg.payload = msg.apiKey;\nreturn msg;",
+        "func": "msg.payload = {\n    apiKey: msg.apiKey,\n    secretKey: msg.secretKey\n}\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 870,
-        "y": 780,
+        "x": 1230,
+        "y": 620,
         "wires": [
             [
                 "410a21721896d093"
@@ -5311,12 +5311,12 @@
         "type": "http in",
         "z": "3a3a41a0d95d74c4",
         "name": "",
-        "url": "/api/auth/token/generate",
+        "url": "/api/auth/req/token",
         "method": "post",
         "upload": false,
         "swaggerDoc": "",
-        "x": 160,
-        "y": 980,
+        "x": 170,
+        "y": 780,
         "wires": [
             [
                 "082631e8018e20d5"
@@ -5335,8 +5335,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 420,
-        "y": 980,
+        "x": 440,
+        "y": 780,
         "wires": [
             [
                 "d0632688bac5ba3e"
@@ -5361,8 +5361,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 430,
-        "y": 1020,
+        "x": 450,
+        "y": 820,
         "wires": [
             [
                 "6f605f3c5daa544b"
@@ -5379,8 +5379,8 @@
         "name": "",
         "statusCode": "400",
         "headers": {},
-        "x": 620,
-        "y": 1120,
+        "x": 640,
+        "y": 920,
         "wires": []
     },
     {
@@ -5402,8 +5402,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 640,
-        "y": 1080,
+        "x": 660,
+        "y": 880,
         "wires": [
             [
                 "8ac57953dd09f87d"
@@ -5421,8 +5421,8 @@
         "search": "_id_",
         "design": "",
         "index": "",
-        "x": 640,
-        "y": 1000,
+        "x": 660,
+        "y": 800,
         "wires": [
             [
                 "cce5eb6051ea0d04"
@@ -5441,8 +5441,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 640,
-        "y": 960,
+        "x": 660,
+        "y": 760,
         "wires": [
             [
                 "6faf53676de1ef86"
@@ -5461,8 +5461,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 630,
-        "y": 1040,
+        "x": 650,
+        "y": 840,
         "wires": [
             [
                 "973ecd3d5d662c3b"
@@ -5487,8 +5487,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 820,
-        "y": 1040,
+        "x": 840,
+        "y": 840,
         "wires": [
             [
                 "63aede2e0e9d6600"
@@ -5505,8 +5505,8 @@
         "name": "",
         "statusCode": "400",
         "headers": {},
-        "x": 1020,
-        "y": 1160,
+        "x": 1040,
+        "y": 960,
         "wires": []
     },
     {
@@ -5528,8 +5528,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1040,
-        "y": 1120,
+        "x": 1060,
+        "y": 920,
         "wires": [
             [
                 "40183f176ae41f4a"
@@ -5543,8 +5543,8 @@
         "name": "",
         "statusCode": "200",
         "headers": {},
-        "x": 1240,
-        "y": 1060,
+        "x": 1260,
+        "y": 860,
         "wires": []
     },
     {
@@ -5559,8 +5559,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1040,
-        "y": 980,
+        "x": 1060,
+        "y": 780,
         "wires": [
             [
                 "570fc3082fcbcd64"
@@ -5572,30 +5572,13 @@
         "type": "subflow:77002254b872fa8e",
         "z": "3a3a41a0d95d74c4",
         "name": "",
-        "x": 1030,
-        "y": 1020,
+        "x": 1050,
+        "y": 820,
         "wires": [
             [
                 "4e6975c918b9c8d3"
             ]
         ]
-    },
-    {
-        "id": "aec176c0330fe745",
-        "type": "debug",
-        "z": "3a3a41a0d95d74c4",
-        "name": "debug 203",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 1250,
-        "y": 1100,
-        "wires": []
     },
     {
         "id": "4e6975c918b9c8d3",
@@ -5609,13 +5592,407 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1070,
-        "y": 1060,
+        "x": 1090,
+        "y": 860,
         "wires": [
             [
                 "12b7193269b0f9d9"
             ]
         ]
+    },
+    {
+        "id": "318fd6943773c9b1",
+        "type": "function",
+        "z": "3a3a41a0d95d74c4",
+        "name": "save apiKey & prepare secret",
+        "func": "msg.apiKey = msg.payload;\nlet { secret } = msg.ori;\nmsg.sub = secret;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 970,
+        "y": 620,
+        "wires": [
+            [
+                "91d05e46f70a0c3a"
+            ]
+        ]
+    },
+    {
+        "id": "91d05e46f70a0c3a",
+        "type": "subflow:0f802e687dcc9e4a",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "x": 1030,
+        "y": 660,
+        "wires": [
+            [
+                "4085a163060750bc"
+            ]
+        ]
+    },
+    {
+        "id": "b9c0e9b1c9deeb56",
+        "type": "http in",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "url": "/api/auth/req/api-key",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 170,
+        "y": 1080,
+        "wires": [
+            [
+                "9065575a997ffa33"
+            ]
+        ]
+    },
+    {
+        "id": "9065575a997ffa33",
+        "type": "function",
+        "z": "3a3a41a0d95d74c4",
+        "name": "validate",
+        "func": "let valid = false;\nlet { app, secret } = msg.payload;\nif (app && secret) {\n    valid = true;\n    msg.ori = msg.payload;\n}\nmsg.valid = valid;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 440,
+        "y": 1080,
+        "wires": [
+            [
+                "3392a4e929803577"
+            ]
+        ]
+    },
+    {
+        "id": "3392a4e929803577",
+        "type": "switch",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "property": "valid",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 450,
+        "y": 1120,
+        "wires": [
+            [
+                "bbc54f93b9f53529"
+            ],
+            [
+                "34be7ad8d41132ae"
+            ]
+        ]
+    },
+    {
+        "id": "780b0081e523628c",
+        "type": "http response",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "statusCode": "400",
+        "headers": {},
+        "x": 640,
+        "y": 1280,
+        "wires": []
+    },
+    {
+        "id": "34be7ad8d41132ae",
+        "type": "change",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "parameter not valid",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 660,
+        "y": 1240,
+        "wires": [
+            [
+                "780b0081e523628c"
+            ]
+        ]
+    },
+    {
+        "id": "68d03969f24c6fc9",
+        "type": "cloudantplus in",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-configs",
+        "service": "_ext_",
+        "search": "_id_",
+        "design": "",
+        "index": "",
+        "x": 660,
+        "y": 1100,
+        "wires": [
+            [
+                "ac2c9201a96749b6"
+            ]
+        ]
+    },
+    {
+        "id": "bbc54f93b9f53529",
+        "type": "function",
+        "z": "3a3a41a0d95d74c4",
+        "name": "smart-api-keys",
+        "func": "msg.secretKey = msg.sub;\nmsg.payload = \"smart-api-keys\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 660,
+        "y": 1060,
+        "wires": [
+            [
+                "68d03969f24c6fc9"
+            ]
+        ]
+    },
+    {
+        "id": "ac2c9201a96749b6",
+        "type": "function",
+        "z": "3a3a41a0d95d74c4",
+        "name": "check apps",
+        "func": "let { app } = msg.ori;\nlet found = false;\nlet data = msg.payload.data;\nlet record = data.find(x => x.app.id === app.id && x.app.version === app.version);\nif (record != undefined) {\n    found = true;\n    msg.service = record;\n}\nmsg.found = found;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 650,
+        "y": 1140,
+        "wires": [
+            [
+                "db5f02ea3be516d3"
+            ]
+        ]
+    },
+    {
+        "id": "db5f02ea3be516d3",
+        "type": "switch",
+        "z": "3a3a41a0d95d74c4",
+        "name": "service found ?",
+        "property": "found",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 660,
+        "y": 1180,
+        "wires": [
+            [
+                "bf70185e47b1cd4c"
+            ],
+            [
+                "502e477d18ed5a7a"
+            ]
+        ]
+    },
+    {
+        "id": "36e409429b39b686",
+        "type": "function",
+        "z": "3a3a41a0d95d74c4",
+        "name": "result",
+        "func": "let { apiKey, secretKey } = msg.service;\nmsg.payload = {\n    apiKey,\n    secretKey\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1150,
+        "y": 1160,
+        "wires": [
+            [
+                "6b02af9ae8ba12c0"
+            ]
+        ]
+    },
+    {
+        "id": "bb6d09bea170fcb0",
+        "type": "http response",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "statusCode": "400",
+        "headers": {},
+        "x": 880,
+        "y": 1300,
+        "wires": []
+    },
+    {
+        "id": "502e477d18ed5a7a",
+        "type": "change",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "aplication not found",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 900,
+        "y": 1260,
+        "wires": [
+            [
+                "bb6d09bea170fcb0"
+            ]
+        ]
+    },
+    {
+        "id": "6b02af9ae8ba12c0",
+        "type": "http response",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 1160,
+        "y": 1200,
+        "wires": []
+    },
+    {
+        "id": "bf70185e47b1cd4c",
+        "type": "function",
+        "z": "3a3a41a0d95d74c4",
+        "name": "validate secret",
+        "func": "let { secret } = msg.ori;\nmsg.sub = {\n    password: secret,\n    hash: msg.service.secretKey\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 900,
+        "y": 1120,
+        "wires": [
+            [
+                "ceccaa7d18f18110"
+            ]
+        ]
+    },
+    {
+        "id": "ceccaa7d18f18110",
+        "type": "subflow:c9c1579a9da27745",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "x": 920,
+        "y": 1160,
+        "wires": [
+            [
+                "0c1bc5b7360a22ec"
+            ]
+        ]
+    },
+    {
+        "id": "0c1bc5b7360a22ec",
+        "type": "switch",
+        "z": "3a3a41a0d95d74c4",
+        "name": "is valid ?",
+        "property": "sub.isValid",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 960,
+        "y": 1200,
+        "wires": [
+            [
+                "36e409429b39b686"
+            ],
+            [
+                "9e1804ea688fa914"
+            ]
+        ]
+    },
+    {
+        "id": "9e1804ea688fa914",
+        "type": "change",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "invalid secret text",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1180,
+        "y": 1240,
+        "wires": [
+            [
+                "ad2a43deee81fa37"
+            ]
+        ]
+    },
+    {
+        "id": "ad2a43deee81fa37",
+        "type": "http response",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "statusCode": "400",
+        "headers": {},
+        "x": 1200,
+        "y": 1280,
+        "wires": []
     },
     {
         "id": "9ae2b5c84660f97f",
@@ -7121,6 +7498,156 @@
         "wires": [
             [
                 "f855085ff361e934"
+            ]
+        ]
+    },
+    {
+        "id": "bf8729df8f141872",
+        "type": "subflow:0f802e687dcc9e4a",
+        "z": "bf22cd3c7ed55a35",
+        "name": "",
+        "x": 990,
+        "y": 1020,
+        "wires": [
+            [
+                "738da214dd03a3cf"
+            ]
+        ]
+    },
+    {
+        "id": "7ebd3831155fe4ee",
+        "type": "inject",
+        "z": "bf22cd3c7ed55a35",
+        "name": "",
+        "props": [
+            {
+                "p": "sub",
+                "v": "",
+                "vt": "date"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 810,
+        "y": 980,
+        "wires": [
+            [
+                "465dcc22f35c1d9b"
+            ]
+        ]
+    },
+    {
+        "id": "465dcc22f35c1d9b",
+        "type": "function",
+        "z": "bf22cd3c7ed55a35",
+        "name": "function 125",
+        "func": "msg.sub = 'some_secret';\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 990,
+        "y": 980,
+        "wires": [
+            [
+                "bf8729df8f141872"
+            ]
+        ]
+    },
+    {
+        "id": "738da214dd03a3cf",
+        "type": "debug",
+        "z": "bf22cd3c7ed55a35",
+        "name": "debug 204",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1210,
+        "y": 1020,
+        "wires": []
+    },
+    {
+        "id": "52ca3dd252ac539f",
+        "type": "inject",
+        "z": "bf22cd3c7ed55a35",
+        "name": "",
+        "props": [
+            {
+                "p": "sub",
+                "v": "",
+                "vt": "date"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 810,
+        "y": 1100,
+        "wires": [
+            [
+                "a63d03cbb273614c"
+            ]
+        ]
+    },
+    {
+        "id": "a63d03cbb273614c",
+        "type": "function",
+        "z": "bf22cd3c7ed55a35",
+        "name": "function 126",
+        "func": "msg.sub = {\n    password: 'some_secret',\n    hash: '$2a$10$e6hjRg32CzodPa0rUQVw6.WS/EjEqKhVrYIiBxCCpK6nJntZ9lU9.'\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 990,
+        "y": 1100,
+        "wires": [
+            [
+                "53b6b2778601844a"
+            ]
+        ]
+    },
+    {
+        "id": "155e0e847f78883a",
+        "type": "debug",
+        "z": "bf22cd3c7ed55a35",
+        "name": "debug 205",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1250,
+        "y": 1140,
+        "wires": []
+    },
+    {
+        "id": "53b6b2778601844a",
+        "type": "subflow:c9c1579a9da27745",
+        "z": "bf22cd3c7ed55a35",
+        "name": "",
+        "x": 1020,
+        "y": 1140,
+        "wires": [
+            [
+                "155e0e847f78883a"
             ]
         ]
     },
