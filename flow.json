@@ -140,7 +140,7 @@
         "type": "tab",
         "label": "Vehicle Tracking",
         "disabled": false,
-        "info": "// nrlint function-eslint:off\n",
+        "info": "// nrlint function-eslint:off, max-flow-size:off\n",
         "env": []
     },
     {
@@ -187,7 +187,7 @@
         "id": "77002254b872fa8e",
         "type": "subflow",
         "name": "algo: jwt-sign",
-        "info": "## input:\r\non msg.sub assign an object like this:\r\n\r\n\r\n    {        \r\n        nik: '', \r\n        fullName: '',\r\n        email: '',\r\n        occupation: '',\r\n        roles: ['']\r\n    }\r\n\r\n\r\n\r\n## output:\r\ninside msg.sub:\r\n\r\n\r\n\r\n    {\r\n        token: 'eyJhbGciOiJIUzI1NiI...',\r\n        decoded: {}  \r\n    }\r\n\r\n// nrlint function-eslint:off\r\n",
+        "info": "## input:\r\non msg.sub assign an object like this:\r\n\r\n\r\n    {        \r\n        nik: '', \r\n        fullName: '',\r\n        email: '',\r\n        occupation: '',\r\n        roles: [''],\r\n        options: {\r\n            expiresIn: '2 days'\r\n        }\r\n    }\r\n\r\n\r\n\r\n## output:\r\ninside msg.sub:\r\n\r\n\r\n\r\n    {\r\n        token: 'eyJhbGciOiJIUzI1NiI...',\r\n        decoded: {}  \r\n    }\r\n\r\n// nrlint function-eslint:off\r\n",
         "category": "",
         "in": [
             {
@@ -1182,6 +1182,39 @@
         "color": "#ff69d6"
     },
     {
+        "id": "9ac4386f65a33996",
+        "type": "subflow",
+        "name": "sub: validate-http-token",
+        "info": "// nrlint no-unconnected-http-nodes:off\n",
+        "category": "",
+        "in": [
+            {
+                "x": 60,
+                "y": 80,
+                "wires": [
+                    {
+                        "id": "4688f91de316168e"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 700,
+                "y": 120,
+                "wires": [
+                    {
+                        "id": "501f24f5e22ccc81",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [],
+        "meta": {},
+        "color": "#3FADB5"
+    },
+    {
         "id": "d68d7a5bd488e2d7",
         "type": "group",
         "z": "ebd3eb3a630da0d4",
@@ -1263,7 +1296,7 @@
         "type": "function",
         "z": "77002254b872fa8e",
         "name": "jwt sign",
-        "func": "try {\n    let secret = env.get('JWTSECRET');\n    let options = { expiresIn: '2 days' };\n    let token = jwt.sign(msg.sub, secret, options);\n    let decoded = jwt.verify(token, secret);\n    msg.sub = token;\n} catch (error) {\n    msg.sub = null;\n    msg.error = error.message;\n};\nreturn msg;",
+        "func": "let { options } = msg.sub;\ntry {\n    let secret = env.get('JWTSECRET');\n    let opt = { expiresIn: (options.expiresIn) ? options.expiresIn : '2 days' };\n    let token = jwt.sign(msg.sub, secret, opt);\n    let decoded = jwt.verify(token, secret);\n    msg.sub = token;\n} catch (error) {\n    msg.sub = null;\n    msg.error = error.message;\n};\nreturn msg;",
         "outputs": 1,
         "timeout": "",
         "noerr": 0,
@@ -3802,6 +3835,191 @@
         ]
     },
     {
+        "id": "4688f91de316168e",
+        "type": "function",
+        "z": "9ac4386f65a33996",
+        "name": "read header authorization",
+        "func": "let valid = false;\nif (msg.req && msg.req.headers) {\n    let { authorization } = msg.req.headers;\n    if (authorization && authorization.includes('Bearer ')) {\n        valid = true;\n        let token = msg.req.headers.authorization.split(' ')[1];\n        msg.sub = token;\n    }\n}\nmsg.valid = valid;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 250,
+        "y": 80,
+        "wires": [
+            [
+                "81f8d14211b19356"
+            ]
+        ]
+    },
+    {
+        "id": "6d88305f04826cfc",
+        "type": "subflow:32e9ed8660fb2fde",
+        "z": "9ac4386f65a33996",
+        "name": "",
+        "x": 520,
+        "y": 80,
+        "wires": [
+            [
+                "796a40fa7623ba0b"
+            ]
+        ]
+    },
+    {
+        "id": "cee29c957db6d785",
+        "type": "http response",
+        "z": "9ac4386f65a33996",
+        "name": "",
+        "statusCode": "400",
+        "headers": {},
+        "x": 540,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "81f8d14211b19356",
+        "type": "switch",
+        "z": "9ac4386f65a33996",
+        "name": "valid authorization ?",
+        "property": "valid",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 260,
+        "y": 120,
+        "wires": [
+            [
+                "6d88305f04826cfc"
+            ],
+            [
+                "e011f8241c9eea59"
+            ]
+        ]
+    },
+    {
+        "id": "e011f8241c9eea59",
+        "type": "change",
+        "z": "9ac4386f65a33996",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "invalid headers",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 520,
+        "y": 200,
+        "wires": [
+            [
+                "cee29c957db6d785"
+            ]
+        ]
+    },
+    {
+        "id": "796a40fa7623ba0b",
+        "type": "function",
+        "z": "9ac4386f65a33996",
+        "name": "check token",
+        "func": "let { error } = msg.sub;\nmsg.error = error\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 530,
+        "y": 120,
+        "wires": [
+            [
+                "501f24f5e22ccc81"
+            ]
+        ]
+    },
+    {
+        "id": "501f24f5e22ccc81",
+        "type": "switch",
+        "z": "9ac4386f65a33996",
+        "name": "token error ?",
+        "property": "error",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "null"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 530,
+        "y": 160,
+        "wires": [
+            [],
+            [
+                "70ac2a6c5d2698a5"
+            ]
+        ]
+    },
+    {
+        "id": "c62a539bbecfada9",
+        "type": "http response",
+        "z": "9ac4386f65a33996",
+        "name": "",
+        "statusCode": "400",
+        "headers": {},
+        "x": 780,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "70ac2a6c5d2698a5",
+        "type": "change",
+        "z": "9ac4386f65a33996",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "error",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 760,
+        "y": 200,
+        "wires": [
+            [
+                "c62a539bbecfada9"
+            ]
+        ]
+    },
+    {
         "id": "07090842a5b11d57",
         "type": "cloudantplus in",
         "z": "68f1d2b77bbdcda6",
@@ -4749,6 +4967,655 @@
         "x": 2160,
         "y": 380,
         "wires": []
+    },
+    {
+        "id": "424754787e93e28e",
+        "type": "http in",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "url": "/api/auth/register/api-key",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 170,
+        "y": 460,
+        "wires": [
+            [
+                "409cfef1a9b30527"
+            ]
+        ]
+    },
+    {
+        "id": "410a21721896d093",
+        "type": "http response",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 1040,
+        "y": 780,
+        "wires": []
+    },
+    {
+        "id": "83b7582d1a701f0f",
+        "type": "uuid",
+        "z": "3a3a41a0d95d74c4",
+        "uuidVersion": "v3",
+        "namespaceType": "dns",
+        "namespace": "",
+        "namespaceCustom": "",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "x": 870,
+        "y": 660,
+        "wires": [
+            [
+                "4085a163060750bc"
+            ]
+        ]
+    },
+    {
+        "id": "409cfef1a9b30527",
+        "type": "function",
+        "z": "3a3a41a0d95d74c4",
+        "name": "validate",
+        "func": "let valid = false;\nlet { app, dns } = msg.payload;\nif (app && app.id && app.version && dns) {\n    valid = true;\n    msg.ori = msg.payload;\n    msg.agiliteUtils = {\n        namespace: `${dns}.${app.id}.${app.version}`\n    };\n}\nmsg.valid = valid;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 440,
+        "y": 460,
+        "wires": [
+            [
+                "6eb3e8d36afa404e"
+            ]
+        ]
+    },
+    {
+        "id": "c1e0693362a48aec",
+        "type": "function",
+        "z": "3a3a41a0d95d74c4",
+        "name": "generate UUID",
+        "func": "let { app, dns } = msg.ori;\nmsg.agiliteUtils = {\n    namespace: `${dns}.${app.id}.${app.version}`\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 900,
+        "y": 620,
+        "wires": [
+            [
+                "83b7582d1a701f0f"
+            ]
+        ]
+    },
+    {
+        "id": "cac484c9466468d5",
+        "type": "cloudantplus in",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-configs",
+        "service": "_ext_",
+        "search": "_id_",
+        "design": "",
+        "index": "",
+        "x": 660,
+        "y": 500,
+        "wires": [
+            [
+                "e0227a0625930d4a"
+            ]
+        ]
+    },
+    {
+        "id": "7bf3619a7ec412a3",
+        "type": "function",
+        "z": "3a3a41a0d95d74c4",
+        "name": "smart-api-keys",
+        "func": "msg.payload = \"smart-api-keys\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 660,
+        "y": 460,
+        "wires": [
+            [
+                "cac484c9466468d5"
+            ]
+        ]
+    },
+    {
+        "id": "6eb3e8d36afa404e",
+        "type": "switch",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "property": "valid",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 430,
+        "y": 500,
+        "wires": [
+            [
+                "7bf3619a7ec412a3"
+            ],
+            [
+                "4c253ac416ec6634"
+            ]
+        ]
+    },
+    {
+        "id": "03688b6c80fe2a51",
+        "type": "http response",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "statusCode": "400",
+        "headers": {},
+        "x": 640,
+        "y": 660,
+        "wires": []
+    },
+    {
+        "id": "4c253ac416ec6634",
+        "type": "change",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "parameter not valid",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 660,
+        "y": 620,
+        "wires": [
+            [
+                "03688b6c80fe2a51"
+            ]
+        ]
+    },
+    {
+        "id": "e0227a0625930d4a",
+        "type": "function",
+        "z": "3a3a41a0d95d74c4",
+        "name": "check apps",
+        "func": "let { app, dns } = msg.ori;\nlet data = msg.payload.data;\nlet found = data.some(x => x.app.id == app.id && x.app.version == app.version && x.dns == dns);\nmsg.document = msg.payload;\nmsg.found = found;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 650,
+        "y": 540,
+        "wires": [
+            [
+                "11f7b4d237cda608"
+            ]
+        ]
+    },
+    {
+        "id": "11f7b4d237cda608",
+        "type": "switch",
+        "z": "3a3a41a0d95d74c4",
+        "name": "found ?",
+        "property": "found",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 680,
+        "y": 580,
+        "wires": [
+            [
+                "e46c2b2b838af1ed"
+            ],
+            [
+                "c1e0693362a48aec"
+            ]
+        ]
+    },
+    {
+        "id": "d9ccda264275691d",
+        "type": "http response",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "statusCode": "400",
+        "headers": {},
+        "x": 1100,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "e46c2b2b838af1ed",
+        "type": "change",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "alredy exsist",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 900,
+        "y": 540,
+        "wires": [
+            [
+                "d9ccda264275691d"
+            ]
+        ]
+    },
+    {
+        "id": "4085a163060750bc",
+        "type": "function",
+        "z": "3a3a41a0d95d74c4",
+        "name": "update api-keys configs",
+        "func": "let { app, dns, description } = msg.ori;\nlet data = msg.document.data;\ndata.push({\n    app,\n    dns,\n    description,\n    apiKey: msg.payload\n});\nmsg.apiKey = msg.payload;\nmsg.document.data = data;\nmsg.payload = msg.document;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 930,
+        "y": 700,
+        "wires": [
+            [
+                "d8d91a2489d4eb7b"
+            ]
+        ]
+    },
+    {
+        "id": "d8d91a2489d4eb7b",
+        "type": "cloudantplus out",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-configs",
+        "service": "_ext_",
+        "payonly": true,
+        "operation": "insert",
+        "x": 900,
+        "y": 740,
+        "wires": [
+            [
+                "19554a016e0a3152"
+            ]
+        ]
+    },
+    {
+        "id": "19554a016e0a3152",
+        "type": "function",
+        "z": "3a3a41a0d95d74c4",
+        "name": "return",
+        "func": "msg.payload = msg.apiKey;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 870,
+        "y": 780,
+        "wires": [
+            [
+                "410a21721896d093"
+            ]
+        ]
+    },
+    {
+        "id": "b1a47295c3ee7448",
+        "type": "http in",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "url": "/api/auth/token/generate",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 160,
+        "y": 980,
+        "wires": [
+            [
+                "082631e8018e20d5"
+            ]
+        ]
+    },
+    {
+        "id": "082631e8018e20d5",
+        "type": "function",
+        "z": "3a3a41a0d95d74c4",
+        "name": "validate",
+        "func": "let valid = false;\nlet { apiKey } = msg.payload;\nif (apiKey) {\n    valid = true;\n    msg.ori = msg.payload;\n}\nmsg.valid = valid;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 420,
+        "y": 980,
+        "wires": [
+            [
+                "d0632688bac5ba3e"
+            ]
+        ]
+    },
+    {
+        "id": "d0632688bac5ba3e",
+        "type": "switch",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "property": "valid",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 430,
+        "y": 1020,
+        "wires": [
+            [
+                "6f605f3c5daa544b"
+            ],
+            [
+                "02eaf81d5d749317"
+            ]
+        ]
+    },
+    {
+        "id": "8ac57953dd09f87d",
+        "type": "http response",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "statusCode": "400",
+        "headers": {},
+        "x": 620,
+        "y": 1120,
+        "wires": []
+    },
+    {
+        "id": "02eaf81d5d749317",
+        "type": "change",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "parameter not valid",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 640,
+        "y": 1080,
+        "wires": [
+            [
+                "8ac57953dd09f87d"
+            ]
+        ]
+    },
+    {
+        "id": "6faf53676de1ef86",
+        "type": "cloudantplus in",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "cloudant": "784d89e62dfb5070",
+        "database": "smart-configs",
+        "service": "_ext_",
+        "search": "_id_",
+        "design": "",
+        "index": "",
+        "x": 640,
+        "y": 1000,
+        "wires": [
+            [
+                "cce5eb6051ea0d04"
+            ]
+        ]
+    },
+    {
+        "id": "6f605f3c5daa544b",
+        "type": "function",
+        "z": "3a3a41a0d95d74c4",
+        "name": "smart-api-keys",
+        "func": "msg.payload = \"smart-api-keys\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 640,
+        "y": 960,
+        "wires": [
+            [
+                "6faf53676de1ef86"
+            ]
+        ]
+    },
+    {
+        "id": "cce5eb6051ea0d04",
+        "type": "function",
+        "z": "3a3a41a0d95d74c4",
+        "name": "check apps",
+        "func": "let { apiKey } = msg.ori;\nlet data = msg.payload.data;\nlet found = false;\nlet record = data.find(x => x.apiKey === apiKey);\nif (record != undefined) found = true;\nmsg.service = record;\nmsg.document = msg.payload;\nmsg.found = found;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 630,
+        "y": 1040,
+        "wires": [
+            [
+                "973ecd3d5d662c3b"
+            ]
+        ]
+    },
+    {
+        "id": "973ecd3d5d662c3b",
+        "type": "switch",
+        "z": "3a3a41a0d95d74c4",
+        "name": "found ?",
+        "property": "found",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 820,
+        "y": 1040,
+        "wires": [
+            [
+                "63aede2e0e9d6600"
+            ],
+            [
+                "6ce811df3c9706eb"
+            ]
+        ]
+    },
+    {
+        "id": "40183f176ae41f4a",
+        "type": "http response",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "statusCode": "400",
+        "headers": {},
+        "x": 1020,
+        "y": 1160,
+        "wires": []
+    },
+    {
+        "id": "6ce811df3c9706eb",
+        "type": "change",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "invalid api key",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1040,
+        "y": 1120,
+        "wires": [
+            [
+                "40183f176ae41f4a"
+            ]
+        ]
+    },
+    {
+        "id": "12b7193269b0f9d9",
+        "type": "http response",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 1240,
+        "y": 1060,
+        "wires": []
+    },
+    {
+        "id": "63aede2e0e9d6600",
+        "type": "function",
+        "z": "3a3a41a0d95d74c4",
+        "name": "generate token",
+        "func": "let { app } = msg.service;\nlet { exp } = msg.ori;\nmsg.sub = {\n    appsID: app.id,\n    version: app.version,\n    options: {\n        expiresIn: (exp) ? exp : '5 days'\n    }\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1040,
+        "y": 980,
+        "wires": [
+            [
+                "570fc3082fcbcd64"
+            ]
+        ]
+    },
+    {
+        "id": "570fc3082fcbcd64",
+        "type": "subflow:77002254b872fa8e",
+        "z": "3a3a41a0d95d74c4",
+        "name": "",
+        "x": 1030,
+        "y": 1020,
+        "wires": [
+            [
+                "4e6975c918b9c8d3"
+            ]
+        ]
+    },
+    {
+        "id": "aec176c0330fe745",
+        "type": "debug",
+        "z": "3a3a41a0d95d74c4",
+        "name": "debug 203",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1250,
+        "y": 1100,
+        "wires": []
+    },
+    {
+        "id": "4e6975c918b9c8d3",
+        "type": "function",
+        "z": "3a3a41a0d95d74c4",
+        "name": "result",
+        "func": "msg.payload = msg.sub;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1070,
+        "y": 1060,
+        "wires": [
+            [
+                "12b7193269b0f9d9"
+            ]
+        ]
     },
     {
         "id": "9ae2b5c84660f97f",
@@ -5931,17 +6798,15 @@
         ]
     },
     {
-        "id": "4fefe085d93baecf",
+        "id": "d568f66b17c82134",
         "type": "inject",
         "z": "bf22cd3c7ed55a35",
-        "name": "call external function from external file.js",
+        "name": "",
         "props": [
             {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
+                "p": "sub",
+                "v": "",
+                "vt": "date"
             }
         ],
         "repeat": "",
@@ -5949,21 +6814,19 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 190,
-        "y": 1540,
+        "x": 770,
+        "y": 460,
         "wires": [
             [
-                "e32b3da6a5e0b28a"
+                "1f353370cfbf18e1"
             ]
         ]
     },
     {
-        "id": "77bd522dbbd9a15c",
+        "id": "334ade4bd19e07df",
         "type": "debug",
         "z": "bf22cd3c7ed55a35",
-        "name": "debug 194",
+        "name": "debug 197",
         "active": true,
         "tosidebar": true,
         "console": false,
@@ -5972,90 +6835,40 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 510,
-        "y": 1580,
+        "x": 1170,
+        "y": 460,
         "wires": []
     },
     {
-        "id": "e32b3da6a5e0b28a",
+        "id": "1f353370cfbf18e1",
         "type": "function",
         "z": "bf22cd3c7ed55a35",
-        "name": "function 109",
-        "func": "const redisTS = global.get('redisTS');\n\nconst vins = ['MJECCB2F8P5002033',\n  'MJEC1JG43M5196356',\n  'MJECCB2F9N5001079',\n  'MJEFM8JK2PJX10417',\n  'MJECCB2F4P5001963',\n  'MJEC1JG43M5197081',\n  'MJEFM2PL2PJM10381',\n  'MJECCB2F4N5002298',\n  'MJECCB2F3N5001272',\n  'MJEFM8JN2PJX19421',\n  'MJEFM2PL2PJM10344',\n  'MJEC1JG43M5196145',\n  'MJEFM8JN2PJX18500',\n  'MJEFL8JW2PJY11964',\n  'MJECCB2F5N5002438',\n  'MJEFM8JN2PJX18504',\n  'MJEC1JG43N5201166',\n  'MJECCB2F9N5002376',\n  'MJECCB2F4N5002379',\n  'MJECCB2F3N5001305',\n  'MJEC1JG43M5196048',\n  'MJEC1JG43M5196149',\n  'MJECCB2F6N5002447',\n  'MJECCB2F2P5001959',\n  'MJEFL8JW2PJY12367',\n  'MJEC1JG43M5196141',\n  'MJECCB2F5N5001077',\n  'MJECCB2FXP5002258',\n  'MJECCB2F0P5002186',\n  'MJECCB2F2N5002378',\n  'MJEFL8JW2PJY12368',\n  'MJECCB2F8N5001770',\n  'MJEC1JG43M5197116',\n  'MJEFL8JN1MJJ12541',\n  'MJEFL8JW2PJY12459',\n  'MJECCB2F6N5007941',\n  'MJECCB2F1N5002906',\n  'MJECCB2F6N5001993',\n  'MJECCB2F0N5002220',\n  'MJECCB2F1P5000267',\n  'MJECCB2F3P5003414',\n  'MJEFM8JN2PJX18404',\n  'MJECCB2F2N5007760',\n  'MJEFM8JN2PJX18502',\n  'MJECCB2FXN5008185',\n  'MJECCB2F3N5003880',\n  'MJEFG8JJ1NJB14456',\n  'MJEFG8JJ2PJP10441',\n  'MJECCB2F1N5002212',\n  'MJECCB2F7P5003528',\n  'MJECCB2FXN5001365',\n  'MJECCB2F4N5002527',\n  'MJEFM2PL2PJM10384',\n  'MJECCB2F1N5001691',\n  'MJEC1JG43M5196385',\n  'MJECCB2F4P5009433',\n  'MJEFG8JJ1NJB14467',\n  'MJEC1JG43M5197080',\n  'MJEFL8JW2PJY12298',\n  'MJECCB2F9P5002185',\n  'MJECCB2F8N5008086',\n  'MJEC1JG43M5196532',\n  'MJEC1JG43N5201135',\n  'MJEC1JG43M5197085',\n  'MJECCB2FXP5002261',\n  'MJECCB2F3P5002263',\n  'MJEFG8JK1NJJ11455',\n  'MJEC1JG43N5200221',\n  'MJEFG8JK2NJP10155',\n  'MJEFM8JN2NJX11603',\n  'MJEC1JG43N5198101',\n  'MJEFL8JW2PJY12345',\n  'MJECCB2F6P5002337',\n  'MJECCB2FXN5002144',\n  'MJECCB2F8N5002143',\n  'MJECCB2F7P5001956',\n  'MJEFL8JW2PJY12484',\n  'MJEC1JG43N5200224',\n  'MJEFM2PL2PJM10355',\n  'MJECCB2F8N5002062',\n  'MJECCB2FXN5000975',\n  'MJEFM8JN2NJX10702',\n  'MJECCB2F5N5002066',\n  'MJECCB2FXN5002063',\n  'MJEFL8JW2PJY12451',\n  'MJEFM8JK2PJX10418',\n  'MJECCB2F1N5001996',\n  'MJEC1JG43M5196321',\n  'MJECCB2FXN5001995',\n  'MJEC1JG43M5196565',\n  'MJECCB2F1P5003461',\n  'MJECCB2F6P5007487',\n  'MJECCB2FXN5002435',\n  'MJECCB2F1N5001335',\n  'MJEFM8JN2PJX18399',\n  'MJEC1JG43M5196176',\n  'MJECCB2F4N5002141',\n  'MJEC1JG43N5201104',\n  'MJECCB2F8N5001171',\n  'MJECCB2F0N5002525',\n  'MJEFM8JN2NJX11625',\n  'MJEFM8JN2NJX10701',\n  'MJECCB2F0N5001827',\n  'MJEC1JG43M5196148',\n  'MJEFG8JK2NJP10097',\n  'MJECCB2F8P5002260',\n  'MJECCB2FXN5002371',\n  'MJEC1JG43M5196247',\n  'MJEC1JG43M5196049',\n  'MJECCB2F1P5003413',\n  'MJECCB2F3N5002437',\n  'MJEFL8JW2PJY12470',\n  'MJECCB2F7N5002909',\n  'MJEFM8JN2PJX19430',\n  'MJECCB2F7N5001338',\n  'MJEC1JG43M5196324',\n  'MJEC1JG43M5196353',\n  'MJEFL8JW2PJY12462',\n  'MJEC1JG43M5196140',\n  'MJECCB2FXP5002180',\n  'MJEC1JG43M5196351',\n  'MJEFM8JN2PJX18501',\n  'MJECCB2F3N5001143',\n  'MJECCB2FXN5007764',\n  'MJEFL8JN1MJJ12490',\n  'MJECCB2FXP5002342',\n  'MJEFM8JN2PJX19429',\n  'MJECCB2FXN5001270',\n  'MJEFL8JW2PJY11972',\n  'MJECCB2F6P5002113',\n  'MJEFM8JN2PJX19418',\n  'MJEC1JG43N5200220',\n  'MJECCB2F2N5002526',\n  'MJEFG8JJ2NJP10112',\n  'MJECCB2F5P5003463',\n  'MJEFM8JN2NJX11628',\n  'MJEFM8JN2PJX19009',\n  'MJEFM2PL2PJM10382',\n  'MJECCB2F9N5008565',\n  'MJECCB2F8N5002367',\n  'MJEC1JG43N5201139',\n  'MJECCB2F6N5008085',\n  'MJEC1JG43M5197084',\n  'MJEC1JG43M5196322',\n  'MJEFM8JN2NJX10705',\n  'MJECCB2F6P5003469',\n  'MJECCB2F0P5003466',\n  'MJECCB2F5N5001239',\n  'MJECCB2F3N5002440',\n  'MJECCB2F9P5009430',\n  'MJECCB2F2P5001962',\n  'MJEFG8JJ2PJP10456',\n  'MJECCB2FXP5003460',\n  'MJECCB2FXN5007943',\n  'MJECCB2F0N5001360',\n  'MJEC1JG43N5201167',\n  'MJECCB2F5N5001774',\n  'MJEFL8JN1MJJ12489',\n  'MJEC1JG43M5196109',\n  'MJECCB2F5N5003654',\n  'MJEFG8JJ1NJB14449',\n  'MJECCB2FXN5002368',\n  'MJEFM2PL2NJM10060',\n  'MJECCB2FXN5003925',\n  'MJECCB2F4N5001765',\n  'MJEFM8JN2NJX10195',\n  'MJECCB2F7N5002294',\n  'MJECCB2F6N5002299',\n  'MJECCB2F1N5008043',\n  'MJEFL8JW2PJY12450',\n  'MJEFM8JN2PJX19434',\n  'MJEFL8JW2PJY12483',\n  'MJEFL8JW2PJY12461',\n  'MJEFL8JN1MJJ12524',\n  'MJEFM8JK2NJX10313',\n  'MJECCB2F1N5001772',\n  'MJEC1JG43N5201137',\n  'MJECCB2F9N5003883',\n  'MJECCB2FXN5002211',\n  'MJECCB2F5N5002441',\n  'MJEFG8JK2NJP10160',\n  'MJEFL8JN1MJJ12538',\n  'MJECCB2F8N5003602',\n  'MJECCB2F3P5002344',\n  'MJEC1JG43M5196107',\n  'MJEC1JG43N5201103',\n  'MJEC1JG43M5197118',\n  'MJECCB2F8N5001994',\n  'MJECCB2F9P5003532',\n  'MJECCB2F7P5002105',\n  'MJECCB2F1N5001769',\n  'MJECCB2F2N5001988',\n  'MJECCB2F4P5002336',\n  'MJECCB2FXP5002339',\n  'MJECCB2F3N5008044',\n  'MJECCB2F6N5002366',\n  'MJECCB2F9N5002135',\n  'MJEFG8JK2NJP10122',\n  'MJECCB2F6P5003410',\n  'MJECCB2F2P5002335',\n  'MJECCB2F5N5001144',\n  'MJEFG8JK2NJP10120',\n  'MJECCB2F8N5003650',\n  'MJECCB2F6P5005500',\n  'MJEC1JG43N5201485',\n  'MJECCB2F6P5002189',\n  'MJECCB2F1N5001075',\n  'MJECCB2F4N5002138',\n  'MJEC1JG43N5200468',\n  'MJEC1JG43M5196183',\n  'MJECCB2F3N5001174',\n  'MJECCB2F6N5002061',\n  'MJECCB2F2N5002221',\n  'MJEC1JG53M5007237',\n  'MJECCB2F9N5001308',\n  'MJECCB2FXN5001818',\n  'MJEC1JG43M5197438',\n  'MJEC1JG43M5196360',\n  'MJECCB2F2N5001991',\n  'MJEC1JG43N5200465',\n  'MJECCB2F2N5002591',\n  'MJEC1JG43M5197082',\n  'MJEFG8JJ2NJP10114',\n  'MJECCB2F6P5002256',\n  'MJECCB2F1N5007944',\n  'MJEFM8JN2PJX19425',\n  'MJEC1JG43M5196361',\n  'MJEFG8JJ2NJP10065',\n  'MJEFM8JN2NJX11408',\n  'MJEC1JG43N5201138',\n  'MJEFG8JJ2NJP10101',\n  'MJECCB2F5P5002264',\n  'MJECCB2F9P5003529',\n  'MJECCB2F2N5001361',\n  'MJECCB2F9P5002106',\n  'MJECCB2F4P5002031',\n  'MJECCB2F7N5002148',\n  'MJECCB2F2P5003467',\n  'MJECCB2F3N5002373',\n  'MJEFM8JN2PJX18362',\n  'MJECCB2F2P5002111',\n  'MJEFM8JN2PJX18397',\n  'MJEFM2PL2PJM10346',\n  'MJECCB2F0P5001958',\n  'MJECCB2F2P5002027',\n  'MJEFG8JK1NJJ11449',\n  'MJEFG8JJ1NJB14455',\n  'MJEC1JG43M5196180',\n  'MJECCB2F8N5001767',\n  'MJECCB2F2N5007662',\n  'MJECCB2F6N5000942',\n  'MJEFM8JN2NJX14537',\n  'MJECCB2F7N5002439',\n  'MJECCB2F3P5005504',\n  'MJECCB2F8N5002448',\n  'MJEFM2PL2NJM10280',\n  'MJECCB2F1N5002517',\n  'MJECCB2F4N5001989',\n  'MJEC1JG43N5200461',\n  'MJECCB2F1N5001142',\n  'MJECCB2FXN5002287',\n  'MJECCB2F3N5001112',\n  'MJEFG8JK1MJJ11355',\n  'MJECCB2F9P5001957',\n  'MJEFM8JK2PJX10416',\n  'MJECCB2F2P5002030',\n  'MJECCB2F8P5007488',\n  'MJECCB2F4P5002028',\n  'MJEFL8JN1MJJ12525',\n  'MJEFL8JW2PJY12291',\n  'MJECCB2F1P5003525',\n  'MJECCB2F5N5003928',\n  'MJECCB2F5N5001208',\n  'MJEC1JG43M5196142',\n  'MJECCB2F1N5002520',\n  'MJECCB2F9P5002025',\n  'MJEFM8JN2PJX19417',\n  'MJECCB2F7N5001078',\n  'MJEC1JG43M5196174',\n  'MJECCB2F3N5007881',\n  'MJEFG8JJ2NJP10066',\n  'MJECCB2F3N5002907',\n  'MJECCB2F0N5002136',\n  'MJECCB2F7N5002442',\n  'MJECCB2F7N5002067',\n  'MJECCB2F3P5002182',\n  'MJEFM8JN2NJX10703',\n  'MJECCB2F7N5001114',\n  'MJEFM2PL2PJM10354',\n  'MJEFM8JK2PJX10415',\n  'MJECCB2FXP5003412',\n  'MJEFG8JJ2NJP10058',\n  'MJECCB2F0P5002107',\n  'MJEFG8JK2NJP10082',\n  'MJECCB2F9N5002149',\n  'MJEFL8JW2PJY12353',\n  'MJEFL8JW2PJY12299',\n  'MJEC1JG43M5196561',\n  'MJECCB2F8P5002338',\n  'MJEC1JG43N5201130',\n  'MJEFM8JN2PJX18361',\n  'MJECCB2F4N5002060',\n  'MJEFG8JJ2NJP10071',\n  'MJEFM8JN2PJX19431',\n  'MJEFM2PL2PJM10380',\n  'MJEFG8JJ1NJB14459',\n  'MJEC1JG43N5201132',\n  'MJECCB2FXN5001141',\n  'MJEC1JG43M5197117',\n  'MJECCB2F8N5002370',\n  'MJECCB2F5N5007817',\n  'MJEC1JG43M5196380',\n  'MJECCB2F8N5002224',\n  'MJEFM8JN2PJX18516',\n  'MJEC1JG43M5196147',\n  'MJEC1JG43M5196362',\n  'MJECCB2F3N5001997',\n  'MJECCB2F0P5002110',\n  'MJECCB2F1N5001402',\n  'MJECCB2F3N5001403',\n  'MJECCB2F2P5007485',\n  'MJEFG8JJ2NJP10070',\n  'MJECCB2F0N5002217',\n  'MJEFL8JW2PJY12469',\n  'MJECCB2F0N5002444',\n  'MJEFG8JJ1NJB14462',\n  'MJEFG8JK2NJP10161',\n  'MJEC1JG43M5197089',\n  'MJECCB2F4N5002365',\n  'MJECCB2F4N5002446',\n  'MJECCB2F4N5002222',\n  'MJEFG8JJ1NJB14450',\n  'MJEC1JG43N5201101',\n  'MJEC1JG43M5197122',\n  'MJECCB2F4N5007663',\n  'MJECCB2F3N5007816',\n  'MJEFM8JN2PJX18400',\n  'MJEFG8JJ1NJB14465',\n  'MJECCB2F1P5005503',\n  'MJECCB2F6P5002032',\n  'MJECCB2F5N5002147',\n  'MJEC1JG43M5196112',\n  'MJEC1JG43N5201102',\n  'MJEFL8JW2PJY12435',\n  'MJEC1JG43M5197115',\n  'MJEFM8JN2NJX11627',\n  'MJEFM8JK2NJX10294',\n  'MJECCB2F8N5001235',\n  'MJEFG8JJ2PJP10436',\n  'MJEFG8JJ1NJB14448',\n  'MJECCB2FXN5008087',\n  'MJECCB2FXN5002449',\n  'MJECCB2F2N5002445',\n  'MJEC1JG43M5196358',\n  'MJEC1JG43M5196046',\n  'MJECCB2F0N5003884',\n  'MJEFG8JK2NJP10157',\n  'MJECCB2F1P5002262',\n  'MJECCB2F6N5002285',\n  'MJECCB2F0N5002069',\n  'MJEFG8JJ2NJP10068',\n  'MJEFM8JN2PJX19414',\n  'MJECCB2F7N5003929',\n  'MJECCB2FXN5001236',\n  'MJECCB2F7N5007818',\n  'MJEFM2PL2NJM10270',\n  'MJEFG8JJ2NJP10072',\n  'MJECCB2F2N5002056',\n  'MJECCB2F7P5003464',\n  'MJECCB2F4P5002188',\n  'MJEFM8JN2PJX18401',\n  'MJECCB2F6N5002139',\n  'MJEFM2PL2PJM10383',\n  'MJECCB2F9N5002068',\n  'MJEFG8JK2NJP10078',\n  'MJEC1JG43M5197523',\n  'MJECCB2F5N5002293',\n  'MJEC1JG43N5201169',\n  'MJECCB2F1N5002372',\n  'MJEC1JG43M5197120',\n  'MJECCB2F1P5002343',\n  'MJECCB2F6N5007762',\n  'MJEC1JG43M5196108',\n  'MJECCB2F8N5002515',\n  'MJEC1JG43N5198104',\n  'MJEFM8JN2NJX11604',\n  'MJEFM2PL2PJM10341',\n  'MJECCB2F2N5002137',\n  'MJECCB2F4P5007486',\n  'MJECCB2F5P5003527',\n  'MJECCB2F6N5007664',\n  'MJECCB2F1N5003926',\n  'MJECCB2F8N5002210',\n  'MJEFG8JK2NJP10146',\n  'MJECCB2F2P5009432',\n  'MJECCB2F9P5001960',\n  'MJECCB2F9N5002295',\n  'MJECCB2F1N5002288',\n  'MJEFL8JW2PJY12325',\n  'MJECCB2F8P5005501',\n  'MJEFM8JN2PJX18518',\n  'MJEFM2PL2PJM10385',\n  'MJECCB2F5N5003881',\n  'MJEFL8JN1MJJ12491',\n  'MJECCB2F9N5007884',\n  'MJECCB2F6P5009434',\n  'MJECCB2F3N5002213',\n  'MJEFG8JJ2NJP10111',\n  'MJECCB2F7N5002375',\n  'MJEFM8JK2PJX10408',\n  'MJECCB2F7N5001985',\n  'MJEC1JG43M5196350',\n  'MJEFG8JJ1NJB14457',\n  'MJECCB2F8N5008041',\n  'MJEC1JG43M5196143',\n  'MJEFM8JN2PJX18363',\n  'MJECCB2F6N5003601',\n  'MJECCB2FXN5001916',\n  'MJECCB2F7N5001307',\n  'MJECCB2F6P5001964',\n  'MJEC1JG43M5196175',\n  'MJEC1JG43M5197086',\n  'MJECCB2F7N5002215',\n  'MJEFL8JW2PJY12346',\n  'MJEC1JG43M5197088',\n  'MJEFM2PL2PJM10343',\n  'MJECCB2F8P5002341',\n  'MJECCB2F8P5002114',\n  'MJECCB2F8N5007763',\n  'MJECCB2F5N5001998',\n  'MJEFM2PL2NJM10272',\n  'MJEFL8JW2PJY12332',\n  'MJECCB2F7N5003882',\n  'MJECCB2F1N5001111',\n  'MJEFG8JJ2NJP10067',\n  'MJECCB2F3N5002146',\n  'MJECCB2F7P5003531',\n  'MJECCB2F0P5009431',\n  'MJECCB2F5N5002214',\n  'MJEC1JG43N5201136',\n  'MJEC1JG43N5201915',\n  'MJEC1JG43M5196355',\n  'MJEFM8JN2NJX11632',\n  'MJECCB2F1N5001271',\n  'MJECCB2F3N5002289',\n  'MJECCB2F4P5002109',\n  'MJECCB2F4N5008134',\n  'MJEC1JG43M5196533',\n  'MJEFG8JK1LJJ11228',\n  'MJEFM8JK2NJX10297',\n  'MJECCB2F1N5002291',\n  'MJEC1JG43M5196323',\n  'MJEFM8JN2PJX18755',\n  'MJEFL8JW2PJY12436',\n  'MJEC1JG43N5201100',\n  'MJECCB2F7N5002523',\n  'MJECCB2F3N5002292',\n  'MJECCB2F8N5001364',\n  'MJECCB2F1N5001173',\n  'MJEC1JG43M5196172',\n  'MJEFM2PL2PJM10357',\n  'MJEC1JG43N5201131',\n  'MJEC1JG43M5197083',\n  'MJEC1JG43N5199014',\n  'MJEFM8JN2PJX19415',\n  'MJECCB2F9N5007819',\n  'MJEFL8JW2PJY12312',\n  'MJEC1JG43M5197119',\n  'MJEC1JG43M5196363',\n  'MJEFG8JK2NJP10144',\n  'MJECCB2F6P5002029',\n  'MJEC1JG43N5201487',\n  'MJECCB2FXN5001401',\n  'MJECCB2F1N5002369',\n  'MJEFG8JJ1NJB14464',\n  'MJECCB2F1P5002259',\n  'MJECCB2F0N5001990',\n  'MJEFM8JN2NJX10704',\n  'MJECCB2F4N5001040',\n  'MJEC1JG43M5196178',\n  'MJEC1JG43M5196181',\n  'MJECCB2F5N5002522',\n  'MJEFL8JN1MJJ12492',\n  'MJEC1JG43N5200222',\n  'MJEFM8JN2PJX19042',\n  'MJECCB2F4N5002057',\n  'MJECCB2F0N5001987',\n  'MJEC1JG43M5196177',\n  'MJEC1JG43M5196184',\n  'MJECCB2F3N5002518',\n  'MJEFM8JN2MJX35464',\n  'MJEC1JG43N5198102',\n  'MJECCB2FXP5002034',\n  'MJECCB2F0N5002590',\n  'MJECCB2F0N5002377',\n  'MJECCB2F0P5001961',\n  'MJEC1JG43M5197087',\n  'MJEC1JG43N5201134',\n  'MJECCB2F3N5001238',\n  'MJECCB2F3P5003526',\n  'MJECCB2F7N5001999',\n  'MJECCB2F7N5007883',\n  'MJECCB2F1N5008186',\n  'MJECCB2F1N5003604',\n  'MJECCB2F6N5002142',\n  'MJEFL8JW2PJY11952',\n  'MJEC1JG43M5196257',\n  'MJEFM2PL2PJM10342',\n  'MJECCB2FXN5003651',\n  'MJECCB2F1N5001206',\n  'MJECCB2F8N5001042',\n  'MJEFM8JN2NJX14539',\n  'MJEFM8JN2PJX18754',\n  'MJEC1JG43M5196170',\n  'MJEFL8JW2PJY12360',\n  'MJECCB2F4N5007548',\n  'MJEFL8JN1MJJ12498',\n  'MJEFL8JN1MJJ12537',\n  'MJECCB2F0N5008566',\n  'MJEC1JG43N5201133',\n  'MJECCB2F1N5001044',\n  'MJECCB2F5P5002183',\n  'MJECCB2FXN5001205',\n  'MJEFL8JW2PJY12446',\n  'MJEFM8JN2PJX19420',\n  'MJECCB2F6N5002593',\n  'MJECCB2F2N5002218',\n  'MJECCB2F3P5000268',\n  'MJECCB2F9N5001986',\n  'MJEFG8JK2NJP10123',\n  'MJECCB2F0N5002296',\n  'MJECCB2F4N5001913',\n  'MJECCB2F3N5001336',\n  'MJEFM8JK2PJX10414',\n  'MJEFG8JK2NJP10119',\n  'MJECCB2F8P5003411',\n  'MJEC1JG43N5201168',\n  'MJECCB2F6P5002340',\n  'MJEFL8JW2PJY12452',\n  'MJEFL8JN1MJJ12494',\n  'MJEFM8JN2PJX18403',\n  'MJECCB2F0N5002055',\n  'MJEFM8JN2NJX11636',\n  'MJEC1JG43N5198103',\n  'MJECCB2F3N5001207',\n  'MJEFG8JK2NJP10156',\n  'MJEC1JG43N5200952',\n  'MJECCB2F1N5002436',\n  'MJEC1JG43M5196106',\n  'MJEFM8JN2PJX18753',\n  'MJEFM2PL2PJM10353',\n  'MJECCB2F8N5001915',\n  'MJEC1JG43M5196111',\n  'MJEC1JG43N5201070',\n  'MJECCB2F2P5002187',\n  'MJECCB2FXN5001172',\n  'MJECCB2F4P5002255',\n  'MJECCB2F7N5001775',\n  'MJECCB2F7N5001209',\n  'MJECCB2F3N5001076',\n  'MJEFM8JN2NJX11624',\n  'MJEFM8JN2PJX18388',\n  'MJEFM8JN2PJX19078',\n  'MJEFM8JN2NJX13857',\n  'MJEFM8JN2NJX14311',\n  'MJECCB2F8N5007942',\n  'MJECCB2F5N5002908',\n  'MJECCB2F7N5001016',\n  'MJEC1JG43N5201165',\n  'MJECCB2F1N5007815',\n  'MJEC1JG43M5196357',\n  'MJEFL8JW2PJY12460',\n  'MJEC1JG43N5200460',\n  'MJECCB2F1N5007880',\n  'MJECCB2F0P5002026',\n  'MJECCB2F3N5002065',\n  'MJECCB2F8P5002257',\n  'MJECCB2F4N5007761',\n  'MJECCB2F7P5002184',\n  'MJEFG8JJ1NJB14460',\n  'MJECCB2F6N5001170',\n  'MJECCB2F1N5002064',\n  'MJEC1JG43M5196179',\n  'MJECCB2F1P5002181',\n  'MJECCB2F6N5002223',\n  'MJEFM2PL2NJM10269',\n  'MJECCB2F3N5003653',\n  'MJECCB2F4N5002592',\n  'MJEFG8JJ2NJP10069',\n  'MJECCB2F6N5001766',\n  'MJEFL8JN1MJJ12500',\n  'MJEFG8JJ2PJP10442',\n  'MJEFG8JK1NJJ11453',\n  'MJECCB2FXP5000266',\n  'MJECCB2F2P5003582',\n  'MJECCB2F3N5002521',\n  'MJECCB2FXN5002905',\n  'MJEC1JG43N5200223',\n  'MJEFM8JN2MJX35089',\n  'MJECCB2F9N5002216',\n  'MJEC1JG43M5196536',\n  'MJECCB2FXN5002290',\n  'MJEC1JG43M5196171',\n  'MJEFG8JJ1NJB14469',\n  'MJEFM8JN2PJX18519',\n  'MJECCB2F2N5001019',\n  'MJEFG8JK2NJP10143',\n  'MJEC1JG43M5196173',\n  'MJECCB2F6N5001914',\n  'MJEFG8JJ2PJP10444',\n  'MJEC1JG43N5201399',\n  'MJEFG8JK1MJJ11354',\n  'MJECCB2F6N5002058',\n  'MJEECB0F4N5000403',\n  'MJECCB2F5N5007882',\n  'MJECCB2F5N5002519',\n  'MJECCB2F8N5000943',\n  'MJEFG8JJ2PJP10439',\n  'MJEFM8JN2PJX19433',\n  'MJEC1JG43M5197121',\n  'MJECCB2F4N5003600',\n  'MJEC1JG43M5196113',\n  'MJEFM8JN2PJX18402',\n  'MJEFL8JN1MJJ12540',\n  'MJEFG8JJ2NJP10057',\n  'MJEFM2PL2PJM10388',\n  'MJECCB2F8N5002529',\n  'MJEFM8JN2NJX11407',\n  'MJECCB2F5N5001273',\n  'MJECCB2F5N5001113',\n  'MJECCB2F4P5002112',\n  'MJECCB2F7N5001405',\n  'MJEC1JG43M5196110',\n  'MJECCB2F4N5007940',\n  'MJECCB2F3N5003927',\n  'MJECCB2FXN5008042',\n  'MJECCB2FXN5001110',\n  'MJECCB2F5N5001306',\n  'MJECCB2F6N5008040',\n  'MJECCB2F5N5002374',\n  'MJEC1JG43N5201488',\n  'MJECCB2F3P5003462',\n  'MJECCB2F1N5001237',\n  'MJEFM8JN2PJX18517',\n  'MJECCB2F4P5003468',\n  'MJECCB2F6N5002528',\n  'MJEFM8JN2PJX19039',\n  'MJEFM2PL2PJM10345',\n  'MJECCB2F1N5002145',\n  'MJECCB2F5P5000269',\n  'MJECCB2F2N5002140',\n  'MJEC1JG43M5196146',\n  'MJEFG8JK1MJJ11353',\n  'MJECCB2F4N5002219',\n  'MJECCB2F9N5002524',\n  'MJEC1JG43M5196384',\n  'MJEC1JG43M5196114'];\n\nlet cmds = [];\nlet topics = [];\nvins.forEach(vin => {\n  topics.push(`vin=${vin}`)\n  cmds.push(['TS.RANGE', `${vin}:altitude`, '-', '+']);\n  cmds.push(['TS.RANGE', `${vin}:latitude`, '-', '+']);\n  cmds.push(['TS.RANGE', `${vin}:longitude`, '-', '+']);\n  cmds.push(['TS.RANGE', `${vin}:odometer`, '-', '+']);\n  cmds.push(['TS.RANGE', `${vin}:heading`, '-', '+']);\n  cmds.push(['TS.RANGE', `${vin}:speed`, '-', '+']);\n  cmds.push(['TS.RANGE', `${vin}:engineHours`, '-', '+']);\n  cmds.push(['TS.RANGE', `${vin}:vehicleStatus`, '-', '+']);\n  cmds.push(['TS.RANGE', `${vin}:positionDatetime`, '-', '+']);\n  cmds.push(['TS.RANGE', `${vin}:createdDatetime`, '-', '+']);\n  cmds.push(['TS.RANGE', `${vin}:printedTimezone`, '-', '+']);\n});\n// let dt = redis.commands(cmds)\nlet dt = redisTS.mrangeByTopics(topics)\ndt.then(x => {\n    node.send({\n        payload: x\n    });\n});\nreturn null;",
+        "name": "function 116",
+        "func": "// Node-RED function node\nconst w = global.get('worker');  // Access the 'worker_threads' module using global\n\n// Create a new worker thread\nconst worker = new w.Worker('./workers/worker.js', { workerData: 'Initial data for the worker' });\n\n// Listen for messages from the worker thread\nworker.on('message', (result) => {\n    // Do something with the result received from the worker thread\n    node.send({ payload: result });\n});\n\n// Send a message to the worker thread\nworker.postMessage('Hello from Node-RED');\n",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 270,
-        "y": 1580,
+        "x": 970,
+        "y": 460,
         "wires": [
             [
-                "77bd522dbbd9a15c"
+                "334ade4bd19e07df"
             ]
         ]
     },
     {
-        "id": "2bf1b3b944065568",
-        "type": "http in",
-        "z": "bf22cd3c7ed55a35",
-        "name": "",
-        "url": "/api/r&d/custom-function",
-        "method": "get",
-        "upload": false,
-        "swaggerDoc": "",
-        "x": 160,
-        "y": 1640,
-        "wires": [
-            [
-                "f6fa55f0906a3574"
-            ]
-        ]
-    },
-    {
-        "id": "f6fa55f0906a3574",
-        "type": "function",
-        "z": "bf22cd3c7ed55a35",
-        "name": "function 110",
-        "func": "const custom = global.get('custom');\n\n// node.warn(env.get(\"REDIS_TS_URL\"));\nlet dt = custom.getDataFromRedis(\"MJEC1JG43M5196148:*\")\ndt.then(x => {\n    msg.payload = x;\n    node.send(msg);\n});\nreturn null;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 210,
-        "y": 1680,
-        "wires": [
-            [
-                "039de443274c4f5d"
-            ]
-        ]
-    },
-    {
-        "id": "039de443274c4f5d",
-        "type": "http response",
-        "z": "bf22cd3c7ed55a35",
-        "name": "",
-        "statusCode": "200",
-        "headers": {},
-        "x": 420,
-        "y": 1680,
-        "wires": []
-    },
-    {
-        "id": "21fa65cedd8b2461",
+        "id": "27e3b6693d5806e6",
         "type": "inject",
         "z": "bf22cd3c7ed55a35",
-        "name": "call external function from external file.js",
+        "name": "",
         "props": [
             {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
+                "p": "sub",
+                "v": "",
+                "vt": "date"
             }
         ],
         "repeat": "",
@@ -6063,41 +6876,19 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 230,
-        "y": 1780,
+        "x": 770,
+        "y": 560,
         "wires": [
             [
-                "3380bce6cfe1a2cf"
+                "dee1b56a77ca0c9a"
             ]
         ]
     },
     {
-        "id": "3380bce6cfe1a2cf",
-        "type": "function",
-        "z": "bf22cd3c7ed55a35",
-        "name": "function 111",
-        "func": "const redis = global.get('redis');\n\nlet key = '*';\n// let keys = [\n//   'MJEC1JG43N5198104:*',\n//   'MJEC1JG43N5198102x:*'\n// ];\nlet rs = redis.checkKey(key);\nrs.then(x => {\n  node.send({\n    payload: x\n  });\n})\n// let rs = redis.checkKeys(keys);\n// rs.then(x => {\n//   node.send({\n//     payload: x\n//   });\n// })\n\nreturn null;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 310,
-        "y": 1820,
-        "wires": [
-            [
-                "f3217baaf46ae794"
-            ]
-        ]
-    },
-    {
-        "id": "f3217baaf46ae794",
+        "id": "f7df7a315e0760f4",
         "type": "debug",
         "z": "bf22cd3c7ed55a35",
-        "name": "debug 195",
+        "name": "debug 198",
         "active": true,
         "tosidebar": true,
         "console": false,
@@ -6106,9 +6897,232 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 550,
-        "y": 1820,
+        "x": 1170,
+        "y": 560,
         "wires": []
+    },
+    {
+        "id": "dee1b56a77ca0c9a",
+        "type": "function",
+        "z": "bf22cd3c7ed55a35",
+        "name": "function 117",
+        "func": "// Node-RED function node\nconst w = global.get('worker');  // Access the 'worker_threads' module using global\n\n// Create a new worker thread\nconst worker = new w.Worker('./workers/worker.js', { workerData: 'Initial data for the worker' });\n\n// Listen for messages from the worker thread\nworker.on('message', (result) => {\n    // Do something with the result received from the worker thread\n    node.send({ payload: result });\n});\n\n// Send a message to the worker thread\nworker.postMessage('Hello from Node-RED');\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 970,
+        "y": 560,
+        "wires": [
+            [
+                "f7df7a315e0760f4"
+            ]
+        ]
+    },
+    {
+        "id": "f308eefd250df61c",
+        "type": "debug",
+        "z": "bf22cd3c7ed55a35",
+        "name": "debug 200",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1170,
+        "y": 700,
+        "wires": []
+    },
+    {
+        "id": "94b67576a94009f3",
+        "type": "inject",
+        "z": "bf22cd3c7ed55a35",
+        "name": "",
+        "props": [
+            {
+                "p": "sub",
+                "v": "",
+                "vt": "date"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 770,
+        "y": 660,
+        "wires": [
+            [
+                "3d2a2b253501a56c"
+            ]
+        ]
+    },
+    {
+        "id": "3d2a2b253501a56c",
+        "type": "function",
+        "z": "bf22cd3c7ed55a35",
+        "name": "function 123",
+        "func": "msg.sub = {\n    appsID: 'app-portal',\n    competence: ['call'],\n    options: {\n        expiresIn: '5 days'\n    }\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 950,
+        "y": 660,
+        "wires": [
+            [
+                "d0452c447cf9eb6b"
+            ]
+        ]
+    },
+    {
+        "id": "d0452c447cf9eb6b",
+        "type": "subflow:77002254b872fa8e",
+        "z": "bf22cd3c7ed55a35",
+        "name": "",
+        "x": 950,
+        "y": 700,
+        "wires": [
+            [
+                "f308eefd250df61c"
+            ]
+        ]
+    },
+    {
+        "id": "a0cfa4cb169298de",
+        "type": "subflow:32e9ed8660fb2fde",
+        "z": "bf22cd3c7ed55a35",
+        "name": "",
+        "x": 1000,
+        "y": 760,
+        "wires": [
+            [
+                "3e5e57627988a422"
+            ]
+        ]
+    },
+    {
+        "id": "3e5e57627988a422",
+        "type": "debug",
+        "z": "bf22cd3c7ed55a35",
+        "name": "debug 201",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1210,
+        "y": 760,
+        "wires": []
+    },
+    {
+        "id": "2fdbe313ebd572c3",
+        "type": "promptinput",
+        "z": "bf22cd3c7ed55a35",
+        "name": "",
+        "datatype": "str",
+        "prompt": "",
+        "property": "sub",
+        "propertyType": "msg",
+        "x": 790,
+        "y": 760,
+        "wires": [
+            [
+                "a0cfa4cb169298de"
+            ]
+        ]
+    },
+    {
+        "id": "8319f1bcca907c69",
+        "type": "inject",
+        "z": "bf22cd3c7ed55a35",
+        "name": "",
+        "props": [
+            {
+                "p": "sub",
+                "v": "",
+                "vt": "date"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 770,
+        "y": 860,
+        "wires": [
+            [
+                "3ea194ab56f57757"
+            ]
+        ]
+    },
+    {
+        "id": "15d571e88ef60234",
+        "type": "debug",
+        "z": "bf22cd3c7ed55a35",
+        "name": "debug 202",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1150,
+        "y": 900,
+        "wires": []
+    },
+    {
+        "id": "f855085ff361e934",
+        "type": "uuid",
+        "z": "bf22cd3c7ed55a35",
+        "uuidVersion": "v3",
+        "namespaceType": "dns",
+        "namespace": "https://digistage.sinarmas-agri.com/sp-api-core/admin/#",
+        "namespaceCustom": "",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "x": 930,
+        "y": 900,
+        "wires": [
+            [
+                "15d571e88ef60234"
+            ]
+        ]
+    },
+    {
+        "id": "3ea194ab56f57757",
+        "type": "function",
+        "z": "bf22cd3c7ed55a35",
+        "name": "function 124",
+        "func": "msg.agiliteUtils = {\n    uuidVersion: 'v3',\n    namespaceType: 'dns',\n    namespaceCustom: 'appportal.api',\n    namespace: 'api.sinarmas-agri.com'\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 950,
+        "y": 860,
+        "wires": [
+            [
+                "f855085ff361e934"
+            ]
+        ]
     },
     {
         "id": "f23842780cb1d49b",
@@ -10254,7 +11268,7 @@
         "y": 120,
         "wires": [
             [
-                "3cdc106f1f3ace69"
+                "64c0a97588c1b892"
             ]
         ]
     },
@@ -10270,8 +11284,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 320,
-        "y": 120,
+        "x": 420,
+        "y": 160,
         "wires": [
             [
                 "851f7f85faba6429"
@@ -10296,8 +11310,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 340,
-        "y": 160,
+        "x": 440,
+        "y": 200,
         "wires": [
             [
                 "ac196b081e86d3b1"
@@ -10314,8 +11328,8 @@
         "name": "",
         "statusCode": "400",
         "headers": {},
-        "x": 520,
-        "y": 180,
+        "x": 620,
+        "y": 220,
         "wires": []
     },
     {
@@ -10336,8 +11350,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 520,
-        "y": 140,
+        "x": 620,
+        "y": 180,
         "wires": [
             [
                 "74d2fd8eafd79712"
@@ -10354,8 +11368,8 @@
         "name": "",
         "statusCode": "200",
         "headers": {},
-        "x": 1360,
-        "y": 440,
+        "x": 1460,
+        "y": 480,
         "wires": []
     },
     {
@@ -10370,8 +11384,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 990,
-        "y": 160,
+        "x": 1090,
+        "y": 200,
         "wires": [
             [
                 "776ee25c650af0a3"
@@ -10383,8 +11397,8 @@
         "type": "subflow:d7ccf53b2b9fe097",
         "z": "c5b9039a5fc48f97",
         "name": "",
-        "x": 1020,
-        "y": 200,
+        "x": 1120,
+        "y": 240,
         "wires": [
             [
                 "aeafeb4e0b09333d"
@@ -10398,8 +11412,8 @@
         "name": "",
         "statusCode": "200",
         "headers": {},
-        "x": 1400,
-        "y": 220,
+        "x": 1500,
+        "y": 260,
         "wires": []
     },
     {
@@ -10414,8 +11428,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1250,
-        "y": 220,
+        "x": 1350,
+        "y": 260,
         "wires": [
             [
                 "b65dd7ab52d2acab"
@@ -10434,8 +11448,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 910,
-        "y": 340,
+        "x": 1010,
+        "y": 380,
         "wires": [
             [
                 "bce3b2f489190dd8"
@@ -10447,8 +11461,8 @@
         "type": "subflow:d7ccf53b2b9fe097",
         "z": "c5b9039a5fc48f97",
         "name": "",
-        "x": 940,
-        "y": 380,
+        "x": 1040,
+        "y": 420,
         "wires": [
             [
                 "fe0b2bcf8a1d5d22"
@@ -10467,8 +11481,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1150,
-        "y": 440,
+        "x": 1250,
+        "y": 480,
         "wires": [
             [
                 "7330dececec1df2b"
@@ -10487,8 +11501,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1270,
-        "y": 260,
+        "x": 1370,
+        "y": 300,
         "wires": [
             [
                 "43026da73cab453c"
@@ -10507,8 +11521,8 @@
         "paramsType": "json",
         "payloadType": "json",
         "block": false,
-        "x": 1440,
-        "y": 260,
+        "x": 1540,
+        "y": 300,
         "wires": [
             []
         ]
@@ -10525,8 +11539,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1170,
-        "y": 480,
+        "x": 1270,
+        "y": 520,
         "wires": [
             [
                 "e9f893334e77352f"
@@ -10545,8 +11559,8 @@
         "paramsType": "json",
         "payloadType": "json",
         "block": false,
-        "x": 1360,
-        "y": 480,
+        "x": 1460,
+        "y": 520,
         "wires": [
             []
         ]
@@ -10563,8 +11577,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 750,
-        "y": 40,
+        "x": 850,
+        "y": 80,
         "wires": [
             [
                 "111969421487e19f"
@@ -10583,8 +11597,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 990,
-        "y": 80,
+        "x": 1090,
+        "y": 120,
         "wires": [
             [
                 "a0e96a48921ae5fc"
@@ -10611,8 +11625,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 810,
-        "y": 120,
+        "x": 910,
+        "y": 160,
         "wires": [
             [
                 "8f9ae1961b5542ee"
@@ -10627,8 +11641,8 @@
         "type": "subflow:8c8c795915b75984",
         "z": "c5b9039a5fc48f97",
         "name": "",
-        "x": 760,
-        "y": 80,
+        "x": 860,
+        "y": 120,
         "wires": [
             [
                 "a83c6e3a8e925b05"
@@ -10642,8 +11656,8 @@
         "name": "",
         "statusCode": "200",
         "headers": {},
-        "x": 1160,
-        "y": 80,
+        "x": 1260,
+        "y": 120,
         "wires": []
     },
     {
@@ -10658,8 +11672,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 720,
-        "y": 240,
+        "x": 820,
+        "y": 280,
         "wires": [
             [
                 "3456326dc70e568e"
@@ -10684,8 +11698,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 730,
-        "y": 320,
+        "x": 830,
+        "y": 360,
         "wires": [
             [
                 "7af802b468c4cae4"
@@ -10707,8 +11721,8 @@
         "paramsType": "json",
         "payloadType": "json",
         "block": false,
-        "x": 720,
-        "y": 280,
+        "x": 820,
+        "y": 320,
         "wires": [
             [
                 "c37b3f01bd3e6eee"
@@ -10727,8 +11741,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 910,
-        "y": 300,
+        "x": 1010,
+        "y": 340,
         "wires": [
             [
                 "72c96e0f058abe77"
@@ -10742,26 +11756,9 @@
         "name": "",
         "statusCode": "200",
         "headers": {},
-        "x": 1080,
-        "y": 300,
+        "x": 1180,
+        "y": 340,
         "wires": []
-    },
-    {
-        "id": "c8302b5e6b8f6d5a",
-        "type": "http in",
-        "z": "c5b9039a5fc48f97",
-        "name": "",
-        "url": "/api/geo-bulk",
-        "method": "post",
-        "upload": false,
-        "swaggerDoc": "",
-        "x": 150,
-        "y": 540,
-        "wires": [
-            [
-                "acc35c4facd45e37"
-            ]
-        ]
     },
     {
         "id": "6f0ff7fa8a76d2fa",
@@ -10770,7 +11767,7 @@
         "name": "",
         "statusCode": "200",
         "headers": {},
-        "x": 1240,
+        "x": 1320,
         "y": 720,
         "wires": []
     },
@@ -10785,7 +11782,7 @@
         "arraySpltType": "len",
         "stream": false,
         "addname": "",
-        "x": 550,
+        "x": 630,
         "y": 580,
         "wires": [
             [
@@ -10809,7 +11806,7 @@
         "timeout": "",
         "count": "",
         "reduceRight": false,
-        "x": 1070,
+        "x": 1150,
         "y": 720,
         "wires": [
             [
@@ -10829,7 +11826,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 830,
+        "x": 910,
         "y": 620,
         "wires": [
             [
@@ -10842,7 +11839,7 @@
         "type": "subflow:d7ccf53b2b9fe097",
         "z": "c5b9039a5fc48f97",
         "name": "",
-        "x": 860,
+        "x": 940,
         "y": 660,
         "wires": [
             [
@@ -10863,7 +11860,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 890,
+        "x": 970,
         "y": 700,
         "wires": [
             [
@@ -10883,7 +11880,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1090,
+        "x": 1170,
         "y": 660,
         "wires": [
             [
@@ -10903,7 +11900,7 @@
         "paramsType": "json",
         "payloadType": "json",
         "block": false,
-        "x": 1260,
+        "x": 1340,
         "y": 660,
         "wires": [
             []
@@ -10921,7 +11918,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 590,
+        "x": 670,
         "y": 620,
         "wires": [
             [
@@ -10941,7 +11938,7 @@
         "paramsType": "json",
         "payloadType": "json",
         "block": false,
-        "x": 620,
+        "x": 700,
         "y": 660,
         "wires": [
             [
@@ -10967,7 +11964,7 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 620,
+        "x": 700,
         "y": 700,
         "wires": [
             [
@@ -10990,7 +11987,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 890,
+        "x": 970,
         "y": 740,
         "wires": [
             [
@@ -11010,7 +12007,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 360,
+        "x": 440,
         "y": 540,
         "wires": [
             [
@@ -11036,7 +12033,7 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 360,
+        "x": 440,
         "y": 580,
         "wires": [
             [
@@ -11054,7 +12051,7 @@
         "name": "",
         "statusCode": "400",
         "headers": {},
-        "x": 560,
+        "x": 640,
         "y": 740,
         "wires": []
     },
@@ -11075,7 +12072,7 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 1070,
+        "x": 1150,
         "y": 620,
         "wires": [
             [
@@ -11095,7 +12092,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 580,
+        "x": 660,
         "y": 540,
         "wires": [
             [
@@ -12132,8 +13129,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 1050,
-        "y": 240,
+        "x": 1150,
+        "y": 280,
         "wires": [
             [
                 "ba815ce52d573d62"
@@ -12163,8 +13160,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1280,
-        "y": 180,
+        "x": 1380,
+        "y": 220,
         "wires": [
             [
                 "9f7de8b2b6db39b3"
@@ -12178,8 +13175,8 @@
         "name": "",
         "statusCode": "400",
         "headers": {},
-        "x": 1480,
-        "y": 180,
+        "x": 1580,
+        "y": 220,
         "wires": []
     },
     {
@@ -12200,8 +13197,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 970,
-        "y": 420,
+        "x": 1070,
+        "y": 460,
         "wires": [
             [
                 "10f19bc0a4ff2c56"
@@ -12231,8 +13228,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1180,
-        "y": 380,
+        "x": 1280,
+        "y": 420,
         "wires": [
             [
                 "0f051ed5d824eb85"
@@ -12246,8 +13243,8 @@
         "name": "",
         "statusCode": "400",
         "headers": {},
-        "x": 1380,
-        "y": 380,
+        "x": 1480,
+        "y": 420,
         "wires": []
     },
     {
@@ -12764,6 +13761,49 @@
         "x": 600,
         "y": 1600,
         "wires": []
+    },
+    {
+        "id": "c8302b5e6b8f6d5a",
+        "type": "http in",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "url": "/api/geo-bulk",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 150,
+        "y": 540,
+        "wires": [
+            [
+                "02d1a19d80257744"
+            ]
+        ]
+    },
+    {
+        "id": "02d1a19d80257744",
+        "type": "subflow:9ac4386f65a33996",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "x": 170,
+        "y": 580,
+        "wires": [
+            [
+                "acc35c4facd45e37"
+            ]
+        ]
+    },
+    {
+        "id": "64c0a97588c1b892",
+        "type": "subflow:9ac4386f65a33996",
+        "z": "c5b9039a5fc48f97",
+        "name": "",
+        "x": 170,
+        "y": 160,
+        "wires": [
+            [
+                "3cdc106f1f3ace69"
+            ]
+        ]
     },
     {
         "id": "7a603f11899ae208",
@@ -15887,7 +16927,7 @@
         "y": 300,
         "wires": [
             [
-                "2cc36b53281ba6eb"
+                "efb6fd3e21e2e6a0"
             ]
         ]
     },
@@ -15903,7 +16943,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1030,
+        "x": 1070,
         "y": 420,
         "wires": [
             [
@@ -15916,7 +16956,7 @@
         "type": "subflow:d7ccf53b2b9fe097",
         "z": "d13820078197e616",
         "name": "",
-        "x": 1020,
+        "x": 1060,
         "y": 460,
         "wires": [
             [
@@ -15936,7 +16976,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 400,
+        "x": 440,
         "y": 300,
         "wires": [
             [
@@ -15962,7 +17002,7 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 410,
+        "x": 450,
         "y": 340,
         "wires": [
             [
@@ -15980,7 +17020,7 @@
         "name": "",
         "statusCode": "400",
         "headers": {},
-        "x": 600,
+        "x": 640,
         "y": 460,
         "wires": []
     },
@@ -15997,7 +17037,7 @@
         "y": 60,
         "wires": [
             [
-                "4f453f7443b1bdba"
+                "4cec475fbe6a60e0"
             ]
         ]
     },
@@ -16013,7 +17053,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 510,
+        "x": 490,
         "y": 60,
         "wires": [
             [
@@ -16026,7 +17066,7 @@
         "type": "subflow:d7ccf53b2b9fe097",
         "z": "d13820078197e616",
         "name": "",
-        "x": 500,
+        "x": 480,
         "y": 100,
         "wires": [
             [
@@ -16057,7 +17097,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 470,
+        "x": 450,
         "y": 140,
         "wires": [
             [
@@ -16078,7 +17118,7 @@
         "y": 660,
         "wires": [
             [
-                "5d1d1785d97cfd03"
+                "af0e4b4a5deffc93"
             ]
         ]
     },
@@ -16094,7 +17134,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 500,
+        "x": 440,
         "y": 660,
         "wires": [
             [
@@ -16120,7 +17160,7 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 510,
+        "x": 450,
         "y": 700,
         "wires": [
             [
@@ -16138,7 +17178,7 @@
         "name": "",
         "statusCode": "400",
         "headers": {},
-        "x": 700,
+        "x": 640,
         "y": 780,
         "wires": []
     },
@@ -16155,7 +17195,7 @@
         "y": 980,
         "wires": [
             [
-                "55ab8873929c560e"
+                "30e937a22f8c77ba"
             ]
         ]
     },
@@ -16296,7 +17336,7 @@
         "y": 1160,
         "wires": [
             [
-                "5f26c7e45011f372"
+                "bfb1ad74f5b90332"
             ]
         ]
     },
@@ -16312,7 +17352,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 500,
+        "x": 460,
         "y": 1160,
         "wires": [
             [
@@ -16338,7 +17378,7 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 510,
+        "x": 470,
         "y": 1200,
         "wires": [
             [
@@ -16356,7 +17396,7 @@
         "name": "",
         "statusCode": "400",
         "headers": {},
-        "x": 700,
+        "x": 660,
         "y": 1280,
         "wires": []
     },
@@ -16373,7 +17413,7 @@
         "y": 1380,
         "wires": [
             [
-                "2f8f9bba77106467"
+                "3c8c497bc0926532"
             ]
         ]
     },
@@ -16389,7 +17429,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 500,
+        "x": 460,
         "y": 1380,
         "wires": [
             [
@@ -16415,7 +17455,7 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 510,
+        "x": 470,
         "y": 1420,
         "wires": [
             [
@@ -16438,7 +17478,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 710,
+        "x": 670,
         "y": 1380,
         "wires": [
             [
@@ -16453,7 +17493,7 @@
         "name": "",
         "statusCode": "400",
         "headers": {},
-        "x": 700,
+        "x": 660,
         "y": 1460,
         "wires": []
     },
@@ -16462,7 +17502,7 @@
         "type": "subflow:d7ccf53b2b9fe097",
         "z": "d13820078197e616",
         "name": "",
-        "x": 740,
+        "x": 700,
         "y": 1420,
         "wires": [
             [
@@ -16482,7 +17522,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 950,
+        "x": 910,
         "y": 1380,
         "wires": [
             [
@@ -16497,7 +17537,7 @@
         "name": "",
         "statusCode": "200",
         "headers": {},
-        "x": 960,
+        "x": 920,
         "y": 1420,
         "wires": []
     },
@@ -16513,7 +17553,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 750,
+        "x": 690,
         "y": 660,
         "wires": [
             [
@@ -16526,7 +17566,7 @@
         "type": "subflow:d7ccf53b2b9fe097",
         "z": "d13820078197e616",
         "name": "",
-        "x": 760,
+        "x": 700,
         "y": 700,
         "wires": [
             [
@@ -16541,7 +17581,7 @@
         "name": "",
         "statusCode": "200",
         "headers": {},
-        "x": 1500,
+        "x": 1440,
         "y": 720,
         "wires": []
     },
@@ -16557,7 +17597,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1010,
+        "x": 950,
         "y": 660,
         "wires": [
             [
@@ -16570,7 +17610,7 @@
         "type": "subflow:d7ccf53b2b9fe097",
         "z": "d13820078197e616",
         "name": "",
-        "x": 1040,
+        "x": 980,
         "y": 700,
         "wires": [
             [
@@ -16590,7 +17630,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1270,
+        "x": 1210,
         "y": 700,
         "wires": [
             [
@@ -16610,7 +17650,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 970,
+        "x": 930,
         "y": 1160,
         "wires": [
             [
@@ -16623,7 +17663,7 @@
         "type": "subflow:d7ccf53b2b9fe097",
         "z": "d13820078197e616",
         "name": "",
-        "x": 960,
+        "x": 920,
         "y": 1200,
         "wires": [
             [
@@ -16643,7 +17683,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1020,
+        "x": 980,
         "y": 1240,
         "wires": [
             [
@@ -16658,7 +17698,7 @@
         "name": "",
         "statusCode": "200",
         "headers": {},
-        "x": 1860,
+        "x": 1820,
         "y": 1280,
         "wires": []
     },
@@ -16673,7 +17713,7 @@
         "arraySpltType": "len",
         "stream": false,
         "addname": "",
-        "x": 1210,
+        "x": 1170,
         "y": 1160,
         "wires": [
             [
@@ -16693,7 +17733,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1280,
+        "x": 1240,
         "y": 1200,
         "wires": [
             [
@@ -16706,7 +17746,7 @@
         "type": "subflow:d7ccf53b2b9fe097",
         "z": "d13820078197e616",
         "name": "",
-        "x": 1260,
+        "x": 1220,
         "y": 1240,
         "wires": [
             [
@@ -16726,7 +17766,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1340,
+        "x": 1300,
         "y": 1280,
         "wires": [
             [
@@ -16750,7 +17790,7 @@
         "timeout": "",
         "count": "",
         "reduceRight": false,
-        "x": 1550,
+        "x": 1510,
         "y": 1200,
         "wires": [
             [
@@ -16770,7 +17810,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1610,
+        "x": 1570,
         "y": 1240,
         "wires": [
             [
@@ -16783,7 +17823,7 @@
         "type": "subflow:183547d77875ed65",
         "z": "d13820078197e616",
         "name": "",
-        "x": 1880,
+        "x": 1840,
         "y": 1240,
         "wires": []
     },
@@ -16799,7 +17839,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1870,
+        "x": 1830,
         "y": 1200,
         "wires": [
             [
@@ -16819,7 +17859,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 720,
+        "x": 680,
         "y": 1160,
         "wires": [
             [
@@ -16839,7 +17879,7 @@
         "paramsType": "json",
         "payloadType": "json",
         "block": false,
-        "x": 700,
+        "x": 660,
         "y": 1200,
         "wires": [
             [
@@ -16865,7 +17905,7 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 730,
+        "x": 690,
         "y": 1240,
         "wires": [
             [
@@ -16888,7 +17928,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 940,
+        "x": 900,
         "y": 1280,
         "wires": [
             [
@@ -16903,7 +17943,7 @@
         "name": "",
         "statusCode": "200",
         "headers": {},
-        "x": 1140,
+        "x": 1100,
         "y": 1280,
         "wires": []
     },
@@ -16927,7 +17967,7 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 1290,
+        "x": 1230,
         "y": 740,
         "wires": [
             [
@@ -16945,7 +17985,7 @@
         "name": "",
         "statusCode": "204",
         "headers": {},
-        "x": 1500,
+        "x": 1440,
         "y": 760,
         "wires": []
     },
@@ -16969,7 +18009,7 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 1630,
+        "x": 1590,
         "y": 1280,
         "wires": [
             [
@@ -16988,8 +18028,1168 @@
         "name": "",
         "statusCode": "204",
         "headers": {},
-        "x": 1860,
+        "x": 1820,
         "y": 1320,
+        "wires": []
+    },
+    {
+        "id": "aa67ac597c2c8366",
+        "type": "switch",
+        "z": "d13820078197e616",
+        "name": "",
+        "property": "sub.rows.length",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "gt",
+                "v": "0",
+                "vt": "num"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 750,
+        "y": 740,
+        "wires": [
+            [
+                "a85cd1c0a79bbe97"
+            ],
+            [
+                "6e05cce5976a2365"
+            ]
+        ]
+    },
+    {
+        "id": "6c45046d957e9a2e",
+        "type": "http response",
+        "z": "d13820078197e616",
+        "name": "",
+        "statusCode": "400",
+        "headers": {},
+        "x": 940,
+        "y": 880,
+        "wires": []
+    },
+    {
+        "id": "6e05cce5976a2365",
+        "type": "change",
+        "z": "d13820078197e616",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "no asset found",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 960,
+        "y": 840,
+        "wires": [
+            [
+                "6c45046d957e9a2e"
+            ]
+        ]
+    },
+    {
+        "id": "6993bfb8d9e8e77a",
+        "type": "switch",
+        "z": "d13820078197e616",
+        "name": "",
+        "property": "sub.rows.length",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "gt",
+                "v": "0",
+                "vt": "num"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 1030,
+        "y": 740,
+        "wires": [
+            [
+                "0b7381b13c15520c"
+            ],
+            [
+                "fa966f946be72c3d"
+            ]
+        ]
+    },
+    {
+        "id": "fa966f946be72c3d",
+        "type": "http response",
+        "z": "d13820078197e616",
+        "name": "",
+        "statusCode": "204",
+        "headers": {},
+        "x": 1200,
+        "y": 800,
+        "wires": []
+    },
+    {
+        "id": "26cf7a1bfade794c",
+        "type": "switch",
+        "z": "d13820078197e616",
+        "name": "",
+        "property": "ori.allUnit",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 830,
+        "y": 360,
+        "wires": [
+            [
+                "d721b94001953c65"
+            ],
+            [
+                "9174f2987092e55d"
+            ]
+        ]
+    },
+    {
+        "id": "d721b94001953c65",
+        "type": "function",
+        "z": "d13820078197e616",
+        "name": "smart-asset by-vin",
+        "func": "msg.sub = {\n    database: 'smart-asset',\n    design: 'truck',\n    view: 'by-vin'\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1050,
+        "y": 300,
+        "wires": [
+            [
+                "94edeabba5d815cf"
+            ]
+        ]
+    },
+    {
+        "id": "94edeabba5d815cf",
+        "type": "subflow:d7ccf53b2b9fe097",
+        "z": "d13820078197e616",
+        "name": "",
+        "x": 1080,
+        "y": 340,
+        "wires": [
+            [
+                "3dd314e872081816"
+            ]
+        ]
+    },
+    {
+        "id": "3dd314e872081816",
+        "type": "function",
+        "z": "d13820078197e616",
+        "name": "msg.vinAsset",
+        "func": "let asset = msg.sub.rows.map(x => x.key);\nmsg.vinAsset = [].concat(...asset).filter(x => x != \"\");\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1110,
+        "y": 380,
+        "wires": [
+            [
+                "21db479b567295fb"
+            ]
+        ]
+    },
+    {
+        "id": "5ada8ccd968c139e",
+        "type": "function",
+        "z": "d13820078197e616",
+        "name": "msg.vinAsset",
+        "func": "msg.vinAsset = msg.sub.rows.filter(x => x.value != \"\").map(x => x.value.vin);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1110,
+        "y": 500,
+        "wires": [
+            [
+                "21db479b567295fb"
+            ]
+        ]
+    },
+    {
+        "id": "8eaec37ed5c09694",
+        "type": "http response",
+        "z": "d13820078197e616",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 1720,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "21db479b567295fb",
+        "type": "function",
+        "z": "d13820078197e616",
+        "name": "get vehicle position by vinAsset",
+        "func": "const redisTS = global.get('redisTS');\nlet { numDays } = msg.ori;\n\nlet vins = msg.vinAsset;\nlet topics = vins.filter(x => x != '').map(x => {\n    return `vin=${x}`\n});\nredisTS.tsMgetByTopics(topics).then(rs => {\n    let filters = rs.data.filter(x => x.data.length > 0).map(x => {\n        let lastDate = x.data.find(x => x.length > 0)[2][0];\n        return {\n            key: x.topic,\n            start: (lastDate) ? lastDate - (numDays * 24 * 60 * 60 * 1000) : null,\n            end: (lastDate) ? lastDate : null\n        }\n    });\n    redisTS.tsMrangeFilter(filters).then(rs => {\n        msg.payload = rs;\n        node.send(msg);\n    }).catch(err => {\n        let { success, func, message } = err;\n        msg.payload = { success, func, message: message.toString() };\n        node.send(msg);\n    })\n}).catch(err => {\n    let { success, func, message } = err;\n    msg.payload = { success, func, message: message.toString() };\n    node.send(msg);\n});\nreturn null;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1430,
+        "y": 380,
+        "wires": [
+            [
+                "8f3537e2d392e144"
+            ]
+        ]
+    },
+    {
+        "id": "8eb1a33b308d05d3",
+        "type": "function",
+        "z": "d13820078197e616",
+        "name": "save to redis",
+        "func": "/**to set expire set topic into null\n * and set payload to an Array with EX on it [topic, value, EX, ex-value]\n */\nmsg.payload = [msg.redisKey, JSON.stringify(msg.payload), 'EX', Number(env.get('NODERED_TTL'))];\nmsg.topic = null;\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1930,
+        "y": 380,
+        "wires": [
+            [
+                "51559aeb155728e8"
+            ]
+        ]
+    },
+    {
+        "id": "51559aeb155728e8",
+        "type": "switch",
+        "z": "d13820078197e616",
+        "name": "",
+        "property": "sub",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "nnull"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 1950,
+        "y": 420,
+        "wires": [
+            [
+                "cfe14f888e7308ae"
+            ]
+        ]
+    },
+    {
+        "id": "cfe14f888e7308ae",
+        "type": "redis-command",
+        "z": "d13820078197e616",
+        "server": "0fb96b870afb5c15",
+        "command": "set",
+        "name": "",
+        "topic": "",
+        "params": "[]",
+        "paramsType": "json",
+        "payloadType": "json",
+        "block": false,
+        "x": 1940,
+        "y": 460,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "c03384dee32e1f26",
+        "type": "function",
+        "z": "d13820078197e616",
+        "name": "get cache",
+        "func": "msg.payload = msg.redisKey;\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 640,
+        "y": 300,
+        "wires": [
+            [
+                "01198adbd85eed6a"
+            ]
+        ]
+    },
+    {
+        "id": "01198adbd85eed6a",
+        "type": "redis-command",
+        "z": "d13820078197e616",
+        "server": "0fb96b870afb5c15",
+        "command": "GET",
+        "name": "",
+        "topic": "",
+        "params": "[]",
+        "paramsType": "json",
+        "payloadType": "json",
+        "block": false,
+        "x": 640,
+        "y": 340,
+        "wires": [
+            [
+                "dfcf975976946381"
+            ]
+        ]
+    },
+    {
+        "id": "dfcf975976946381",
+        "type": "switch",
+        "z": "d13820078197e616",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "null"
+            },
+            {
+                "t": "nnull"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 650,
+        "y": 380,
+        "wires": [
+            [
+                "26cf7a1bfade794c"
+            ],
+            [
+                "a7177e8c02b34a0b"
+            ]
+        ]
+    },
+    {
+        "id": "a7177e8c02b34a0b",
+        "type": "function",
+        "z": "d13820078197e616",
+        "name": "return from redis",
+        "func": "msg.payload = JSON.parse(msg.payload);\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 860,
+        "y": 560,
+        "wires": [
+            [
+                "77b41a0c6f315b9e"
+            ]
+        ]
+    },
+    {
+        "id": "77b41a0c6f315b9e",
+        "type": "http response",
+        "z": "d13820078197e616",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 1100,
+        "y": 560,
+        "wires": []
+    },
+    {
+        "id": "8f3537e2d392e144",
+        "type": "switch",
+        "z": "d13820078197e616",
+        "name": "",
+        "property": "payload.success",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 1510,
+        "y": 420,
+        "wires": [
+            [
+                "dc327375d01b3762"
+            ],
+            [
+                "69741c87d9e5a90b"
+            ]
+        ]
+    },
+    {
+        "id": "dc327375d01b3762",
+        "type": "function",
+        "z": "d13820078197e616",
+        "name": "function 112",
+        "func": "let { data } = msg.payload;\nmsg.payload = data.map(x => {\n    return {\n        vin: x.topic.split('=')[1],\n        series: x.data.map(x => {\n            return {\n                key: x[0].split(':')[1],\n                data: x[2]\n            }\n        })\n    }\n});\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1710,
+        "y": 380,
+        "wires": [
+            [
+                "8eaec37ed5c09694",
+                "8eb1a33b308d05d3"
+            ]
+        ]
+    },
+    {
+        "id": "69741c87d9e5a90b",
+        "type": "http response",
+        "z": "d13820078197e616",
+        "name": "",
+        "statusCode": "500",
+        "headers": {},
+        "x": 1700,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "d435ec781b508608",
+        "type": "http in",
+        "z": "d13820078197e616",
+        "name": "",
+        "url": "/api/tracking/asset-vs-tracking",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 200,
+        "y": 1620,
+        "wires": [
+            [
+                "91f5634482ee9507"
+            ]
+        ]
+    },
+    {
+        "id": "85e17e6d5d5a7128",
+        "type": "function",
+        "z": "d13820078197e616",
+        "name": "validated",
+        "func": "let valid = false;\nlet { unittransport, numDays, allUnit } = msg.payload;\nif (\n    numDays\n    && typeof numDays == 'number'\n) {\n    if (unittransport\n        && allUnit == undefined\n        && Array.isArray(unittransport)\n        && unittransport.length > 0) {\n        msg.ori = msg.payload;\n        msg.redisKey = `cache:tracking:${unittransport.join(';')}`\n        valid = true;\n    }\n\n    if (\n        allUnit != undefined\n        && unittransport == undefined\n        && typeof allUnit == 'boolean'\n    ) {\n        msg.ori = msg.payload;\n        msg.redisKey = `cache:tracking:all-unit`\n        valid = true;\n    }\n}\nmsg.valid = valid;\nif (!valid) {\n    msg.payload = \"parameter is not valid\"\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 480,
+        "y": 1620,
+        "wires": [
+            [
+                "bc758d6fb0984cf7"
+            ]
+        ]
+    },
+    {
+        "id": "bc758d6fb0984cf7",
+        "type": "switch",
+        "z": "d13820078197e616",
+        "name": "",
+        "property": "valid",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 490,
+        "y": 1660,
+        "wires": [
+            [
+                "0bf3e6e25789e8ed"
+            ],
+            [
+                "72944f40983dd48a"
+            ]
+        ]
+    },
+    {
+        "id": "d7b7ca782d735c65",
+        "type": "function",
+        "z": "d13820078197e616",
+        "name": "get vin by unit-transport",
+        "func": "let { unittransport } = msg.ori;\nmsg.sub = {\n    database: 'smart-asset',\n    design: 'truck',\n    view: 'by-unitID',\n    keys: unittransport.map(x => `[${x}]`),\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 890,
+        "y": 1680,
+        "wires": [
+            [
+                "97a25293d9670d35"
+            ]
+        ]
+    },
+    {
+        "id": "97a25293d9670d35",
+        "type": "subflow:d7ccf53b2b9fe097",
+        "z": "d13820078197e616",
+        "name": "",
+        "x": 880,
+        "y": 1720,
+        "wires": [
+            [
+                "2cad50f70dbecc57"
+            ]
+        ]
+    },
+    {
+        "id": "0bf3e6e25789e8ed",
+        "type": "switch",
+        "z": "d13820078197e616",
+        "name": "",
+        "property": "ori.allUnit",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 650,
+        "y": 1620,
+        "wires": [
+            [
+                "3905735f60ecbeee"
+            ],
+            [
+                "d7b7ca782d735c65"
+            ]
+        ]
+    },
+    {
+        "id": "3905735f60ecbeee",
+        "type": "function",
+        "z": "d13820078197e616",
+        "name": "smart-asset by-vin",
+        "func": "msg.sub = {\n    database: 'smart-asset',\n    design: 'truck',\n    view: 'by-vin'\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 870,
+        "y": 1560,
+        "wires": [
+            [
+                "1a122284d912662b"
+            ]
+        ]
+    },
+    {
+        "id": "1a122284d912662b",
+        "type": "subflow:d7ccf53b2b9fe097",
+        "z": "d13820078197e616",
+        "name": "",
+        "x": 900,
+        "y": 1600,
+        "wires": [
+            [
+                "7d1be67e600cac6e"
+            ]
+        ]
+    },
+    {
+        "id": "7d1be67e600cac6e",
+        "type": "function",
+        "z": "d13820078197e616",
+        "name": "msg.vinAsset",
+        "func": "let asset = msg.sub.rows.map(x => x.key);\nmsg.vinAsset = [].concat(...asset).filter(x => x != \"\");\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 930,
+        "y": 1640,
+        "wires": [
+            [
+                "95fabdc735812f68"
+            ]
+        ]
+    },
+    {
+        "id": "2cad50f70dbecc57",
+        "type": "function",
+        "z": "d13820078197e616",
+        "name": "msg.vinAsset",
+        "func": "msg.vinAsset = msg.sub.rows.filter(x => x.value != \"\").map(x => x.value.vin);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 930,
+        "y": 1760,
+        "wires": [
+            [
+                "95fabdc735812f68"
+            ]
+        ]
+    },
+    {
+        "id": "72944f40983dd48a",
+        "type": "http response",
+        "z": "d13820078197e616",
+        "name": "",
+        "statusCode": "400",
+        "headers": {},
+        "x": 660,
+        "y": 1720,
+        "wires": []
+    },
+    {
+        "id": "95fabdc735812f68",
+        "type": "function",
+        "z": "d13820078197e616",
+        "name": "function 113",
+        "func": "const redisTS = global.get('redisTS');\nlet rs = redisTS.checkKey('*');\nlet vinAsset = msg.vinAsset;\nrs.then(keys => {\n    let vins = keys.map(x => x.split(':')[0]);\n    let vinTracking = [...new Set(vins)];\n    let vinAssetNotInTracking = vinAsset.filter(x => !vinTracking.includes(x));\n    let vinTrackingNotInAsset = vinTracking.filter(x => !vinAsset.includes(x));\n    msg.payload = { vinAsset, vinTracking, vinAssetNotInTracking, vinTrackingNotInAsset }\n    node.send(msg);\n})\n    .catch(err => {\n        msg.payload = msg;\n        node.send(msg);\n    });\nreturn null;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1190,
+        "y": 1640,
+        "wires": [
+            [
+                "805c319aabca1c7d"
+            ]
+        ]
+    },
+    {
+        "id": "805c319aabca1c7d",
+        "type": "http response",
+        "z": "d13820078197e616",
+        "name": "",
+        "statusCode": "400",
+        "headers": {},
+        "x": 1200,
+        "y": 1680,
+        "wires": []
+    },
+    {
+        "id": "73aa74a70dedca12",
+        "type": "http in",
+        "z": "d13820078197e616",
+        "name": "",
+        "url": "/api/tracking/last-position/all",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 190,
+        "y": 1860,
+        "wires": [
+            [
+                "555add4b26db8110"
+            ]
+        ]
+    },
+    {
+        "id": "e43bd7581bc76630",
+        "type": "redis-command",
+        "z": "d13820078197e616",
+        "server": "8ca322e6bc2d554c",
+        "command": "KEYS",
+        "name": "",
+        "topic": "",
+        "params": "[]",
+        "paramsType": "json",
+        "payloadType": "json",
+        "block": false,
+        "x": 490,
+        "y": 1900,
+        "wires": [
+            [
+                "9755efbf302f7b3a"
+            ]
+        ]
+    },
+    {
+        "id": "0d919eefbea027b0",
+        "type": "function",
+        "z": "d13820078197e616",
+        "name": "function 118",
+        "func": "msg.payload = '*'\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 490,
+        "y": 1860,
+        "wires": [
+            [
+                "e43bd7581bc76630"
+            ]
+        ]
+    },
+    {
+        "id": "9755efbf302f7b3a",
+        "type": "function",
+        "z": "d13820078197e616",
+        "name": "function 119",
+        "func": "let keys = msg.payload;\nmsg.payload = [...new Set(keys.map(x => x.split(':')[0]))]\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 490,
+        "y": 1940,
+        "wires": [
+            [
+                "503f54aaa49b1557"
+            ]
+        ]
+    },
+    {
+        "id": "503f54aaa49b1557",
+        "type": "split",
+        "z": "d13820078197e616",
+        "name": "",
+        "splt": "\\n",
+        "spltType": "str",
+        "arraySplt": 1,
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "x": 710,
+        "y": 1860,
+        "wires": [
+            [
+                "1a3871712538435c"
+            ]
+        ]
+    },
+    {
+        "id": "b40b775960d166de",
+        "type": "join",
+        "z": "d13820078197e616",
+        "name": "",
+        "mode": "auto",
+        "build": "object",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "accumulate": "false",
+        "timeout": "",
+        "count": "",
+        "reduceRight": false,
+        "x": 710,
+        "y": 2020,
+        "wires": [
+            [
+                "f0c46def3406ac7f"
+            ]
+        ]
+    },
+    {
+        "id": "52ec907e2917219d",
+        "type": "subflow:3065e229b488d382",
+        "z": "d13820078197e616",
+        "name": "",
+        "x": 750,
+        "y": 1940,
+        "wires": [
+            [
+                "b66aaf03a69fd039"
+            ]
+        ]
+    },
+    {
+        "id": "1a3871712538435c",
+        "type": "function",
+        "z": "d13820078197e616",
+        "name": "function 120",
+        "func": "msg.vin = msg.payload;\nmsg.sub = {\n    label: [`vin=${msg.payload}`]\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 730,
+        "y": 1900,
+        "wires": [
+            [
+                "52ec907e2917219d"
+            ]
+        ]
+    },
+    {
+        "id": "b66aaf03a69fd039",
+        "type": "function",
+        "z": "d13820078197e616",
+        "name": "function 121",
+        "func": "msg.payload = {\n    vin: msg.vin,\n    data: msg.sub.map(x => {\n        return {\n            key: x[0].split(':')[1],\n            series: x[2]\n        }\n    })\n};\ndelete msg.sub;\ndelete msg.vin;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 730,
+        "y": 1980,
+        "wires": [
+            [
+                "b40b775960d166de"
+            ]
+        ]
+    },
+    {
+        "id": "f0c46def3406ac7f",
+        "type": "http response",
+        "z": "d13820078197e616",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 900,
+        "y": 2020,
+        "wires": []
+    },
+    {
+        "id": "db8e8a575ae112e6",
+        "type": "function",
+        "z": "d13820078197e616",
+        "name": "get vin by unit-transport",
+        "func": "msg.sub = {\n    database: 'smart-asset',\n    design: 'truck',\n    view: 'by-unitID'\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 510,
+        "y": 2120,
+        "wires": [
+            [
+                "1f27a340e546c89c"
+            ]
+        ]
+    },
+    {
+        "id": "1f27a340e546c89c",
+        "type": "subflow:d7ccf53b2b9fe097",
+        "z": "d13820078197e616",
+        "name": "",
+        "x": 520,
+        "y": 2160,
+        "wires": [
+            [
+                "be6d2232bf009453"
+            ]
+        ]
+    },
+    {
+        "id": "0bb4cd614802c554",
+        "type": "function",
+        "z": "d13820078197e616",
+        "name": "smart-vehicle",
+        "func": "let assets = msg.sub.rows.map(x => {\n    let {_id, _rev, ...other} = x.value;\n    return other;\n});\nmsg.assets = assets;\nmsg.sub = {\n    database: 'smart-vehicle',\n    design: 'list',\n    view: 'by-vin'\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 770,
+        "y": 2120,
+        "wires": [
+            [
+                "e4ef1e8a4b297a1e"
+            ]
+        ]
+    },
+    {
+        "id": "e4ef1e8a4b297a1e",
+        "type": "subflow:d7ccf53b2b9fe097",
+        "z": "d13820078197e616",
+        "name": "",
+        "x": 800,
+        "y": 2160,
+        "wires": [
+            [
+                "0d1d2127a517a284"
+            ]
+        ]
+    },
+    {
+        "id": "dba3a93194f9a5c1",
+        "type": "function",
+        "z": "d13820078197e616",
+        "name": "function 122",
+        "func": "let vehicles = msg.sub.rows?.map(x => {\n    let { _id, _rev, ...props } = x.value;\n    return {\n        props\n    }\n});\nlet assets = msg.assets;\nmsg.payload = vehicles.map(x => {\n    let asset = assets.find(asset => asset.vin == x.props.vin);\n    if (asset) {\n        let { vin, unitTransport, images, comodity } = asset;\n        return {\n            vin,\n            unitTransport,\n            images,\n            comodity,\n            ...x\n        }\n    } else {\n        return {\n            vin: x.props.vin,\n            unitTransport: [],\n            images: [],\n            comodity: null,\n            ...x\n        }\n    }\n});\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1030,
+        "y": 2160,
+        "wires": [
+            [
+                "d01080fd14a348b9"
+            ]
+        ]
+    },
+    {
+        "id": "d01080fd14a348b9",
+        "type": "switch",
+        "z": "d13820078197e616",
+        "name": "payload.length > 0",
+        "property": "payload.length",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "gt",
+                "v": "0",
+                "vt": "num"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 1050,
+        "y": 2200,
+        "wires": [
+            [
+                "c3488b6172435703"
+            ],
+            [
+                "fdb4db92c53a31de"
+            ]
+        ]
+    },
+    {
+        "id": "be6d2232bf009453",
+        "type": "switch",
+        "z": "d13820078197e616",
+        "name": "",
+        "property": "sub.rows.length",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "gt",
+                "v": "0",
+                "vt": "num"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 570,
+        "y": 2200,
+        "wires": [
+            [
+                "0bb4cd614802c554"
+            ],
+            [
+                "84aa6d4d57a0c54c"
+            ]
+        ]
+    },
+    {
+        "id": "84aa6d4d57a0c54c",
+        "type": "change",
+        "z": "d13820078197e616",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "no asset found",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 780,
+        "y": 2260,
+        "wires": [
+            [
+                "24ccec51385e0699"
+            ]
+        ]
+    },
+    {
+        "id": "0d1d2127a517a284",
+        "type": "switch",
+        "z": "d13820078197e616",
+        "name": "",
+        "property": "sub.rows.length",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "gt",
+                "v": "0",
+                "vt": "num"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 850,
+        "y": 2200,
+        "wires": [
+            [
+                "dba3a93194f9a5c1"
+            ],
+            [
+                "4505b025cfc1cdc2"
+            ]
+        ]
+    },
+    {
+        "id": "24ccec51385e0699",
+        "type": "http response",
+        "z": "d13820078197e616",
+        "name": "",
+        "statusCode": "400",
+        "headers": {},
+        "x": 800,
+        "y": 2300,
+        "wires": []
+    },
+    {
+        "id": "4505b025cfc1cdc2",
+        "type": "http response",
+        "z": "d13820078197e616",
+        "name": "",
+        "statusCode": "204",
+        "headers": {},
+        "x": 1020,
+        "y": 2240,
+        "wires": []
+    },
+    {
+        "id": "c3488b6172435703",
+        "type": "http response",
+        "z": "d13820078197e616",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 1240,
+        "y": 2180,
+        "wires": []
+    },
+    {
+        "id": "797532db9b1a05d1",
+        "type": "http in",
+        "z": "d13820078197e616",
+        "name": "",
+        "url": "/api/tracking/vehicles/all",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 180,
+        "y": 2120,
+        "wires": [
+            [
+                "fa674df40ae43995"
+            ]
+        ]
+    },
+    {
+        "id": "fdb4db92c53a31de",
+        "type": "http response",
+        "z": "d13820078197e616",
+        "name": "",
+        "statusCode": "204",
+        "headers": {},
+        "x": 1240,
+        "y": 2220,
         "wires": []
     },
     {
@@ -17018,7 +19218,7 @@
             }
         ],
         "x": 160,
-        "y": 1560,
+        "y": 2480,
         "wires": [
             [
                 "eb64ed52ae8f1a18"
@@ -17037,7 +19237,7 @@
         "finalize": "",
         "libs": [],
         "x": 450,
-        "y": 1560,
+        "y": 2480,
         "wires": [
             [
                 "51fab92465e0c058"
@@ -17066,7 +19266,7 @@
         "payload": "",
         "payloadType": "date",
         "x": 120,
-        "y": 1600,
+        "y": 2520,
         "wires": [
             [
                 "eb64ed52ae8f1a18"
@@ -17103,7 +19303,7 @@
             }
         ],
         "x": 490,
-        "y": 1600,
+        "y": 2520,
         "wires": [
             [
                 "ec19fb40493e2b7c",
@@ -17124,7 +19324,7 @@
         "finalize": "",
         "libs": [],
         "x": 540,
-        "y": 1640,
+        "y": 2560,
         "wires": [
             [
                 "b3c015605912187d"
@@ -17144,7 +19344,7 @@
         "finalize": "",
         "libs": [],
         "x": 750,
-        "y": 1600,
+        "y": 2520,
         "wires": [
             [
                 "ab2a2452075f8e7f"
@@ -17170,7 +19370,7 @@
         "repair": false,
         "outputs": 2,
         "x": 550,
-        "y": 1680,
+        "y": 2600,
         "wires": [
             [
                 "d291712a6ca4ce5f"
@@ -17194,7 +19394,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 920,
-        "y": 1600,
+        "y": 2520,
         "wires": []
     },
     {
@@ -17210,7 +19410,7 @@
         "finalize": "",
         "libs": [],
         "x": 770,
-        "y": 1640,
+        "y": 2560,
         "wires": [
             [
                 "2d59f41d60594c41"
@@ -17229,7 +19429,7 @@
         "finalize": "",
         "libs": [],
         "x": 750,
-        "y": 1740,
+        "y": 2660,
         "wires": [
             [
                 "be6ae8e32096a82a"
@@ -17250,7 +19450,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 1000,
-        "y": 1680,
+        "y": 2600,
         "wires": []
     },
     {
@@ -17267,7 +19467,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 900,
-        "y": 1740,
+        "y": 2660,
         "wires": []
     },
     {
@@ -17296,7 +19496,7 @@
             }
         ],
         "x": 130,
-        "y": 1840,
+        "y": 2760,
         "wires": [
             [
                 "28dec8cb7278843d"
@@ -17315,7 +19515,7 @@
         "finalize": "",
         "libs": [],
         "x": 370,
-        "y": 1840,
+        "y": 2760,
         "wires": [
             [
                 "e5a3172e2c504f7e"
@@ -17344,7 +19544,7 @@
         "payload": "",
         "payloadType": "date",
         "x": 120,
-        "y": 1880,
+        "y": 2800,
         "wires": [
             [
                 "28dec8cb7278843d"
@@ -17381,7 +19581,7 @@
             }
         ],
         "x": 390,
-        "y": 1880,
+        "y": 2800,
         "wires": [
             [
                 "8628d12fa8232121"
@@ -17401,7 +19601,7 @@
         "finalize": "",
         "libs": [],
         "x": 620,
-        "y": 1840,
+        "y": 2760,
         "wires": [
             [
                 "f8af11ab216893d8"
@@ -17427,7 +19627,7 @@
         "repair": false,
         "outputs": 2,
         "x": 630,
-        "y": 1880,
+        "y": 2800,
         "wires": [
             [
                 "34fa04e5252242d0"
@@ -17450,7 +19650,7 @@
         "finalize": "",
         "libs": [],
         "x": 850,
-        "y": 1840,
+        "y": 2760,
         "wires": [
             [
                 "df776ab7fafa518d"
@@ -17469,7 +19669,7 @@
         "finalize": "",
         "libs": [],
         "x": 830,
-        "y": 1920,
+        "y": 2840,
         "wires": [
             [
                 "3614fadd0a981a76"
@@ -17482,7 +19682,7 @@
         "z": "d13820078197e616",
         "name": "",
         "x": 780,
-        "y": 1680,
+        "y": 2600,
         "wires": [
             [
                 "73b0fc70536de338"
@@ -17503,7 +19703,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 1040,
-        "y": 1920,
+        "y": 2840,
         "wires": []
     },
     {
@@ -17512,7 +19712,7 @@
         "z": "d13820078197e616",
         "name": "",
         "x": 860,
-        "y": 1880,
+        "y": 2800,
         "wires": [
             [
                 "e9dbbf2725b384df"
@@ -17533,7 +19733,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 1080,
-        "y": 1880,
+        "y": 2800,
         "wires": []
     },
     {
@@ -17558,7 +19758,7 @@
         "payload": "",
         "payloadType": "date",
         "x": 150,
-        "y": 2020,
+        "y": 2940,
         "wires": [
             [
                 "74cd250b448102f4"
@@ -17582,7 +19782,7 @@
         "senderr": false,
         "headers": [],
         "x": 150,
-        "y": 2060,
+        "y": 2980,
         "wires": [
             [
                 "e7386d744d9b0111"
@@ -17610,7 +19810,7 @@
         "repair": false,
         "outputs": 2,
         "x": 190,
-        "y": 2100,
+        "y": 3020,
         "wires": [
             [
                 "f8360ff7db454e88"
@@ -17633,7 +19833,7 @@
         "finalize": "",
         "libs": [],
         "x": 430,
-        "y": 2040,
+        "y": 2960,
         "wires": [
             [
                 "be30c137015edd6a"
@@ -17654,7 +19854,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 390,
-        "y": 2160,
+        "y": 3080,
         "wires": []
     },
     {
@@ -17663,7 +19863,7 @@
         "z": "d13820078197e616",
         "name": "",
         "x": 440,
-        "y": 2080,
+        "y": 3000,
         "wires": [
             [
                 "b0d9a66b4bd2b79f"
@@ -17683,7 +19883,7 @@
         "finalize": "",
         "libs": [],
         "x": 460,
-        "y": 2120,
+        "y": 3040,
         "wires": [
             [
                 "370bb3ac65508a3b"
@@ -17700,486 +19900,94 @@
         "ioname": "job.geojson.get.tree",
         "server": "e907ba5364e5896f",
         "x": 690,
-        "y": 2120,
+        "y": 3040,
         "wires": []
     },
     {
-        "id": "aa67ac597c2c8366",
-        "type": "switch",
+        "id": "4cec475fbe6a60e0",
+        "type": "subflow:9ac4386f65a33996",
         "z": "d13820078197e616",
         "name": "",
-        "property": "sub.rows.length",
-        "propertyType": "msg",
-        "rules": [
-            {
-                "t": "gt",
-                "v": "0",
-                "vt": "num"
-            },
-            {
-                "t": "else"
-            }
-        ],
-        "checkall": "true",
-        "repair": false,
-        "outputs": 2,
-        "x": 810,
-        "y": 740,
+        "x": 170,
+        "y": 100,
         "wires": [
             [
-                "a85cd1c0a79bbe97"
-            ],
-            [
-                "6e05cce5976a2365"
+                "4f453f7443b1bdba"
             ]
         ]
     },
     {
-        "id": "6c45046d957e9a2e",
-        "type": "http response",
+        "id": "efb6fd3e21e2e6a0",
+        "type": "subflow:9ac4386f65a33996",
         "z": "d13820078197e616",
         "name": "",
-        "statusCode": "400",
-        "headers": {},
-        "x": 1000,
-        "y": 880,
-        "wires": []
-    },
-    {
-        "id": "6e05cce5976a2365",
-        "type": "change",
-        "z": "d13820078197e616",
-        "name": "",
-        "rules": [
-            {
-                "t": "set",
-                "p": "payload",
-                "pt": "msg",
-                "to": "no asset found",
-                "tot": "str"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 1020,
-        "y": 840,
-        "wires": [
-            [
-                "6c45046d957e9a2e"
-            ]
-        ]
-    },
-    {
-        "id": "6993bfb8d9e8e77a",
-        "type": "switch",
-        "z": "d13820078197e616",
-        "name": "",
-        "property": "sub.rows.length",
-        "propertyType": "msg",
-        "rules": [
-            {
-                "t": "gt",
-                "v": "0",
-                "vt": "num"
-            },
-            {
-                "t": "else"
-            }
-        ],
-        "checkall": "true",
-        "repair": false,
-        "outputs": 2,
-        "x": 1090,
-        "y": 740,
-        "wires": [
-            [
-                "0b7381b13c15520c"
-            ],
-            [
-                "fa966f946be72c3d"
-            ]
-        ]
-    },
-    {
-        "id": "fa966f946be72c3d",
-        "type": "http response",
-        "z": "d13820078197e616",
-        "name": "",
-        "statusCode": "204",
-        "headers": {},
-        "x": 1260,
-        "y": 800,
-        "wires": []
-    },
-    {
-        "id": "26cf7a1bfade794c",
-        "type": "switch",
-        "z": "d13820078197e616",
-        "name": "",
-        "property": "ori.allUnit",
-        "propertyType": "msg",
-        "rules": [
-            {
-                "t": "true"
-            },
-            {
-                "t": "else"
-            }
-        ],
-        "checkall": "true",
-        "repair": false,
-        "outputs": 2,
-        "x": 790,
-        "y": 360,
-        "wires": [
-            [
-                "d721b94001953c65"
-            ],
-            [
-                "9174f2987092e55d"
-            ]
-        ]
-    },
-    {
-        "id": "d721b94001953c65",
-        "type": "function",
-        "z": "d13820078197e616",
-        "name": "smart-asset by-vin",
-        "func": "msg.sub = {\n    database: 'smart-asset',\n    design: 'truck',\n    view: 'by-vin'\n}\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 1010,
-        "y": 300,
-        "wires": [
-            [
-                "94edeabba5d815cf"
-            ]
-        ]
-    },
-    {
-        "id": "94edeabba5d815cf",
-        "type": "subflow:d7ccf53b2b9fe097",
-        "z": "d13820078197e616",
-        "name": "",
-        "x": 1040,
+        "x": 170,
         "y": 340,
         "wires": [
             [
-                "3dd314e872081816"
+                "2cc36b53281ba6eb"
             ]
         ]
     },
     {
-        "id": "3dd314e872081816",
-        "type": "function",
-        "z": "d13820078197e616",
-        "name": "msg.vinAsset",
-        "func": "let asset = msg.sub.rows.map(x => x.key);\nmsg.vinAsset = [].concat(...asset).filter(x => x != \"\");\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 1070,
-        "y": 380,
-        "wires": [
-            [
-                "21db479b567295fb"
-            ]
-        ]
-    },
-    {
-        "id": "5ada8ccd968c139e",
-        "type": "function",
-        "z": "d13820078197e616",
-        "name": "msg.vinAsset",
-        "func": "msg.vinAsset = msg.sub.rows.filter(x => x.value != \"\").map(x => x.value.vin);\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 1070,
-        "y": 500,
-        "wires": [
-            [
-                "21db479b567295fb"
-            ]
-        ]
-    },
-    {
-        "id": "8eaec37ed5c09694",
-        "type": "http response",
+        "id": "af0e4b4a5deffc93",
+        "type": "subflow:9ac4386f65a33996",
         "z": "d13820078197e616",
         "name": "",
-        "statusCode": "200",
-        "headers": {},
-        "x": 1680,
-        "y": 420,
-        "wires": []
-    },
-    {
-        "id": "21db479b567295fb",
-        "type": "function",
-        "z": "d13820078197e616",
-        "name": "get vehicle position by vinAsset",
-        "func": "const redisTS = global.get('redisTS');\nlet { numDays } = msg.ori;\n\nlet vins = msg.vinAsset;\nlet topics = vins.filter(x => x != '').map(x => {\n    return `vin=${x}`\n});\nlet latest = redisTS.mgetByTopics(topics);\nlatest.then(late => {\n    // let assetNoTracking = late.filter(x => x.data.length == 0).map(x => x.topic.split('=')[1]);\n    // let assetInTracking = late.filter(x => x.data.length > 0).map(x => x.topic.split('=')[1]);\n    let filters = late.filter(x => x.data.length > 0).map(x => {\n        let lastDate = x.data.find(x => x.length > 0)[2][0];\n        return {\n            key: x.topic,\n            start: (lastDate) ? lastDate - (numDays * 24 * 60 * 60 * 1000) : null,\n            end: (lastDate) ? lastDate : null\n        }\n    });\n    let nDaysData = redisTS.mrangeFilter(filters);\n    nDaysData.then(result => {\n        msg.payload = result\n        node.send(msg);\n    }).catch(err => {\n        let { success, func, message } = err;\n        msg.payload = { success, func, message: message.toString() };\n        node.send(msg);\n    })\n}).catch(err => {\n    let { success, func, message } = err;\n    msg.payload = { success, func, message: message.toString() };\n    node.send(msg);\n});\nreturn null;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 1390,
-        "y": 380,
+        "x": 170,
+        "y": 700,
         "wires": [
             [
-                "8f3537e2d392e144"
+                "5d1d1785d97cfd03"
             ]
         ]
     },
     {
-        "id": "8eb1a33b308d05d3",
-        "type": "function",
-        "z": "d13820078197e616",
-        "name": "save to redis",
-        "func": "/**to set expire set topic into null\n * and set payload to an Array with EX on it [topic, value, EX, ex-value]\n */\nmsg.payload = [msg.redisKey, JSON.stringify(msg.payload), 'EX', Number(env.get('NODERED_TTL'))];\nmsg.topic = null;\nreturn msg;",
-        "outputs": 1,
-        "timeout": "",
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 1890,
-        "y": 380,
-        "wires": [
-            [
-                "51559aeb155728e8"
-            ]
-        ]
-    },
-    {
-        "id": "51559aeb155728e8",
-        "type": "switch",
+        "id": "30e937a22f8c77ba",
+        "type": "subflow:9ac4386f65a33996",
         "z": "d13820078197e616",
         "name": "",
-        "property": "sub",
-        "propertyType": "msg",
-        "rules": [
-            {
-                "t": "nnull"
-            }
-        ],
-        "checkall": "true",
-        "repair": false,
-        "outputs": 1,
-        "x": 1910,
-        "y": 420,
+        "x": 230,
+        "y": 1020,
         "wires": [
             [
-                "cfe14f888e7308ae"
+                "55ab8873929c560e"
             ]
         ]
     },
     {
-        "id": "cfe14f888e7308ae",
-        "type": "redis-command",
+        "id": "bfb1ad74f5b90332",
+        "type": "subflow:9ac4386f65a33996",
         "z": "d13820078197e616",
-        "server": "0fb96b870afb5c15",
-        "command": "set",
         "name": "",
-        "topic": "",
-        "params": "[]",
-        "paramsType": "json",
-        "payloadType": "json",
-        "block": false,
-        "x": 1900,
-        "y": 460,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "c03384dee32e1f26",
-        "type": "function",
-        "z": "d13820078197e616",
-        "name": "get cache",
-        "func": "msg.payload = msg.redisKey;\nreturn msg;",
-        "outputs": 1,
-        "timeout": "",
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 600,
-        "y": 300,
+        "x": 190,
+        "y": 1200,
         "wires": [
             [
-                "01198adbd85eed6a"
+                "5f26c7e45011f372"
             ]
         ]
     },
     {
-        "id": "01198adbd85eed6a",
-        "type": "redis-command",
+        "id": "3c8c497bc0926532",
+        "type": "subflow:9ac4386f65a33996",
         "z": "d13820078197e616",
-        "server": "0fb96b870afb5c15",
-        "command": "GET",
         "name": "",
-        "topic": "",
-        "params": "[]",
-        "paramsType": "json",
-        "payloadType": "json",
-        "block": false,
-        "x": 600,
-        "y": 340,
+        "x": 190,
+        "y": 1420,
         "wires": [
             [
-                "dfcf975976946381"
+                "2f8f9bba77106467"
             ]
         ]
     },
     {
-        "id": "dfcf975976946381",
-        "type": "switch",
+        "id": "91f5634482ee9507",
+        "type": "subflow:9ac4386f65a33996",
         "z": "d13820078197e616",
         "name": "",
-        "property": "payload",
-        "propertyType": "msg",
-        "rules": [
-            {
-                "t": "null"
-            },
-            {
-                "t": "nnull"
-            }
-        ],
-        "checkall": "true",
-        "repair": false,
-        "outputs": 2,
-        "x": 610,
-        "y": 380,
-        "wires": [
-            [
-                "26cf7a1bfade794c"
-            ],
-            [
-                "a7177e8c02b34a0b"
-            ]
-        ]
-    },
-    {
-        "id": "a7177e8c02b34a0b",
-        "type": "function",
-        "z": "d13820078197e616",
-        "name": "return from redis",
-        "func": "msg.payload = JSON.parse(msg.payload);\nreturn msg;",
-        "outputs": 1,
-        "timeout": "",
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 820,
-        "y": 560,
-        "wires": [
-            [
-                "77b41a0c6f315b9e"
-            ]
-        ]
-    },
-    {
-        "id": "77b41a0c6f315b9e",
-        "type": "http response",
-        "z": "d13820078197e616",
-        "name": "",
-        "statusCode": "200",
-        "headers": {},
-        "x": 1060,
-        "y": 560,
-        "wires": []
-    },
-    {
-        "id": "8f3537e2d392e144",
-        "type": "switch",
-        "z": "d13820078197e616",
-        "name": "",
-        "property": "payload.success",
-        "propertyType": "msg",
-        "rules": [
-            {
-                "t": "true"
-            },
-            {
-                "t": "false"
-            }
-        ],
-        "checkall": "true",
-        "repair": false,
-        "outputs": 2,
-        "x": 1470,
-        "y": 420,
-        "wires": [
-            [
-                "dc327375d01b3762"
-            ],
-            [
-                "69741c87d9e5a90b"
-            ]
-        ]
-    },
-    {
-        "id": "dc327375d01b3762",
-        "type": "function",
-        "z": "d13820078197e616",
-        "name": "function 112",
-        "func": "let { data } = msg.payload;\nmsg.payload = data.map(x => {\n    return {\n        vin: x.topic.split('=')[1],\n        series: x.data.map(x => {\n            return {\n                key: x[0].split(':')[1],\n                data: x[2]\n            }\n        })\n    }\n});\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 1670,
-        "y": 380,
-        "wires": [
-            [
-                "8eaec37ed5c09694",
-                "8eb1a33b308d05d3"
-            ]
-        ]
-    },
-    {
-        "id": "69741c87d9e5a90b",
-        "type": "http response",
-        "z": "d13820078197e616",
-        "name": "",
-        "statusCode": "500",
-        "headers": {},
-        "x": 1660,
-        "y": 480,
-        "wires": []
-    },
-    {
-        "id": "d435ec781b508608",
-        "type": "http in",
-        "z": "d13820078197e616",
-        "name": "",
-        "url": "/api/tracking/asset-vs-tracking",
-        "method": "post",
-        "upload": false,
-        "swaggerDoc": "",
-        "x": 200,
-        "y": 2320,
+        "x": 230,
+        "y": 1660,
         "wires": [
             [
                 "85e17e6d5d5a7128"
@@ -18187,230 +19995,30 @@
         ]
     },
     {
-        "id": "85e17e6d5d5a7128",
-        "type": "function",
-        "z": "d13820078197e616",
-        "name": "validated",
-        "func": "let valid = false;\nlet { unittransport, numDays, allUnit } = msg.payload;\nif (\n    numDays\n    && typeof numDays == 'number'\n) {\n    if (unittransport\n        && allUnit == undefined\n        && Array.isArray(unittransport)\n        && unittransport.length > 0) {\n        msg.ori = msg.payload;\n        msg.redisKey = `cache:tracking:${unittransport.join(';')}`\n        valid = true;\n    }\n\n    if (\n        allUnit != undefined\n        && unittransport == undefined\n        && typeof allUnit == 'boolean'\n    ) {\n        msg.ori = msg.payload;\n        msg.redisKey = `cache:tracking:all-unit`\n        valid = true;\n    }\n}\nmsg.valid = valid;\nif (!valid) {\n    msg.payload = \"parameter is not valid\"\n}\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 440,
-        "y": 2320,
-        "wires": [
-            [
-                "bc758d6fb0984cf7"
-            ]
-        ]
-    },
-    {
-        "id": "bc758d6fb0984cf7",
-        "type": "switch",
+        "id": "555add4b26db8110",
+        "type": "subflow:9ac4386f65a33996",
         "z": "d13820078197e616",
         "name": "",
-        "property": "valid",
-        "propertyType": "msg",
-        "rules": [
-            {
-                "t": "true"
-            },
-            {
-                "t": "false"
-            }
-        ],
-        "checkall": "true",
-        "repair": false,
-        "outputs": 2,
-        "x": 450,
-        "y": 2360,
+        "x": 210,
+        "y": 1900,
         "wires": [
             [
-                "0bf3e6e25789e8ed"
-            ],
-            [
-                "72944f40983dd48a"
+                "0d919eefbea027b0"
             ]
         ]
     },
     {
-        "id": "d7b7ca782d735c65",
-        "type": "function",
-        "z": "d13820078197e616",
-        "name": "get vin by unit-transport",
-        "func": "let { unittransport } = msg.ori;\nmsg.sub = {\n    database: 'smart-asset',\n    design: 'truck',\n    view: 'by-unitID',\n    keys: unittransport.map(x => `[${x}]`),\n}\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 850,
-        "y": 2380,
-        "wires": [
-            [
-                "97a25293d9670d35"
-            ]
-        ]
-    },
-    {
-        "id": "97a25293d9670d35",
-        "type": "subflow:d7ccf53b2b9fe097",
+        "id": "fa674df40ae43995",
+        "type": "subflow:9ac4386f65a33996",
         "z": "d13820078197e616",
         "name": "",
-        "x": 840,
-        "y": 2420,
+        "x": 190,
+        "y": 2160,
         "wires": [
             [
-                "2cad50f70dbecc57"
+                "db8e8a575ae112e6"
             ]
         ]
-    },
-    {
-        "id": "0bf3e6e25789e8ed",
-        "type": "switch",
-        "z": "d13820078197e616",
-        "name": "",
-        "property": "ori.allUnit",
-        "propertyType": "msg",
-        "rules": [
-            {
-                "t": "true"
-            },
-            {
-                "t": "else"
-            }
-        ],
-        "checkall": "true",
-        "repair": false,
-        "outputs": 2,
-        "x": 610,
-        "y": 2320,
-        "wires": [
-            [
-                "3905735f60ecbeee"
-            ],
-            [
-                "d7b7ca782d735c65"
-            ]
-        ]
-    },
-    {
-        "id": "3905735f60ecbeee",
-        "type": "function",
-        "z": "d13820078197e616",
-        "name": "smart-asset by-vin",
-        "func": "msg.sub = {\n    database: 'smart-asset',\n    design: 'truck',\n    view: 'by-vin'\n}\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 830,
-        "y": 2260,
-        "wires": [
-            [
-                "1a122284d912662b"
-            ]
-        ]
-    },
-    {
-        "id": "1a122284d912662b",
-        "type": "subflow:d7ccf53b2b9fe097",
-        "z": "d13820078197e616",
-        "name": "",
-        "x": 860,
-        "y": 2300,
-        "wires": [
-            [
-                "7d1be67e600cac6e"
-            ]
-        ]
-    },
-    {
-        "id": "7d1be67e600cac6e",
-        "type": "function",
-        "z": "d13820078197e616",
-        "name": "msg.vinAsset",
-        "func": "let asset = msg.sub.rows.map(x => x.key);\nmsg.vinAsset = [].concat(...asset).filter(x => x != \"\");\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 890,
-        "y": 2340,
-        "wires": [
-            [
-                "95fabdc735812f68"
-            ]
-        ]
-    },
-    {
-        "id": "2cad50f70dbecc57",
-        "type": "function",
-        "z": "d13820078197e616",
-        "name": "msg.vinAsset",
-        "func": "msg.vinAsset = msg.sub.rows.filter(x => x.value != \"\").map(x => x.value.vin);\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 890,
-        "y": 2460,
-        "wires": [
-            [
-                "95fabdc735812f68"
-            ]
-        ]
-    },
-    {
-        "id": "72944f40983dd48a",
-        "type": "http response",
-        "z": "d13820078197e616",
-        "name": "",
-        "statusCode": "400",
-        "headers": {},
-        "x": 620,
-        "y": 2420,
-        "wires": []
-    },
-    {
-        "id": "95fabdc735812f68",
-        "type": "function",
-        "z": "d13820078197e616",
-        "name": "function 113",
-        "func": "const redisTS = global.get('redisTS');\nlet rs = redisTS.checkKey('*');\nlet vinAsset = msg.vinAsset;\nrs.then(keys => {\n    let vins = keys.map(x => x.split(':')[0]);\n    let vinTracking = [...new Set(vins)];\n    let vinAssetNotInTracking = vinAsset.filter(x => !vinTracking.includes(x));\n    let vinTrackingNotInAsset = vinTracking.filter(x => !vinAsset.includes(x));\n    msg.payload = { vinAsset, vinTracking, vinAssetNotInTracking, vinTrackingNotInAsset }\n    node.send(msg);\n})\n    .catch(err => {\n        msg.payload = msg;\n        node.send(msg);\n    });\nreturn null;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 1150,
-        "y": 2340,
-        "wires": [
-            [
-                "805c319aabca1c7d"
-            ]
-        ]
-    },
-    {
-        "id": "805c319aabca1c7d",
-        "type": "http response",
-        "z": "d13820078197e616",
-        "name": "",
-        "statusCode": "400",
-        "headers": {},
-        "x": 1160,
-        "y": 2380,
-        "wires": []
     },
     {
         "id": "bc39f3d827ecdc09",
@@ -19331,7 +20939,7 @@
         "type": "function",
         "z": "d27f5b11c2fa7b08",
         "name": "function 75",
-        "func": "let payload = [];\nlet counter = 0;\n// let data = [].concat(...msg.sub.rows.map(x => x.value.payload));\nlet data = msg.sub.rows.map(x => x.value);\nif (Array.isArray(data)) {\n    payload = data;\n    split();\n}\nreturn null;\n\nfunction split() {\n    if (counter < payload.length) {\n        node.send({\n            payload: payload[counter],\n            headers: {\n                \"x-arguments\": JSON.stringify({ \"x-message-ttl\": 10000 })\n            }\n        });\n        counter++;\n        setTimeout(split, 6000);\n    }\n}\nreturn msg;\n",
+        "func": "let data = msg.sub.rows.map(x => x.value);\nmsg.payload = data.map(x => {\n    return {\n        date: x.createdAt,\n        data: x.payload\n    }\n});\nreturn msg;\n",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -19696,7 +21304,7 @@
         "type": "function",
         "z": "d27f5b11c2fa7b08",
         "name": "dates",
-        "func": "let counter = 0;\nlet payload = [\n    '2023-12-12',\n    '2023-12-13',\n    '2023-12-18',\n    '2023-12-19',\n    '2023-12-20',\n    '2023-12-21',\n    '2023-12-22'\n];\nsplit();\nreturn null;\n\nfunction split() {\n    if (counter < payload.length) {\n        node.send({\n            payload: payload[counter]\n        });\n        counter++;\n        setTimeout(split, 25 * 60 * 1000);\n    }\n}",
+        "func": "let counter = 0;\nlet payload = [\n    '2023-12-12',\n    '2023-12-13',\n    '2023-12-18',\n    '2023-12-19',\n    '2023-12-20',\n    '2023-12-21',\n    '2023-12-22'\n];\nsplit();\nreturn null;\n\nfunction split() {\n    if (counter < payload.length) {\n        node.send({\n            payload: payload[counter]\n        });\n        counter++;\n        setTimeout(split, 1000);\n    }\n}",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -19749,7 +21357,7 @@
         "type": "function",
         "z": "d27f5b11c2fa7b08",
         "name": "function 107",
-        "func": "let payload = [];\nlet counter = 0;\n// let data = [].concat(...msg.sub.rows.map(x => x.value.payload));\nlet data = msg.sub.rows.map(x => x.value);\nif (Array.isArray(data)) {\n    payload = data;\n    split();\n}\nreturn null;\n\nfunction split() {\n    if (counter < payload.length) {\n        node.send({\n            payload: payload[counter],\n            headers: {\n                \"x-arguments\": JSON.stringify({ \"x-message-ttl\": 10000 })\n            }\n        });\n        counter++;\n        setTimeout(split, 6000);\n    }\n}\nreturn msg;\n",
+        "func": "let payload = [];\nlet counter = 0;\nlet data = msg.sub.rows.map(x => x.value);\nmsg.payload = data;\nmsg.headers = {\n    \"x-arguments\": JSON.stringify({ \"x-message-ttl\": 10000 })\n}\nreturn msg;\n",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -19778,6 +21386,36 @@
         "wires": []
     },
     {
+        "id": "3d8bb783f21cdd8c",
+        "type": "inject",
+        "z": "d27f5b11c2fa7b08",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "sub",
+                "v": "2023-12-12",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 140,
+        "y": 300,
+        "wires": [
+            [
+                "7437c9629891b0da"
+            ]
+        ]
+    },
+    {
         "id": "3180930ea2b7037b",
         "type": "amqp in",
         "z": "b5ec5e315779d1ba",
@@ -19790,7 +21428,7 @@
         "y": 80,
         "wires": [
             [
-                "e27e63558952908c"
+                "9891632cc378daaf"
             ]
         ]
     },
@@ -19809,8 +21447,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 710,
-        "y": 160,
+        "x": 450,
+        "y": 340,
         "wires": [
             [
                 "ce2dd45285cf765d"
@@ -19828,8 +21466,8 @@
         "arraySpltType": "len",
         "stream": false,
         "addname": "",
-        "x": 710,
-        "y": 200,
+        "x": 450,
+        "y": 380,
         "wires": [
             [
                 "2cd69a931af41fc5"
@@ -19848,8 +21486,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 720,
-        "y": 240,
+        "x": 460,
+        "y": 420,
         "wires": [
             [
                 "dcace8cdfca65d44"
@@ -19868,8 +21506,8 @@
         "paramsType": "json",
         "payloadType": "json",
         "block": false,
-        "x": 930,
-        "y": 160,
+        "x": 670,
+        "y": 340,
         "wires": [
             [
                 "4f8187cee4ac7c25"
@@ -19896,8 +21534,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 950,
-        "y": 200,
+        "x": 690,
+        "y": 380,
         "wires": [
             [
                 "1a64973410f81b95"
@@ -19919,8 +21557,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1140,
-        "y": 160,
+        "x": 880,
+        "y": 340,
         "wires": [
             [
                 "ace7f3a822df9b48"
@@ -19939,8 +21577,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1150,
-        "y": 240,
+        "x": 890,
+        "y": 420,
         "wires": [
             [
                 "27786af47b786cb8"
@@ -19952,8 +21590,8 @@
         "type": "subflow:943c8c2749f2d9d3",
         "z": "b5ec5e315779d1ba",
         "name": "",
-        "x": 1180,
-        "y": 280,
+        "x": 920,
+        "y": 460,
         "wires": [
             [
                 "1a64973410f81b95"
@@ -19965,8 +21603,8 @@
         "type": "subflow:a7f86da2f9168cf7",
         "z": "b5ec5e315779d1ba",
         "name": "",
-        "x": 1170,
-        "y": 200,
+        "x": 910,
+        "y": 380,
         "wires": [
             [
                 "510086dde7ae5c0b"
@@ -19989,8 +21627,8 @@
         "timeout": "",
         "count": "",
         "reduceRight": false,
-        "x": 1410,
-        "y": 200,
+        "x": 1150,
+        "y": 380,
         "wires": [
             [
                 "b8d7bb19c0eab9cc"
@@ -20009,8 +21647,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 500,
-        "y": 200,
+        "x": 240,
+        "y": 380,
         "wires": [
             [
                 "3b84606d10082c91"
@@ -20281,8 +21919,8 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1430,
-        "y": 240,
+        "x": 1170,
+        "y": 420,
         "wires": []
     },
     {
@@ -20479,8 +22117,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 480,
-        "y": 80,
+        "x": 220,
+        "y": 260,
         "wires": [
             [
                 "12580ffe69a13aa4"
@@ -20492,8 +22130,8 @@
         "type": "subflow:ef0e7b589320b81a",
         "z": "b5ec5e315779d1ba",
         "name": "",
-        "x": 490,
-        "y": 120,
+        "x": 230,
+        "y": 300,
         "wires": [
             [
                 "fd4b7ede2abecd13"
@@ -20624,11 +22262,68 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 470,
-        "y": 160,
+        "x": 210,
+        "y": 340,
         "wires": [
             [
                 "7a1aac7a55fb00ca"
+            ]
+        ]
+    },
+    {
+        "id": "3168b37a7c0c3913",
+        "type": "debug",
+        "z": "b5ec5e315779d1ba",
+        "name": "debug 196",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 490,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "9891632cc378daaf",
+        "type": "function",
+        "z": "b5ec5e315779d1ba",
+        "name": "function 114",
+        "func": "let payload = msg.payload;\nlet suffix = ['vehicleStatus', 'odometer', 'engineHours', 'longitude', 'latitude', 'altitude',\n    'heading', 'speed', 'positionDatetime', 'createdDatetime', 'printedTimezone'];\nlet vehicleStatusOptions = ['OFF', 'ON', 'MOVING', 'IDDLE'];\nlet needToAdd = [];\nlet needToCreate = [];\nfor (const load of payload) {\n    for (const rec of load.data) {\n        if (needToCreate.length == 0 || needToCreate.some(x => x.vin != rec.vin)) {\n            needToCreate.push({\n                vin: `${rec.vin}`,\n                createPayload: suffix.map(suf => {\n                    return {\n                        key: `${rec.vin}:${suf}`,\n                        retention: 0,\n                        duplicatePolicy: 'LAST',\n                        labels: ['type', 'vehicle-position', 'vin', rec.vin, 'topic', suf],\n                        encoding: 'UNCOMPRESSED'\n                    }\n                })\n            });\n        }\n        needToAdd.push({\n            key: `${rec.vin}:vehicleStatus`,\n            timestamp: new Date(rec.printed_timezone).getTime(),\n            value: vehicleStatusOptions.indexOf(rec.vehiclestatus)\n        });\n        needToAdd.push({\n            key: `${rec.vin}:odometer`,\n            timestamp: new Date(rec.printed_timezone).getTime(),\n            value: (rec.odometer) ? parseFloat(rec.odometer) : null\n        });\n        needToAdd.push({\n            key: `${rec.vin}:engineHours`,\n            timestamp: new Date(rec.printed_timezone).getTime(),\n            value: (rec.enginehours) ? parseFloat(rec.enginehours) : null\n        });\n        needToAdd.push({\n            key: `${rec.vin}:longitude`,\n            timestamp: new Date(rec.printed_timezone).getTime(),\n            value: rec.longitude\n        });\n        needToAdd.push({\n            key: `${rec.vin}:latitude`,\n            timestamp: new Date(rec.printed_timezone).getTime(),\n            value: rec.latitude\n        });\n        needToAdd.push({\n            key: `${rec.vin}:altitude`,\n            timestamp: new Date(rec.printed_timezone).getTime(),\n            value: (rec.altitude) ? parseFloat(rec.altitude) : null\n        });\n        needToAdd.push({\n            key: `${rec.vin}:heading`,\n            timestamp: new Date(rec.printed_timezone).getTime(),\n            value: (rec.heading) ? parseFloat(rec.heading) : null\n        });\n        needToAdd.push({\n            key: `${rec.vin}:speed`,\n            timestamp: new Date(rec.printed_timezone).getTime(),\n            value: (rec.speed) ? parseFloat(rec.speed) : null\n        });\n        needToAdd.push({\n            key: `${rec.vin}:positionDatetime`,\n            timestamp: new Date(rec.printed_timezone).getTime(),\n            value: new Date(rec.positiondatetime).getTime()\n        });\n        needToAdd.push({\n            key: `${rec.vin}:createdDatetime`,\n            timestamp: new Date(rec.printed_timezone).getTime(),\n            value: new Date(rec.createddatetime).getTime()\n        });\n        needToAdd.push({\n            key: `${rec.vin}:printedTimezone`,\n            timestamp: new Date(rec.printed_timezone).getTime(),\n            value: new Date(rec.printed_timezone).getTime()\n        });\n    }\n}\n\nmsg.payload = { needToCreate, needToAdd }\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 230,
+        "y": 120,
+        "wires": [
+            [
+                "0e11e5c593e08740"
+            ]
+        ]
+    },
+    {
+        "id": "0e11e5c593e08740",
+        "type": "function",
+        "z": "b5ec5e315779d1ba",
+        "name": "function 115",
+        "func": "const redisTS = global.get('redisTS');\nlet { needToCreate } = msg.payload;\n\n// redisTS.checkKeys(needToCreate.map(x => x.vin)).then(result => {\n//     let data = result.data;\n//     let payloads = needToCreate.filter(x => data.some(y => y.key == x && y.data.length == 0)).map(x => x.createPayload);\n//     redisTS.tsCreate(payloads).then(rs => {\n//         node.warn(rs);\n//     });\n// })\nmsg.payloads = needToCreate.map(x => x.createPayload);\n// redisTS.tsCreate(payloads).then(rs => {\n//     node.warn(rs);\n// });\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 490,
+        "y": 80,
+        "wires": [
+            [
+                "3168b37a7c0c3913"
             ]
         ]
     },
